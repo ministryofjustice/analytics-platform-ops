@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: r-shiny-example
+  labels:
+    app: r-shiny-example
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: r-shiny-example
+  ports:
+  - port: 80
+    targetPort: 3838

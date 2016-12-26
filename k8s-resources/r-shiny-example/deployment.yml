@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: r-shiny-example
+  labels:
+    app: r-shiny-example
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: r-shiny-example
+    spec:
+      containers:
+      - name: r-shiny-example
+        image: rocker/shiny
+        ports:
+        - containerPort: 3838
