@@ -7,3 +7,4 @@ data:
   use-proxy-protocol: "true"
   enable-sticky-sessions: "true"
   # enable-vts-status: "true"
+  server-name-hash-bucket-size: "128"
