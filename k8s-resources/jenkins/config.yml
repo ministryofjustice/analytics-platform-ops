@@ -1,0 +1,4 @@
+Master:
+  ServiceType: ClusterIP
+  ContainerPort: 8080
+  SlaveListenerPort: 50000
