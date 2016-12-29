@@ -1,0 +1,378 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "AnalyticsVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsSupport": true,
+        "EnableDnsHostnames": true
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {}
+    },
+    "DMZ0": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        },
+        "CidrBlock": "10.0.0.0/24",
+        "MapPublicIpOnLaunch": true
+      }
+    },
+    "DMZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "DMZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "SSHBastionASG": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": [
+          {
+            "Ref": "DMZ0"
+          },
+          {
+            "Ref": "DMZ1"
+          },
+          {
+            "Ref": "DMZ2"
+          }
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "SSHBastionLaunchConfig"
+        }
+      }
+    },
+    "NATGateway0": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "DMZ0"
+        }
+      }
+    },
+    "NATGateway1": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "dmz1"
+        }
+      }
+    },
+    "NATGateway2": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "dmz2"
+        }
+      }
+    },
+    "SSHBastionLaunchConfig": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "SecurityGroups": [
+          {
+            "Ref": "SSHBastionSG"
+          }
+        ]
+      }
+    },
+    "EC2VPCG1ZEO2": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        },
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "SSHBastionSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "EC2SRTA4ATSH": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "Main"
+        },
+        "SubnetId": {
+          "Ref": "dmz2"
+        }
+      }
+    },
+    "EC2SRTA2NJ46": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "Main"
+        },
+        "SubnetId": {
+          "Ref": "dmz1"
+        }
+      }
+    },
+    "EC2SRTA1CKJ0": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "Main"
+        },
+        "SubnetId": {
+          "Ref": "DMZ0"
+        }
+      }
+    },
+    "Local": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "Main"
+        }
+      }
+    },
+    "Internet": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "Main"
+        },
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      },
+      "DependsOn": [
+        "InternetGateway"
+      ]
+    },
+    "Main": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "PrivateRT0": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Private0Local": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT0"
+        }
+      }
+    },
+    "Private0Internet": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT0"
+        }
+      },
+      "DependsOn": [
+        "NATGateway0"
+      ]
+    },
+    "EC2SRTA2966H": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT0"
+        },
+        "SubnetId": {
+          "Ref": "Private0"
+        }
+      }
+    },
+    "EC2SRTA11HEX": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT0"
+        },
+        "SubnetId": {
+          "Ref": "Services0"
+        }
+      }
+    },
+    "Private1Local": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT1"
+        }
+      }
+    },
+    "Private1Internet": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT1"
+        }
+      },
+      "DependsOn": [
+        "NATGateway1"
+      ]
+    },
+    "Private2Local": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT2"
+        }
+      }
+    },
+    "Private2Internet": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT2"
+        }
+      },
+      "DependsOn": [
+        "NATGateway2"
+      ]
+    },
+    "EC2SRTA3V6YQ": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT1"
+        },
+        "SubnetId": {
+          "Ref": "Private1"
+        }
+      }
+    },
+    "EC2SRTADLC7": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT1"
+        },
+        "SubnetId": {
+          "Ref": "Services1"
+        }
+      }
+    },
+    "EC2SRTA57SVL": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT2"
+        },
+        "SubnetId": {
+          "Ref": "Private2"
+        }
+      }
+    },
+    "EC2SRTA2MXKF": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PrivateRT2"
+        },
+        "SubnetId": {
+          "Ref": "Services2"
+        }
+      }
+    },
+    "PrivateRT1": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "7ce67c1a-2ad3-4566-9414-48b9a7fce39d"
+        }
+      }
+    },
+    "PrivateRT2": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Private0": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Private1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Private2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Services0": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Services1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    },
+    "Services2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AnalyticsVPC"
+        }
+      }
+    }
+  }
+}
