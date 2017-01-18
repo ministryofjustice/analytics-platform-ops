@@ -8,13 +8,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - jenkins.apps.k8s-kops-test.integration.dsd.io
+    - jenkins.apps.analytics.kops.integration.dsd.io
     secretName: analytics-jenkins-tls
   rules:
-  - host: jenkins.apps.k8s-kops-test.integration.dsd.io
+  - host: jenkins.apps.analytics.kops.integration.dsd.io
     http:
       paths:
       - backend:
-          serviceName: analytics-jenkins
+          serviceName: ironic-lion-jenkins
           servicePort: 8080
         path: /
