@@ -2,3 +2,10 @@ Master:
   ServiceType: ClusterIP
   ContainerPort: 8080
   SlaveListenerPort: 50000
+
+Persistence:
+  Enabled: false
+
+Agent:
+  Image: kerin/jnlp-slave-analytics
+  ImageTag: latest
