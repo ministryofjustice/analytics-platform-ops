@@ -1,4 +1,7 @@
 node {
+
+    git "https://github.com/ministryofjustice/analytics-qnd-ops.git"
+
     stage ("Apply default namespace resources") {
         sh """
         for f in k8s-templates/user-base/default-namespace/*
