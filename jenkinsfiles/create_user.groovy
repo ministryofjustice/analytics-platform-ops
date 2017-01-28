@@ -1,6 +1,7 @@
 node {
     stage ("Apply default namespace resources") {
         sh """
+        ls -ln k8s-templates/user-resources/default-namespace/
         for f in k8s-templates/user-resources/default-namespace/*
         do
             cat \$f | sed \\
