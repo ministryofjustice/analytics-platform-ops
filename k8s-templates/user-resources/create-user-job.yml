@@ -29,6 +29,8 @@ spec:
             GROUP=staff
             HOMES=/home
 
+            echo "Adding user: $USER"
+
             if [ "$(ls -A ${HOMES})" ]; then
                 # If /home isn't empty, get the highest current UID and increment by 1
                 NEW_UID=$(($(ls -ln ${HOMES} | awk '{print $3}' | sort -n | tail -n 1)+1))
