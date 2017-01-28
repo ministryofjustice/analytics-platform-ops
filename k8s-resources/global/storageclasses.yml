@@ -1,0 +1,40 @@
+# ---
+# kind: StorageClass
+# apiVersion: storage.k8s.io/v1beta1
+# metadata:
+#   name: standard
+#   annotations:
+#     storageclass.beta.kubernetes.io/is-default-class: "true"
+# provisioner: kubernetes.io/aws-ebs
+# parameters:
+#   type: gp2
+
+# ---
+# kind: StorageClass
+# apiVersion: storage.k8s.io/v1beta1
+# metadata:
+#   name: standard-eu-west-1a
+# provisioner: kubernetes.io/aws-ebs
+# parameters:
+#   type: gp2
+#   zone: eu-west-1a
+
+# ---
+# kind: StorageClass
+# apiVersion: storage.k8s.io/v1beta1
+# metadata:
+#   name: standard-eu-west-1b
+# provisioner: kubernetes.io/aws-ebs
+# parameters:
+#   type: gp2
+#   zone: eu-west-1b
+
+# ---
+# kind: StorageClass
+# apiVersion: storage.k8s.io/v1beta1
+# metadata:
+#   name: standard-eu-west-1c
+# provisioner: kubernetes.io/aws-ebs
+# parameters:
+#   type: gp2
+#   zone: eu-west-1c
