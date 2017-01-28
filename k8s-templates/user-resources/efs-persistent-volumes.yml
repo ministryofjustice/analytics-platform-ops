@@ -13,18 +13,18 @@ spec:
     server: {{.EFSHostname}}
     path: "/"
 
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-home-{{.Username}}
-  labels:
-    user: {{.Username}}
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: {{.EFSHostname}}
-    path: "/{{.Username}}"
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: nfs-home-{{.Username}}
+#   labels:
+#     user: {{.Username}}
+# spec:
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteMany
+#   nfs:
+#     server: {{.EFSHostname}}
+#     path: "/{{.Username}}"

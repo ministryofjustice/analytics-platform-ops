@@ -21,8 +21,8 @@ spec:
           - "while true; do sleep; done"
         volumeMounts:
           - name: home
-            mountPath: "/home/{{.Username}}"
+            mountPath: "/home"
       volumes:
       - name: home
         persistentVolumeClaim:
-          claimName: nfs-home
+          claimName: nfs-homes
