@@ -1,9 +1,4 @@
 node {
-
-    stage ("Checkout") {
-        git url: 'https://github.com/ministryofjustice/analytics-qnd-ops.git'
-    }
-
     stage ("Create namespace") {
 sh """
 cat <<EOF | kubectl apply -f -
