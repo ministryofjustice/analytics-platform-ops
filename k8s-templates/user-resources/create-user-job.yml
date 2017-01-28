@@ -12,8 +12,6 @@ spec:
       - name: create-user
         image: ubuntu:16.04
         env:
-          - name: NAMESPACE_PREFIX
-            value: "user-"
           - name: NAMESPACE
             valueFrom:
               fieldRef:
@@ -25,7 +23,7 @@ spec:
             #!/bin/bash
             set -e
 
-            USER=$(echo $NAMESPACE | sed 's/^${NAMESPACE_PREFIX}//g')
+            USER=$(echo $NAMESPACE | sed 's/^user-//')
             GROUP=staff
             HOMES=/home
 
