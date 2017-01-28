@@ -28,7 +28,11 @@ variable "zones" {
   ]
 }
 
-variable "cidr_blocks_rds" {
+variable "node_security_group_id" {
+  type = "string"
+}
+
+variable "cidr_blocks_storage" {
   type = "list"
 
   default = [
