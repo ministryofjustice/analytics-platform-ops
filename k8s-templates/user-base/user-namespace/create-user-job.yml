@@ -11,9 +11,8 @@ spec:
       containers:
       - name: create-user
         image: ubuntu:16.04
-        command:
-          - ["useradd", "-u", "1001", "-g", "1001", "-m",
-             "-d", "/home/{{.Username}}", "{{.Username}}"]
+        command: ["useradd", "-u", "1001", "-g", "1001", "-m",
+                  "-d", "/home/{{.Username}}", "{{.Username}}"]
         volumeMounts:
           - name: homes
             mountPath: "/home"
