@@ -21,7 +21,7 @@ node {
             cat \$f | sed \\
                 -e 's/{{\\.Username}}/${env.USERNAME}/g' \\
                 -e 's/{{\\.EFSHostname}}/${env.EFS_HOSTNAME}/g' | \\
-            kubectl apply -f -n user-${env.USERNAME} -
+            kubectl apply -n user-${env.USERNAME} -f -
         done
         """
     }
