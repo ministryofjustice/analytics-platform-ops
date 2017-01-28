@@ -10,7 +10,7 @@ spec:
       containers:
       - name: ubuntu
         image: ubuntu:16.04
-        command: ["useradd", "-u", "1001", "-g", "1001", "-m",
+        command: ["useradd", "-u", "1001", "-g", "staff", "-m",
                   "-d", "/home/{{.Username}}", "{{.Username}}"]
         volumeMounts:
           - name: homes
