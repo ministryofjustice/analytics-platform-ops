@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-user
+  namespace: user-{{.Username}}
+spec:
+  template:
+    metadata:
+      name: create-user
+    spec:
+      containers:
+      - name: create-user
+        image: ubuntu:16.04
+        env:
+          - name: NAMESPACE_PREFIX
+            value: "user-"
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        command:
+          - /bin/sh
+          - -c
+          - |
+            #!/bin/bash
+            set -e
+
+            USER=$(echo $NAMESPACE | sed 's/^${NAMESPACE_PREFIX}//g')
+            GROUP=staff
+            HOMES=/home
+
+            if [ "$(ls -A ${HOMES})" ]; then
+                # If /home isn't empty, get the highest current UID and increment by 1
+                NEW_UID=$(($(ls -ln ${HOMES} | awk '{print $3}' | sort -n | tail -n 1)+1))
+            else
+                # Default
+                NEW_UID=1001
+            fi
+
+            useradd -u $NEW_UID -g $GROUP -m -d /home/$USER $USER
+        volumeMounts:
+          - name: homes
+            mountPath: "/home"
+      restartPolicy: Never
+      volumes:
+      - name: homes
+        persistentVolumeClaim:
+          claimName: nfs-homes
