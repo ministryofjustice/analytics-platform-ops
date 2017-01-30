@@ -1,0 +1,76 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: r-studio-{{.Username}}
+  labels:
+    app: r-studio-{{.Username}}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: r-studio-{{.Username}}
+    spec:
+      containers:
+
+        - name: rstudio-auth-proxy
+          image: kerin/rstudio-auth-proxy:v12
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-config
+                  key: client_secret
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-config
+                  key: client_id
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-config
+                  key: domain
+            - name: AUTH0_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-config-{{.Username}}
+                  key: callback_url
+            - name: COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-config-{{.Username}}
+                  key: cookie_secret
+            - name: SHINY_HOST
+              value: localhost
+            - name: SHINY_PORT
+              value: "8787"
+            - name: PORT
+              value: "3000"
+          resources:
+            requests:
+              cpu: 10m
+
+        - name: r-studio-server
+          image: kerin/analytics-r-studio-pro:v4
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8787
+          resources:
+            requests:
+              cpu: 200m
+          env:
+            - name: USER
+              value: alice
+          volumeMounts:
+            - name: home
+              mountPath: "/home/{{.Username}}"
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: nfs-home-{{.Username}}

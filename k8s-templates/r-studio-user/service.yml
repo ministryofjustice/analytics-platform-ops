@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: r-studio-{{.Username}}
+  labels:
+    app: r-studio-{{.Username}}
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: r-studio-{{.Username}}
+  ports:
+  - port: 80
+    targetPort: 3000
