@@ -44,7 +44,7 @@ proxy.on('proxyReq', function(proxyReq, req, res, options) {
   setIfExists(proxyReq, 'x-auth0-locale', req.user._json.locale);
 
   setIfExists(proxyReq, 'X-RStudio-Username',
-              emailToUsername(req.user._json.email));
+              emailToUsername(req.user._json.nickname));
 });
 
 
@@ -71,6 +71,10 @@ router.get('/callback',
 
 /* Proxy RStudio login URL */
 router.all('/auth-sign-in', function(req, res, next) {
+  proxy.web(req, res);
+});
+
+router.all('/favicon.ico', function(req, res, next) {
   proxy.web(req, res);
 });
 
