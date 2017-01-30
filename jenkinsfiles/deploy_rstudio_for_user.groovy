@@ -4,12 +4,12 @@ node {
 
     stage ("Deploy RStudio") {
         sh """
+        USERNAME=${env.USERNAME}
+        CALLBACK_URL=$(echo -n "https://r-studio.${env.USERNAME}.users.analytics.kops.integration.dsd.io/callback"|base64)
+        COOKIE_SECRET=$(echo -n "${env.COOKIE_SECRET}"|base64)
+
         for f in k8s-templates/r-studio-user/*
         do
-            USERNAME=${env.USERNAME}
-            CALLBACK_URL=$(echo -n "https://r-studio.${env.USERNAME}.users.analytics.kops.integration.dsd.io/callback"|base64)
-            COOKIE_SECRET=$(echo -n "${env.COOKIE_SECRET}"|base64)
-
             cat \$f | sed \\
                 -e s/{{\\.Username}}/\${USERNAME}/g \\
                 -e s/{{\\.CallbackURLB64}}/\${CALLBACK_URL}/g \\
