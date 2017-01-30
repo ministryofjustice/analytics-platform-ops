@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: r-studio-example
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - r-studio-example.apps.analytics.kops.integration.dsd.io
+    secretName: r-studio-example-tls
+  rules:
+  - host: r-studio-example.apps.analytics.kops.integration.dsd.io
+    http:
+      paths:
+      - backend:
+          serviceName: r-studio-example
+          servicePort: 80
+        path: /

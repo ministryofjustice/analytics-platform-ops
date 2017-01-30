@@ -1,16 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: ubuntu
-  namespace: user-{{.Username}}
+  name: ubuntu-{{.Username}}
   labels:
-    app: ubuntu
+    app: ubuntu-{{.Username}}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: ubuntu
+        app: ubuntu-{{.Username}}
     spec:
       containers:
       - name: ubuntu
@@ -25,4 +24,4 @@ spec:
       volumes:
       - name: home
         persistentVolumeClaim:
-          claimName: nfs-home
+          claimName: nfs-home-{{.Username}}

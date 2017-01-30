@@ -1,0 +1,82 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: r-studio-example
+  labels:
+    app: r-studio-example
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: r-studio-example
+    spec:
+      containers:
+
+        - name: rstudio-auth-proxy
+          image: kerin/rstudio-auth-proxy:v8
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-example-auth
+                  key: client_secret
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-example-auth
+                  key: client_id
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-example-auth
+                  key: domain
+            - name: AUTH0_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-example-auth
+                  key: callback_url
+            - name: COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-example-auth
+                  key: cookie_secret
+            - name: SHINY_HOST
+              value: localhost
+            - name: SHINY_PORT
+              value: "8787"
+            - name: PORT
+              value: "3000"
+          resources:
+            requests:
+              cpu: 10m
+
+        - name: r-studio-server
+          image: kerin/analytics-r-studio-pro:v7
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8787
+          resources:
+            requests:
+              cpu: 200m
+          env:
+            - name: USERS_PATH
+              value: /etc/rstudio-config/rstudio.users
+          volumeMounts:
+            - name: r-studio-nfs
+              mountPath: "/mnt"
+            - name: config-volume
+              mountPath: /etc/rstudio-config/
+
+      volumes:
+      - name: r-studio-nfs
+        persistentVolumeClaim:
+          claimName: r-studio-pvc
+      - name: config-volume
+        configMap:
+          name: r-studio-example
