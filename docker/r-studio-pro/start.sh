@@ -32,5 +32,5 @@ USER_UID=1001
   #   && addgroup rstudio staff \
 useradd -g $GROUP -u $USER_UID -d /home/$USER $USER
 
-echo "auth-proxy-sign-in-url=https://${USER}.r-studio.apps.analytics.kops.integration.dsd.io/login" >> /etc/rstudio/rserver.conf
+echo "auth-proxy-sign-in-url=https://${USER}.r-studio.users.analytics.kops.integration.dsd.io/login" >> /etc/rstudio/rserver.conf
 /usr/lib/rstudio-server/bin/rserver --server-daemonize 0
