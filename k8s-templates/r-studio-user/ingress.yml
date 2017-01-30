@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - r-studio.{{.Username}}.users.analytics.kops.integration.dsd.io
+    - {{.Username}}.r-studio.users.analytics.kops.integration.dsd.io
     secretName: users-{{.Username}}-rstudio-tls
   rules:
-  - host: r-studio.{{.Username}}.users.analytics.kops.integration.dsd.io
+  - host: {{.Username}}.r-studio.users.analytics.kops.integration.dsd.io
     http:
       paths:
       - backend:

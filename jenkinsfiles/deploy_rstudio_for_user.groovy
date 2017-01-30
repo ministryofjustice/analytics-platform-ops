@@ -4,7 +4,7 @@ node {
 
     stage ("Deploy RStudio") {
         sh """
-        CALLBACK_URL=\$(echo -n "https://r-studio.${env.USERNAME}.users.analytics.kops.integration.dsd.io/callback"|base64 -w 0)
+        CALLBACK_URL=\$(echo -n "https://${env.USERNAME}.r-studio.users.analytics.kops.integration.dsd.io/callback"|base64 -w 0)
         COOKIE_SECRET=\$(echo -n "${env.COOKIE_SECRET}"|base64 -w 0)
 
         for f in k8s-templates/r-studio-user/*
