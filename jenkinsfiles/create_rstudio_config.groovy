@@ -9,7 +9,7 @@ node {
             cat \$f | sed \\
                 -e s/{{\\.ClientSecretB64}}/${env.CLIENT_SECRET}/g \\
                 -e s/{{\\.ClientIDB64}}/${env.CLIENT_ID}/g \\
-                -e s/{{\\.Domain}}/${env.DOMAIN}/g | \\
+                -e s/{{\\.DomainB64}}/${env.DOMAIN}/g | \\
             kubectl apply -f -
         done
         """
