@@ -52,6 +52,7 @@ RUN apt-get update \
   && git config --system push.default simple
 
 RUN echo "server-access-log=1" >> /etc/rstudio/rserver.conf
+RUN echo "server-project-sharing=0" >> /etc/rstudio/rserver.conf
 RUN echo "auth-proxy=1" >> /etc/rstudio/rserver.conf
 
 COPY userconf.sh /etc/cont-init.d/conf
