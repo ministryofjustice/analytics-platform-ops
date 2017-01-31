@@ -28,23 +28,22 @@ var setIfExists = function(proxyReq, header, value){
   }
 }
 
-var emailToUsername = function(email){
-  return email.toLowerCase()
-    .replace(/.gov.uk$/g, '')
-    .replace(/[^a-z0-9_]/g, '-')
-    .slice(0, 31);
-}
-
 proxy.on('proxyReq', function(proxyReq, req, res, options) {
-  setIfExists(proxyReq, 'x-auth0-nickname', req.user._json.nickname);
-  setIfExists(proxyReq, 'x-auth0-user_id', req.user._json.user_id);
-  setIfExists(proxyReq, 'x-auth0-email', req.user._json.email);
-  setIfExists(proxyReq, 'x-auth0-name', req.user._json.name);
-  setIfExists(proxyReq, 'x-auth0-picture', req.user._json.picture);
-  setIfExists(proxyReq, 'x-auth0-locale', req.user._json.locale);
+  if(req.user){
+    // setIfExists(proxyReq, 'x-auth0-nickname', req.user._json.nickname);
+    // setIfExists(proxyReq, 'x-auth0-user_id', req.user._json.user_id);
+    // setIfExists(proxyReq, 'x-auth0-email', req.user._json.email);
+    // setIfExists(proxyReq, 'x-auth0-name', req.user._json.name);
+    // setIfExists(proxyReq, 'x-auth0-picture', req.user._json.picture);
+    // setIfExists(proxyReq, 'x-auth0-locale', req.user._json.locale);
+    //setIfExists(proxyReq, 'X-RStudio-Username', req.user._json.nickname);
 
-  setIfExists(proxyReq, 'X-RStudio-Username',
-              emailToUsername(req.user._json.nickname));
+    // make sure Github usernames are lowercased - username is used in k8s resource labels,
+    // which only allow lowercase
+    if(req.user.__json && req.user.__json.nickname){
+      proxyReq.setHeader('X-RStudio-Username', req.user.__json.nickname.toLowerCase())
+    }
+  }
 });
 
 
