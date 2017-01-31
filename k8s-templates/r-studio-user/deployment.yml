@@ -14,7 +14,7 @@ spec:
       containers:
 
         - name: rstudio-auth-proxy
-          image: kerin/rstudio-auth-proxy:v16
+          image: kerin/rstudio-auth-proxy:v15
           imagePullPolicy: Always
           ports:
             - name: http
@@ -51,12 +51,12 @@ spec:
               value: "8787"
             - name: PORT
               value: "3000"
-          readinessProbe:
-            httpGet:
-              path: /login
-              port: http
-            initialDelaySeconds: 3
-            periodSeconds: 2
+          # readinessProbe:
+          #   httpGet:
+          #     path: /login
+          #     port: http
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 2
           resources:
             requests:
               cpu: 10m
