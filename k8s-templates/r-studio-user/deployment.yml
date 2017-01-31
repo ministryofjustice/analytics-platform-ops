@@ -14,7 +14,7 @@ spec:
       containers:
 
         - name: rstudio-auth-proxy
-          image: kerin/rstudio-auth-proxy:v15
+          image: kerin/rstudio-auth-proxy:v20
           imagePullPolicy: Always
           ports:
             - name: http
