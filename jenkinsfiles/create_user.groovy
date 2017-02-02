@@ -1,6 +1,6 @@
 node {
 
-    git "https://github.com/ministryofjustice/analytics-qnd-ops.git"
+    checkout scm
 
     stage ("Apply resources") {
         sh """
