@@ -57,9 +57,13 @@ spec:
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
-          # resources:
-          #   requests:
-          #     cpu: 10m
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 10m
+            limits:
+              memory: 128Mi
+              cpu: 100m
 
         - name: r-studio-server
           image: kerin/analytics-r-studio-pro:v13
@@ -67,9 +71,13 @@ spec:
           ports:
             - name: http
               containerPort: 8787
-          # resources:
-          #   requests:
-          #     cpu: 200m
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limit:
+              memory: 512Mi
+              cpu: 500m
           env:
             - name: USER
               value: {{.Username}}
