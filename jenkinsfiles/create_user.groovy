@@ -19,6 +19,7 @@ node {
         do
             cat \$f \\
             | sed \\
+                -e s/{{\\.Username}}/\$USERNAME/g \\
                 -e s/{{\\.RequestCPU}}/${env.REQUEST_CPU}/g \\
                 -e s/{{\\.RequestMemory}}/${env.REQUEST_MEMORY}/g \\
                 -e s/{{\\.LimitsCPU}}/${env.LIMITS_CPU}/g \\
