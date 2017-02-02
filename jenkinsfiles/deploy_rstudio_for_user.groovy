@@ -13,7 +13,7 @@ node {
 
         for f in k8s-templates/r-studio-user/*
         do
-            cat \$f
+            cat \$f \\
             | sed \\
                 -e s/{{\\.Username}}/\${USERNAME}/g \\
                 -e s/{{\\.ClientSecretB64}}/\${CLIENT_SECRET}/g \\
