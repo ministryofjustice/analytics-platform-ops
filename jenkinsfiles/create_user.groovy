@@ -6,7 +6,7 @@ node {
         sh """
         USERNAME=\$(echo '${env.USERNAME}' | tr '[:upper:]' '[:lower:]')
 
-        for f in user-base/default-namespace/*
+        for f in k8s-templates/user-base/default-namespace/*
         do
             cat \$f \
             | sed \
@@ -15,7 +15,7 @@ node {
             | kubectl apply -f -
         done
 
-        for f in user-base/user-namespace/*
+        for f in k8s-templates/user-base/user-namespace/*
         do
             cat \$f \
             | sed -e s/{{\\.Username}}/\$USERNAME/g \
