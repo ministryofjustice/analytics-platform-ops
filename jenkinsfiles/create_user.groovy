@@ -10,15 +10,15 @@ node {
         do
             cat \$f \
             | sed \
-                -e s/{{\.Username}}/\$USERNAME/g \
-                -e s/{{\.EFSHostname}}/${env.EFS_HOSTNAME}/g \
+                -e s/{{\\.Username}}/\$USERNAME/g \
+                -e s/{{\\.EFSHostname}}/${env.EFS_HOSTNAME}/g \
             | kubectl apply -f -
         done
 
         for f in user-base/user-namespace/*
         do
             cat $f \
-            | sed -e s/{{.Username}}/\$USERNAME/g \
+            | sed -e s/{{\\.Username}}/\$USERNAME/g \
             | kubectl apply -n user-\$USERNAME -f -
         done
         """
