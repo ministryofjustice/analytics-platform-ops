@@ -1,15 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: r-studio-{{.Username}}
+  name: r-studio
   labels:
-    app: r-studio-{{.Username}}
+    app: r-studio
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: r-studio-{{.Username}}
+        app: r-studio
     spec:
       containers:
 
@@ -38,12 +38,12 @@ spec:
             - name: AUTH0_CALLBACK_URL
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config-{{.Username}}
+                  name: r-studio-config
                   key: callback_url
             - name: COOKIE_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config-{{.Username}}
+                  name: r-studio-config
                   key: cookie_secret
             - name: SHINY_HOST
               value: localhost
@@ -85,4 +85,4 @@ spec:
       volumes:
         - name: home
           persistentVolumeClaim:
-            claimName: nfs-home-{{.Username}}
+            claimName: nfs-home

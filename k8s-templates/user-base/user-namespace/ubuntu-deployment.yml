@@ -1,0 +1,27 @@
+# apiVersion: extensions/v1beta1
+# kind: Deployment
+# metadata:
+#   name: ubuntu-{{.Username}}
+#   labels:
+#     app: ubuntu-{{.Username}}
+# spec:
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: ubuntu-{{.Username}}
+#     spec:
+#       containers:
+#       - name: ubuntu
+#         image: ubuntu:16.04
+#         command:
+#           - /bin/sh
+#           - -c
+#           - "while true; do sleep 100; done"
+#         volumeMounts:
+#           - name: home
+#             mountPath: "/home/{{.Username}}"
+#       volumes:
+#       - name: home
+#         persistentVolumeClaim:
+#           claimName: nfs-home-{{.Username}}

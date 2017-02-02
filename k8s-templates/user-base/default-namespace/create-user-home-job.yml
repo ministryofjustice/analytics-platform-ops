@@ -2,10 +2,11 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: create-user-home-{{.Username}}
+  namespace: default
 spec:
   template:
     metadata:
-      name: create-user-home-{{.Username}}
+      name: create-user-home
     spec:
       containers:
       - name: ubuntu
