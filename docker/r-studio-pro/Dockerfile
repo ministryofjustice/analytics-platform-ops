@@ -26,6 +26,7 @@ RUN apt-get update \
     sudo \
     wget \
     rrdtool \
+    openssh-client \
   && wget -q https://download2.rstudio.org/rstudio-server-pro-1.0.136-amd64.deb \
   && dpkg -i rstudio-server-pro-1.0.136-amd64.deb \
   && rm rstudio-server-pro-*-amd64.deb \
@@ -53,6 +54,7 @@ RUN apt-get update \
 
 RUN echo "server-access-log=1" >> /etc/rstudio/rserver.conf
 RUN echo "server-project-sharing=0" >> /etc/rstudio/rserver.conf
+RUN echo "server-health-check-enabled=1" >> /etc/rstudio/rserver.conf
 RUN echo "auth-proxy=1" >> /etc/rstudio/rserver.conf
 
 COPY userconf.sh /etc/cont-init.d/conf

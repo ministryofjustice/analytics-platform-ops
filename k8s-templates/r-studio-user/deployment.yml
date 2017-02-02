@@ -14,7 +14,7 @@ spec:
       containers:
 
         - name: rstudio-auth-proxy
-          image: kerin/rstudio-auth-proxy:v20
+          image: kerin/rstudio-auth-proxy:v22
           imagePullPolicy: Always
           ports:
             - name: http
@@ -51,18 +51,18 @@ spec:
               value: "8787"
             - name: PORT
               value: "3000"
-          # readinessProbe:
-          #   httpGet:
-          #     path: /login
-          #     port: http
-          #   initialDelaySeconds: 3
-          #   periodSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             requests:
               cpu: 10m
 
         - name: r-studio-server
-          image: kerin/analytics-r-studio-pro:v8
+          image: kerin/analytics-r-studio-pro:v10
           imagePullPolicy: Always
           ports:
             - name: http
@@ -73,6 +73,12 @@ spec:
           env:
             - name: USER
               value: {{.Username}}
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           volumeMounts:
             - name: home
               mountPath: "/home/{{.Username}}"
