@@ -75,7 +75,7 @@ spec:
             requests:
               memory: 256Mi
               cpu: 250m
-            limit:
+            limits:
               memory: 512Mi
               cpu: 500m
           env:
