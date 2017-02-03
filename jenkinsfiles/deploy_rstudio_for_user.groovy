@@ -11,7 +11,7 @@ node {
         CALLBACK_URL=\$(echo -n "https://\${USERNAME}.rstudio.users.analytics.kops.integration.dsd.io/callback"|base64 -w 0)
         COOKIE_SECRET=\$(echo -n "${env.COOKIE_SECRET}"|base64 -w 0)
         AWS_ACCESS_KEY_ID=\$(echo -n "${env.AWS_ACCESS_KEY_ID}"|base64 -w 0)
-        AWS_SECRET_ACCESS_KEY=$(echo -n "${AWS_SECRET_ACCESS_KEY}"|base64 -w 0)
+        AWS_SECRET_ACCESS_KEY=\$(echo -n "${AWS_SECRET_ACCESS_KEY}"|base64 -w 0)
 
         for f in k8s-templates/r-studio-user/*
         do
