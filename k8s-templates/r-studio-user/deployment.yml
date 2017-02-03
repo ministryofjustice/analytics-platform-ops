@@ -74,10 +74,10 @@ spec:
           resources:
             requests:
               memory: 512Mi
-              cpu: 500m
+              cpu: 250m
             limits:
               memory: 1Gi
-              cpu: 1
+              cpu: 500m
           env:
             - name: USER
               value: {{.Username}}
