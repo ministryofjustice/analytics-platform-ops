@@ -66,7 +66,7 @@ spec:
               cpu: 100m
 
         - name: r-studio-server
-          image: kerin/analytics-r-studio-pro:v13
+          image: kerin/analytics-r-studio-pro:v14
           imagePullPolicy: Always
           ports:
             - name: http
