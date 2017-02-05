@@ -1,5 +1,4 @@
 /aws/terraform/terraform.tfvars
 .terraform
 *.tfstate*
-*.tfvars
 *.tgz
