@@ -1,23 +1,32 @@
 #!/bin/bash
 set -ex
 
-if [ $# -lt 2 ]; then
-  echo 1>&2 "$0: Arguments: KOPS_STATE_STORE_BUCKET SSH_PUBLIC_KEY_PATH"
+if [ $# -lt 1 ]; then
+  echo 1>&2 "$0: Arguments: SSH_PUBLIC_KEY_PATH"
   exit 2
 fi
 
-KOPS_STATE_STORE=s3://${1}
-SSH_PUBLIC_KEY=${2}
+# Get Kops state bucket name from 'base' terraform
+CWD=$(pwd)
+cd ../base
+terraform refresh \
+    -var-file terraform.tfvars \
+    -var-file ../global_terraform.tfvars
+KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
+cd $CWD
+
+
+SSH_PUBLIC_KEY=${1}
 
 KUBERNETES_VERSION=1.5.1
 CHANNEL=alpha
 NETWORKING=calico
 MASTER_SIZE=t2.medium
 NODE_COUNT=3
-NODE_SIZE=m4.xlarge
+NODE_SIZE=m4.large
 
-CLUSTER_NAME=$(terraform output dns_zone_domain)
-DNS_ZONE=$(terraform output dns_zone_id)
+CLUSTER_NAME=$(terraform output --module=cluster_dns dns_zone_domain)
+DNS_ZONE=$(terraform output --module=cluster_dns dns_zone_id)
 NETWORK_CIDR=$(terraform output --module=aws_vpc cidr)
 VPC_ID=$(terraform output --module=aws_vpc vpc_id)
 MASTER_ZONES=$(terraform output --module=aws_vpc availability_zones)

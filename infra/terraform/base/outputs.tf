@@ -13,3 +13,7 @@ output "xyz_dns_zone_name" {
 output "xyz_root_domain" {
     value = "${var.xyz_root_domain}"
 }
+
+output "kops_bucket_name" {
+    value = "${var.kops_bucket_name}"
+}
