@@ -25,7 +25,6 @@ resource "aws_subnet" "storage" {
   count = "${length(var.availability_zones)}"
 
   tags = {
-    KubernetesCluster = "${var.name}"
     Name = "storage-${element(var.availability_zones, count.index)}.${var.name}"
   }
 }
