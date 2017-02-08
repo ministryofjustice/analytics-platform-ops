@@ -1,11 +1,16 @@
 variable "name" {}
 variable "cidr" {}
 variable "availability_zones" {
-    default = [
-        "eu-west-1a",
-        "eu-west-1b",
-        "eu-west-1c"
-    ]
+    type = "list"
+}
+variable "storage_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "192.168.20.0/24",
+    "192.168.24.0/24",
+    "192.168.28.0/24"
+  ]
 }
 
 
@@ -19,6 +24,10 @@ output "cidr" {
 
 output "availability_zones" {
     value = "${join(",", var.availability_zones)}"
+}
+
+output "storage_subnet_ids" {
+    value = ["${aws_subnet.storage.*.id}"]
 }
 
 output "extra_node_sg_id" {

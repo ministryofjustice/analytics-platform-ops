@@ -17,3 +17,15 @@ resource "aws_internet_gateway" "igw" {
         Cluster = "${var.name}"
     }
 }
+
+resource "aws_subnet" "storage" {
+  vpc_id = "${aws_vpc.main.id}"
+  cidr_block = "${element(var.storage_cidr_blocks, count.index)}"
+  availability_zone = "${element(var.availability_zones, count.index)}"
+  count = "${length(var.availability_zones)}"
+
+  tags = {
+    KubernetesCluster = "${var.name}"
+    Name = "storage-${element(var.availability_zones, count.index)}.${var.name}"
+  }
+}
