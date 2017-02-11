@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: nginx-ingress-controller
   namespace: kube-system
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "True"
   labels:
     app: nginx-ingress-controller
 spec:
