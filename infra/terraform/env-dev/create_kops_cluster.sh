@@ -32,6 +32,7 @@ VPC_ID=$(terraform output --module=aws_vpc vpc_id)
 MASTER_ZONES=$(terraform output --module=aws_vpc availability_zones)
 ZONES=$(terraform output --module=aws_vpc availability_zones)
 NODE_SECURITY_GROUPS=$(terraform output --module=aws_vpc extra_node_sg_id)
+MASTER_SECURITY_GROUPS=$(terraform output --module=aws_vpc extra_master_sg_id)
 
 
 kops create cluster \
@@ -52,4 +53,5 @@ kops create cluster \
     --ssh-public-key=$SSH_PUBLIC_KEY \
     --zones=$ZONES \
     --state=$KOPS_STATE_STORE \
+    --master-security-groups=$MASTER_SECURITY_GROUPS \
     --vpc=$VPC_ID
