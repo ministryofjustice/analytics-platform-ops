@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - grafana.tools.analytics.kops.integration.dsd.io
+    - grafana.services.dev.mojanalytics.xyz
     secretName: monitoring-grafana-tls
   rules:
-  - host: grafana.tools.analytics.kops.integration.dsd.io
+  - host: grafana.services.dev.mojanalytics.xyz
     http:
       paths:
       - backend:
