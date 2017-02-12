@@ -33,3 +33,7 @@ output "storage_subnet_ids" {
 output "extra_node_sg_id" {
     value = "${aws_security_group.node_extra.id}"
 }
+
+output "extra_master_sg_id" {
+    value = "${aws_security_group.master_extra.id}"
+}
