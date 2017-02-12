@@ -1,0 +1,15 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: influxdb-volume
+  namespace: kube-system
+  labels:
+    task: monitoring
+    k8s-app: influxdb
+    kubernetes.io/name: monitoring-grafana
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
