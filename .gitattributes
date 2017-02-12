@@ -1,3 +1,4 @@
 secretfile filter=git-crypt diff=git-crypt
 *.tfvars filter=git-crypt diff=git-crypt
-env-ingress/**/* filter=git-crypt diff=git-crypt
+env-ingress/**/*.yml filter=git-crypt diff=git-crypt
+env-ingress/*.yml filter=git-crypt diff=git-crypt
