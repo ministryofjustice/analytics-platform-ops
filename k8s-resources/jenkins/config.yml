@@ -32,7 +32,7 @@ Master:
 
 Agent:
   Image: kerin/jnlp-slave-analytics
-  ImageTag: latest
+  ImageTag: v2
   Cpu: "200m"
   Memory: "256Mi"
 
