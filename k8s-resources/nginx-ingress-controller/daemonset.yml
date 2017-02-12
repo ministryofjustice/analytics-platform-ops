@@ -1,11 +1,12 @@
 apiVersion: extensions/v1beta1
-kind: DaemonSet
+kind: Deployment
 metadata:
   name: nginx-ingress-controller
   namespace: kube-system
   labels:
     app: nginx-ingress-controller
 spec:
+  replicas: 3
   template:
     metadata:
       labels:
