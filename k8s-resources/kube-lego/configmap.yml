@@ -7,4 +7,5 @@ data:
   # modify this to specify your address
   lego.email: "kerin.cosford@digital.justice.gov.uk"
   # configure letencrypt's production api
-  lego.url: "https://acme-v01.api.letsencrypt.org/directory"
+  # lego.url: "https://acme-v01.api.letsencrypt.org/directory"
+  lego.url: "https://acme-staging.api.letsencrypt.org/directory"
