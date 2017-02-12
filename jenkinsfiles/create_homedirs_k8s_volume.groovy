@@ -4,7 +4,7 @@ node {
 
     stage ("Apply resources") {
         sh """
-        for f in k8s-templates/global*
+        for f in k8s-templates/global/*
         do
             cat \$f \\
             | sed \\
