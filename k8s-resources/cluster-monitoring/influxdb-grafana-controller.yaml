@@ -68,7 +68,9 @@ spec:
             mountPath: /var
       volumes:
       - name: influxdb-persistent-storage
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: influxdb-volume
       - name: grafana-persistent-storage
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: grafana-volume
 
