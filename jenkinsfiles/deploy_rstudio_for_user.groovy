@@ -2,13 +2,6 @@ node {
 
     checkout scm
 
-    withCredentials([
-        file(credentialsId: 'analytics-ops-gpg.key', variable: 'GPG_KEY')]) {
-
-        sh "git-crypt unlock ${GPG_KEY}"
-    }
-
-
     stage ("Deploy RStudio") {
         sh """
         USERNAME=\$(echo '${env.USERNAME}' | tr '[:upper:]' '[:lower:]')
