@@ -9,7 +9,7 @@ spec:
     - ReadWriteMany
   selector:
     matchLabels:
-      user: {{.Username}}
+      mountpoint: "/{{.Username}}"
   resources:
     requests:
       storage: 10Gi
