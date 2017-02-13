@@ -5,8 +5,9 @@ metadata:
   labels:
     app: jupyter-notebook
 spec:
-  type: LoadBalancer
+  sessionAffinity: ClientIP
   selector:
     app: jupyter-notebook
   ports:
-  - port: 8888
+  - port: 80
+    targetPort: 3000
