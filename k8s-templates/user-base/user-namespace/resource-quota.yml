@@ -4,7 +4,7 @@ metadata:
   name: compute-resources
 spec:
   hard:
-    requests.cpu: "{{.RequestCPU}}"
-    requests.memory: {{.RequestMemory}}
+    # requests.cpu: "{{.RequestCPU}}"
+    # requests.memory: {{.RequestMemory}}
     limits.cpu: "{{.LimitsCPU}}"
     limits.memory: {{.LimitsMemory}}
