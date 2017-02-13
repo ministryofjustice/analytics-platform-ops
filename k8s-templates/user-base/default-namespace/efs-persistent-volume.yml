@@ -5,7 +5,7 @@ metadata:
   annotations:
     volume.beta.kubernetes.io/storage-class: efs
   labels:
-    user: {{.Username}}
+    mountpoint: "/{{.Username}}"
 spec:
   capacity:
     storage: 10Gi
