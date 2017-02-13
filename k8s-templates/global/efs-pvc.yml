@@ -7,6 +7,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
+  selector:
+    matchLabels:
+      mountpoint: "/"
   resources:
     requests:
       storage: 100Gi

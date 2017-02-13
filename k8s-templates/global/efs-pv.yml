@@ -4,6 +4,8 @@ metadata:
   name: nfs-homes
   annotations:
     volume.beta.kubernetes.io/storage-class: efs
+  labels:
+    mountpoint: "/"
 spec:
   capacity:
     storage: 100Gi
