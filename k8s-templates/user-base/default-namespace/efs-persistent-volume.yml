@@ -2,6 +2,8 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: nfs-home-{{.Username}}
+  annotations:
+    volume.beta.kubernetes.io/storage-class: efs
   labels:
     user: {{.Username}}
 spec:
