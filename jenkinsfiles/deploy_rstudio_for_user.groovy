@@ -8,7 +8,7 @@ node {
         CLIENT_SECRET=\$(echo -n "${env.CLIENT_SECRET}"|base64 -w 0)
         CLIENT_ID=\$(echo -n "${env.CLIENT_ID}"|base64 -w 0)
         DOMAIN=\$(echo -n "${env.DOMAIN}"|base64 -w 0)
-        CALLBACK_URL=\$(echo -n "https://\${USERNAME}.rstudio.users.analytics.kops.integration.dsd.io/callback"|base64 -w 0)
+        CALLBACK_URL=\$(echo -n "https://\${USERNAME}.rstudio.${env.TOOLS_DOMAIN}"|base64 -w 0)
         COOKIE_SECRET=\$(echo -n "${env.COOKIE_SECRET}"|base64 -w 0)
         AWS_ACCESS_KEY_ID=\$(echo -n "${env.AWS_ACCESS_KEY_ID}"|base64 -w 0)
         AWS_SECRET_ACCESS_KEY=\$(echo -n "${AWS_SECRET_ACCESS_KEY}"|base64 -w 0)
