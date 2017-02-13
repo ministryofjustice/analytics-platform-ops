@@ -23,6 +23,7 @@ resource "aws_security_group" "efs" {
 resource "aws_efs_mount_target" "storage" {
   file_system_id = "${aws_efs_file_system.users.id}"
   subnet_id = "${element(var.subnet_ids, count.index)}"
-  security_groups = ["${var.node_security_group_id}"]
+  # security_groups = ["${var.node_security_group_id}"]
+  security_groups = ["${aws_security_group.efs.id}"]
   count = "${length(var.availability_zones)}"
 }
