@@ -9,7 +9,7 @@ spec:
     - ReadWriteMany
   selector:
     matchLabels:
-      mountpoint: "/"
+      mounttype: "root"
   resources:
     requests:
       storage: 100Gi
