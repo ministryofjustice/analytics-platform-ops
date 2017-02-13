@@ -2,6 +2,12 @@ node {
 
     checkout scm
 
+    withCredentials([
+        file(credentialsId: 'analytics-ops-gpg.key', variable: 'GPG_KEY')]) {
+
+        sh "git-crypt unlock ${GPG_KEY}"
+    }
+
     stage ("Apply resources") {
         sh """
         USERNAME=\$(echo '${env.USERNAME}' | tr '[:upper:]' '[:lower:]')
@@ -20,8 +26,6 @@ node {
             cat \$f \\
             | sed \\
                 -e s/{{\\.Username}}/\$USERNAME/g \\
-                -e s/{{\\.RequestCPU}}/${env.REQUEST_CPU}/g \\
-                -e s/{{\\.RequestMemory}}/${env.REQUEST_MEMORY}/g \\
                 -e s/{{\\.LimitsCPU}}/${env.LIMITS_CPU}/g \\
                 -e s/{{\\.LimitsMemory}}/${LIMITS_MEMORY}/g \\
             | kubectl apply -n user-\$USERNAME -f -
