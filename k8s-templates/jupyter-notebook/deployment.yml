@@ -80,7 +80,7 @@ spec:
                   key: aws_secret_access_key
           readinessProbe:
             httpGet:
-              path: /health-check
+              path: /
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
