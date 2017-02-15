@@ -61,9 +61,9 @@ spec:
             # requests:
             #   memory: 64Mi
             #   cpu: 10m
-            limits:
-              memory: 128Mi
-              cpu: 50m
+            # limits:
+            #   memory: 128Mi
+            #   cpu: 50m
 
         - name: r-studio-server
           image: kerin/analytics-r-studio-pro:v14
@@ -75,9 +75,9 @@ spec:
             # requests:
             #   memory: 512Mi
             #   cpu: 250m
-            limits:
-              memory: 1Gi
-              cpu: 1
+            # limits:
+            #   memory: 1Gi
+            #   cpu: 1
           env:
             - name: USER
               value: {{.Username}}

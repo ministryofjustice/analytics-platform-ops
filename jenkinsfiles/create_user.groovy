@@ -26,8 +26,6 @@ node {
             cat \$f \\
             | sed \\
                 -e s/{{\\.Username}}/\$USERNAME/g \\
-                -e s/{{\\.LimitsCPU}}/${env.LIMITS_CPU}/g \\
-                -e s/{{\\.LimitsMemory}}/${LIMITS_MEMORY}/g \\
             | kubectl apply -n user-\$USERNAME -f -
         done
         """
