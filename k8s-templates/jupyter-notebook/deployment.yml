@@ -61,9 +61,9 @@ spec:
             # requests:
             #   memory: 64Mi
             #   cpu: 10m
-            limits:
-              memory: 128Mi
-              cpu: 50m
+            # limits:
+            #   memory: 128Mi
+            #   cpu: 50m
 
         - name: jupyter-notebook
           image: quay.io/mojanalytics/jupyter:f1cd1830430c651bf8d944028e835c5307cddd7a
@@ -77,9 +77,9 @@ spec:
             # requests:
             #   memory: 512Mi
             #   cpu: 250m
-            limits:
-              memory: 1Gi
-              cpu: 1
+            # limits:
+            #   memory: 1Gi
+            #   cpu: 1
           env:
             - name: USER
               value: {{.Username}}
