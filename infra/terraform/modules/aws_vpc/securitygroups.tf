@@ -26,4 +26,12 @@ resource "aws_security_group" "master_extra" {
         protocol = "tcp"
         security_groups = ["${aws_security_group.node_extra.id}"]
     }
+
+    # Prometheus port
+    ingress {
+        from_port = 10250
+        to_port = 10250
+        protocol = "tcp"
+        security_groups = ["${aws_security_group.node_extra.id}"]
+    }
 }
