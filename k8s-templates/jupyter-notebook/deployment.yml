@@ -14,7 +14,7 @@ spec:
       containers:
 
         - name: jupyter-notebook-auth-proxy
-          image: quay.io/mojanalytics/rstudio-auth-proxy:c9403317
+          image: quay.io/mojanalytics/rstudio-auth-proxy:b1b2e124
           imagePullPolicy: Always
           ports:
             - name: http
