@@ -20,6 +20,8 @@ spec:
             - name: http
               containerPort: 3000
           env:
+            - name: USER
+              value: {{.Username}}
             - name: AUTH0_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
