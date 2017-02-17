@@ -60,9 +60,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
         - name: notebook
-          image: quay.io/mojanalytics/jupyter:f1cd1830430c651bf8d944028e835c5307cddd7a
-          # Disable authentication, see: https://github.com/jupyter/docker-stacks/blob/master/datascience-notebook/README.md#notebook-options
-          command: ["start-notebook.sh", "--NotebookApp.token=''"]
+          image: quay.io/mojanalytics/jupyter:1971f4d5
           imagePullPolicy: Always
           ports:
             - name: http
