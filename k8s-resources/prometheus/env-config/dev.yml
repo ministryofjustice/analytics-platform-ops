@@ -31,8 +31,8 @@ server:
           - prometheus.services.dev.mojanalytics.xyz
   resources:
     limits:
-      cpu: 1
-      memory: 1Gi
+      cpu: 1500m
+      memory: 1536Mi
     requests:
       cpu: 500m
       memory: 512Mi
