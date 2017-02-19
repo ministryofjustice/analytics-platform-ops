@@ -11,6 +11,10 @@ alertmanager:
         hosts:
           - alerts.services.dev.mojanalytics.xyz
 
+kubeStateMetrics:
+  httpPort: 80
+  image: gcr.io/google_containers/kube-state-metrics:v0.4.1
+
 server:
   ingress:
     enabled: true
