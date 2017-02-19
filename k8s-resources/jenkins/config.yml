@@ -12,7 +12,7 @@
 Master:
   Name: jenkins-master
   Image: kerin/analytics-jenkins
-  ImageTag: v2
+  ImageTag: v3
   ImagePullPolicy: "Always"
   Component: "jenkins-master"
   AdminUser: admin
