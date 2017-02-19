@@ -13,8 +13,8 @@ spec:
     spec:
       containers:
 
-        - name: jupyter-notebook-auth-proxy
-          image: quay.io/mojanalytics/rstudio-auth-proxy:7732289cfc1ed97121f13e861fc5b5f0c826d0c7
+        - name: auth-proxy
+          image: quay.io/mojanalytics/rstudio-auth-proxy:cd69d4ec
           imagePullPolicy: Always
           ports:
             - name: http
@@ -59,10 +59,8 @@ spec:
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
-        - name: jupyter-notebook
-          image: quay.io/mojanalytics/jupyter:f1cd1830430c651bf8d944028e835c5307cddd7a
-          # Disable authentication, see: https://github.com/jupyter/docker-stacks/blob/master/datascience-notebook/README.md#notebook-options
-          command: ["start-notebook.sh", "--NotebookApp.token=''"]
+        - name: notebook
+          image: quay.io/mojanalytics/jupyter:1971f4d5
           imagePullPolicy: Always
           ports:
             - name: http
