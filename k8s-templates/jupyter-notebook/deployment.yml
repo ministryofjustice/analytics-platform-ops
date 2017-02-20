@@ -60,7 +60,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
         - name: notebook
-          image: quay.io/mojanalytics/jupyter:1971f4d5
+          image: quay.io/mojanalytics/jupyter:638db51f
           imagePullPolicy: Always
           ports:
             - name: http
