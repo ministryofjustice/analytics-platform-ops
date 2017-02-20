@@ -78,19 +78,19 @@ spec:
                 secretKeyRef:
                   name: jupyter-notebook-config
                   key: aws_secret_access_key
-          readinessProbe:
-            exec:
-              command:
-                - cat
-                - /tmp/ready
-            initialDelaySeconds: 30
-            periodSeconds: 5
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
+          # readinessProbe:
+          #   exec:
+          #     command:
+          #       - cat
+          #       - /tmp/ready
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
           volumeMounts:
             - name: home
               mountPath: "/home/{{.Username}}"
