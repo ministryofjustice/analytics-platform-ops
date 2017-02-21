@@ -14,6 +14,15 @@ resource "aws_iam_group_policy" "managers_s3" {
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "ManagersListAllBucketsInConsole",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "arn:aws:s3:::*"
+    },
+    {
       "Sid": "SourceBucketManagersListBucket",
       "Action": [
         "s3:ListBucket"
@@ -63,6 +72,15 @@ resource "aws_iam_group_policy" "analysts_s3" {
 {
   "Version": "2012-10-17",
   "Statement": [
+    {
+      "Sid": "AnalystsListAllBucketsInConsole",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "arn:aws:s3:::*"
+    },
     {
       "Sid": "SourceBucketAnalystsListBucket",
       "Action": [
