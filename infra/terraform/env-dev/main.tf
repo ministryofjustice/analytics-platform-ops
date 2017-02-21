@@ -44,3 +44,11 @@ module "user_nfs" {
     subnet_ids = "${module.aws_vpc.storage_subnet_ids}"
     availability_zones = "${var.availability_zones}"
 }
+
+module "logging_elasticsearch" {
+    source = "../modules/logging_elasticsearch"
+
+    name = "logging-es.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
+    domain_name = "logging-${var.env}"
+    vpc_cidr = "${var.vpc_cidr}"
+}
