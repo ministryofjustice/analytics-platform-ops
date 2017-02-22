@@ -1,3 +1,10 @@
+# - The s3:GetBucketLocation and s3:ListAllMyBuckets actions are necessary
+#   to allow the user to see the buckets in the AWS console
+# - The s3:ListBucket action is necessary to allow users to list objects
+#   in a bucket
+#
+# See: https://aws.amazon.com/blogs/security/writing-iam-policies-how-to-grant-access-to-an-amazon-s3-bucket/
+
 resource "aws_iam_group" "managers" {
     name = "analytics-managers"
 }
@@ -14,15 +21,27 @@ resource "aws_iam_group_policy" "managers_s3" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "SourceBucketManagersListBucket",
+      "Sid": "ManagersListAllBucketsInConsole",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "arn:aws:s3:::*"
+    },
+    {
+      "Sid": "ManagersListBucketObjects",
       "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.source.arn}"
+      "Resource": [
+        "${aws_s3_bucket.source.arn}",
+        "${aws_s3_bucket.scratch.arn}"
+      ]
     },
     {
-      "Sid": "SourceBucketManagersReadWriteDeleteObjects",
+      "Sid": "ManagersReadWriteDeleteObjects",
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
@@ -30,26 +49,10 @@ resource "aws_iam_group_policy" "managers_s3" {
         "s3:RestoreObject"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.source.arn}/*"
-    },
-    {
-      "Sid": "ScratchBucketManagersListBucket",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.scratch.arn}"
-    },
-    {
-      "Sid": "ScratchBucketManagersReadWriteDeleteObjects",
-      "Action": [
-        "s3:DeleteObject",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:RestoreObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.scratch.arn}/*"
+      "Resource": [
+        "${aws_s3_bucket.source.arn}/*",
+        "${aws_s3_bucket.scratch.arn}/*"
+      ]
     }
   ]
 }
@@ -64,12 +67,24 @@ resource "aws_iam_group_policy" "analysts_s3" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "SourceBucketAnalystsListBucket",
+      "Sid": "AnalystsListAllBucketsInConsole",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "arn:aws:s3:::*"
+    },
+    {
+      "Sid": "AnalystsListBucketObjects",
       "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.source.arn}"
+      "Resource": [
+        "${aws_s3_bucket.source.arn}",
+        "${aws_s3_bucket.scratch.arn}"
+      ]
     },
     {
       "Sid": "SourceBucketAnalystsReadOnly",
@@ -78,14 +93,6 @@ resource "aws_iam_group_policy" "analysts_s3" {
       ],
       "Effect": "Allow",
       "Resource": "${aws_s3_bucket.source.arn}/*"
-    },
-    {
-      "Sid": "ScratchBucketAnalystsListBucket",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.scratch.arn}"
     },
     {
       "Sid": "ScratchBucketAnalystsReadWriteDeleteObjects",
