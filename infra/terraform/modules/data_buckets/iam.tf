@@ -1,3 +1,10 @@
+# - The s3:GetBucketLocation and s3:ListAllMyBuckets actions are necessary
+#   to allow the user to see the buckets in the AWS console
+# - The s3:ListBucket action is necessary to allow users to list objects
+#   in a bucket
+#
+# See: https://aws.amazon.com/blogs/security/writing-iam-policies-how-to-grant-access-to-an-amazon-s3-bucket/
+
 resource "aws_iam_group" "managers" {
     name = "analytics-managers"
 }
