@@ -14,8 +14,7 @@ spec:
       containers:
 
         - name: rstudio-auth-proxy
-          image: kerin/rstudio-auth-proxy:v22
-          imagePullPolicy: Always
+          image: quay.io/mojanalytics/rstudio-auth-proxy:0153ad9c
           ports:
             - name: http
               containerPort: 3000
