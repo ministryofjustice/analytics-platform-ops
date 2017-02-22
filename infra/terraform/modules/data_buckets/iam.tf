@@ -30,15 +30,18 @@ resource "aws_iam_group_policy" "managers_s3" {
       "Resource": "arn:aws:s3:::*"
     },
     {
-      "Sid": "SourceBucketManagersListBucket",
+      "Sid": "ManagersListBucketObjects",
       "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.source.arn}"
+      "Resource": [
+        "${aws_s3_bucket.source.arn}",
+        "${aws_s3_bucket.scratch.arn}"
+      ]
     },
     {
-      "Sid": "SourceBucketManagersReadWriteDeleteObjects",
+      "Sid": "ManagersReadWriteDeleteObjects",
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
@@ -46,26 +49,10 @@ resource "aws_iam_group_policy" "managers_s3" {
         "s3:RestoreObject"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.source.arn}/*"
-    },
-    {
-      "Sid": "ScratchBucketManagersListBucket",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.scratch.arn}"
-    },
-    {
-      "Sid": "ScratchBucketManagersReadWriteDeleteObjects",
-      "Action": [
-        "s3:DeleteObject",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:RestoreObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.scratch.arn}/*"
+      "Resource": [
+        "${aws_s3_bucket.source.arn}/*",
+        "${aws_s3_bucket.scratch.arn}/*"
+      ]
     }
   ]
 }
@@ -89,12 +76,15 @@ resource "aws_iam_group_policy" "analysts_s3" {
       "Resource": "arn:aws:s3:::*"
     },
     {
-      "Sid": "SourceBucketAnalystsListBucket",
+      "Sid": "AnalystsListBucketObjects",
       "Action": [
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.source.arn}"
+      "Resource": [
+        "${aws_s3_bucket.source.arn}",
+        "${aws_s3_bucket.scratch.arn}"
+      ]
     },
     {
       "Sid": "SourceBucketAnalystsReadOnly",
@@ -103,14 +93,6 @@ resource "aws_iam_group_policy" "analysts_s3" {
       ],
       "Effect": "Allow",
       "Resource": "${aws_s3_bucket.source.arn}/*"
-    },
-    {
-      "Sid": "ScratchBucketAnalystsListBucket",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.scratch.arn}"
     },
     {
       "Sid": "ScratchBucketAnalystsReadWriteDeleteObjects",
