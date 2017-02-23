@@ -60,7 +60,7 @@ spec:
             periodSeconds: 5
 
         - name: r-studio-server
-          image: kerin/analytics-r-studio-pro:v14
+          image: quay.io/mojanalytics/rstudio:8a7454f
           imagePullPolicy: Always
           ports:
             - name: http
