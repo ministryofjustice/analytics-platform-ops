@@ -51,4 +51,5 @@ module "logging_elasticsearch" {
     name = "logging-es.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
     domain_name = "logging-${var.env}"
     vpc_cidr = "${var.vpc_cidr}"
+    ingress_ips = "${module.aws_vpc.nat_gateway_public_ips}"
 }

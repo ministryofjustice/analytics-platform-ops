@@ -2,6 +2,10 @@ variable "name" {}
 variable "domain_name" {}
 variable "vpc_cidr" {}
 
+variable "ingress_ips" {
+    type = "list"
+}
+
 variable "es_version" {
     default = "5.1"
 }
