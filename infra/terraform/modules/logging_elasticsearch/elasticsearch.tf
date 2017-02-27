@@ -2,22 +2,6 @@ resource "aws_elasticsearch_domain" "logging" {
     domain_name = "${var.domain_name}"
     elasticsearch_version = "${var.es_version}"
 
-    access_policies = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "es:*",
-            "Principal": "*",
-            "Effect": "Allow",
-            "Condition": {
-                "IpAddress": {"aws:SourceIp": ["${var.vpc_cidr}"]}
-            }
-        }
-    ]
-}
-EOF
-
     snapshot_options {
         automated_snapshot_start_hour = 1
     }
@@ -40,4 +24,29 @@ EOF
     tags {
       Name = "${var.name}"
     }
+}
+
+resource "aws_elasticsearch_domain_policy" "logging" {
+  domain_name = "${aws_elasticsearch_domain.logging.domain_name}"
+  access_policies = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "es:*",
+      "Resource": "${aws_elasticsearch_domain.logging.arn}",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": "${jsonencode(var.ingress_ips)}"
+        }
+      }
+    }
+  ]
+}
+EOF
 }
