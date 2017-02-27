@@ -42,7 +42,7 @@ resource "aws_elasticsearch_domain_policy" "logging" {
       "Resource": "${aws_elasticsearch_domain.logging.arn}",
       "Condition": {
         "IpAddress": {
-          "aws:SourceIp": "${jsonencode(var.ingress_ips)}"
+          "aws:SourceIp": ${jsonencode(var.ingress_ips)}
         }
       }
     }
