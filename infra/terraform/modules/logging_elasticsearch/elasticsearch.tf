@@ -39,7 +39,7 @@ resource "aws_elasticsearch_domain_policy" "logging" {
         "AWS": "*"
       },
       "Action": "es:*",
-      "Resource": "${aws_elasticsearch_domain.logging.arn}",
+      "Resource": "${aws_elasticsearch_domain.logging.arn}/*",
       "Condition": {
         "IpAddress": {
           "aws:SourceIp": ${jsonencode(var.ingress_ips)}
