@@ -18,13 +18,14 @@ resource "aws_internet_gateway" "igw" {
     }
 }
 
-resource "aws_subnet" "storage" {
-  vpc_id = "${aws_vpc.main.id}"
-  cidr_block = "${element(var.storage_cidr_blocks, count.index)}"
-  availability_zone = "${element(var.availability_zones, count.index)}"
+resource "aws_eip" "private_gw" {
+  vpc = true
   count = "${length(var.availability_zones)}"
+}
 
-  tags = {
-    Name = "storage-${element(var.availability_zones, count.index)}.${var.name}"
-  }
+resource "aws_nat_gateway" "private_gw" {
+  allocation_id = "${element(aws_eip.private_gw.*.id, count.index)}"
+  subnet_id     = "${element(aws_subnet.dmz.*.id, count.index)}"
+  depends_on    = ["aws_internet_gateway.igw"]
+  count         = "${length(var.availability_zones)}"
 }

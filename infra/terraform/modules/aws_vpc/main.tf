@@ -3,6 +3,27 @@ variable "cidr" {}
 variable "availability_zones" {
     type = "list"
 }
+
+variable "dmz_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "192.168.0.0/22",
+    "192.168.4.0/22",
+    "192.168.8.0/22"
+  ]
+}
+
+variable "private_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "192.168.32.0/19",
+    "192.168.64.0/19",
+    "192.168.96.0/19"
+  ]
+}
+
 variable "storage_cidr_blocks" {
   type = "list"
 
