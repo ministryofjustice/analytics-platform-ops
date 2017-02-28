@@ -1,0 +1,78 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: cluster.example.com
+spec:
+  api:
+    loadBalancer:
+      type: Public
+  channel: alpha
+  cloudProvider: aws
+  configBase: s3://STATE_BUCKET/cluster.example.com
+  dnsZone: DNS_ZONE_ID
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-eu-west-1a
+      name: a
+    - instanceGroup: master-eu-west-1b
+      name: b
+    - instanceGroup: master-eu-west-1c
+      name: c
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-eu-west-1a
+      name: a
+    - instanceGroup: master-eu-west-1b
+      name: b
+    - instanceGroup: master-eu-west-1c
+      name: c
+    name: events
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: 1.5.3
+  masterInternalName: api.internal.cluster.example.com
+  masterPublicName: api.cluster.example.com
+  networkCIDR: 192.168.0.0/16
+  networkID: VPC_ID
+  networking:
+    calico: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - id: SUBNET_ID
+    name: eu-west-1a
+    type: Private
+    zone: eu-west-1a
+
+  - id: SUBNET_ID
+    name: eu-west-1b
+    type: Private
+    zone: eu-west-1b
+
+  - id: SUBNET_ID
+    name: eu-west-1c
+    type: Private
+    zone: eu-west-1c
+
+  - id: SUBNET_ID
+    name: dmz-eu-west-1a
+    type: Utility
+    zone: eu-west-1a
+
+  - id: SUBNET_ID
+    name: dmz-eu-west-1b
+    type: Utility
+    zone: eu-west-1b
+
+  - id: SUBNET_ID
+    name: dmz-eu-west-1c
+    type: Utility
+    zone: eu-west-1c
+  topology:
+    bastion:
+      bastionPublicName: bastion.cluster.example.com
+    dns:
+      type: Public
+    masters: private
+    nodes: private
