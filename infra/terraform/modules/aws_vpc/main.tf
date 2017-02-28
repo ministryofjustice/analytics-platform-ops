@@ -47,8 +47,24 @@ output "availability_zones" {
     value = "${join(",", var.availability_zones)}"
 }
 
+output "dmz_subnet_ids" {
+    value = ["${aws_subnet.dmz.*.id}"]
+}
+
+output "private_subnet_ids" {
+    value = ["${aws_subnet.private.*.id}"]
+}
+
 output "storage_subnet_ids" {
     value = ["${aws_subnet.storage.*.id}"]
+}
+
+output "dmz_subnets" {
+    value = "${zipmap(aws_subnet.dmz.*.id, aws_subnet.dmz.*.availability_zone)}"
+}
+
+output "private_subnets" {
+    value = "${zipmap(aws_subnet.private.*.id, aws_subnet.private.*.availability_zone)}"
 }
 
 output "extra_node_sg_id" {
