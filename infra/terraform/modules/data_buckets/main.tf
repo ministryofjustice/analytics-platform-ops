@@ -21,6 +21,10 @@ output "iam_analysts_arn" {
     value = "${aws_iam_group.analysts.arn}"
 }
 
+output "scratch_bucket_id" {
+    value = "${aws_s3_bucket.scratch.id}"
+}
+
 output "shared_analyst_access_key_id" {
   value = "${aws_iam_access_key.shared_analyst.id}"
 }
