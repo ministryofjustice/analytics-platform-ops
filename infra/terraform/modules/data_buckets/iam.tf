@@ -46,6 +46,7 @@ resource "aws_iam_group_policy" "managers_s3" {
         "s3:DeleteObject",
         "s3:GetObject",
         "s3:PutObject",
+        "s3:PutObjectAcl",
         "s3:RestoreObject"
       ],
       "Effect": "Allow",
@@ -100,6 +101,7 @@ resource "aws_iam_group_policy" "analysts_s3" {
         "s3:DeleteObject",
         "s3:GetObject",
         "s3:PutObject",
+        "s3:PutObjectAcl",
         "s3:RestoreObject"
       ],
       "Effect": "Allow",
