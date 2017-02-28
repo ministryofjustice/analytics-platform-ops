@@ -1,3 +1,5 @@
+variable "env" {}
+
 variable "cluster_name" {}
 variable "vpc_id" {}
 variable "node_security_group_id" {}
