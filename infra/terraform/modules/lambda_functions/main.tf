@@ -9,6 +9,7 @@ data "archive_file" "lambda_function_package" {
 resource "aws_lambda_function" "encrypt_s3_object" {
     description = "Encrypt S3 objects using AWS' server side encryption"
     filename = "${path.module}/encrypt_s3_object.zip"
+    source_code_hash = "${data.archive_file.lambda_function_package.output_base64sha256}"
     function_name = "encrypt_s3_object"
     role = "${aws_iam_role.encrypt_s3_object_role.arn}"
     handler = "index.handler"
