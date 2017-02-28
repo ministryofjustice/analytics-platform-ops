@@ -20,7 +20,9 @@ exports.handler = (event, context, callback) => {
 
     s3.getObject(getParams, function(err, data) {
         if (err) {
-            console.log(`Error getting object ${key} from bucket ${bucket}`);
+            const error_msg = `Error getting object ${key} from bucket ${bucket}`;
+            console.log(error_msg);
+            callback(error_msg);
         } else {
             // Only encrypt if not encrypted already
             if (data.ServerSideEncryption !== 'AES256') {
@@ -45,9 +47,10 @@ exports.handler = (event, context, callback) => {
                     }
                 });
             } else {
-                console.log(`SKIPPING ENCRYPTION...already encrypted! key="${key}" bucket=${bucket}.`);
+                const success_msg = `SKIPPING ENCRYPTION...already encrypted! key="${key}" bucket=${bucket}.`;
+                console.log(success_msg);
+                callback(null, success_msg);
             }
         }
     });
-
 };
