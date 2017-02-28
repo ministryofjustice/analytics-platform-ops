@@ -2,11 +2,11 @@ apiVersion: kops/v1alpha2
 kind: InstanceGroup
 metadata:
   labels:
-    kops.k8s.io/cluster: cluster.example.com
+    kops.k8s.io/cluster: CLUSTER_NAME
   name: master-eu-west-1a
 spec:
   additionalSecurityGroups:
-  - SECURITY_GROUP_ID
+  - EXTRA_MASTER_SECURITY_GROUP_ID
   associatePublicIp: false
   image: kope.io/k8s-1.5-debian-jessie-amd64-hvm-ebs-2017-01-09
   machineType: t2.small
@@ -22,11 +22,11 @@ apiVersion: kops/v1alpha2
 kind: InstanceGroup
 metadata:
   labels:
-    kops.k8s.io/cluster: cluster.example.com
+    kops.k8s.io/cluster: CLUSTER_NAME
   name: master-eu-west-1b
 spec:
   additionalSecurityGroups:
-  - SECURITY_GROUP_ID
+  - EXTRA_MASTER_SECURITY_GROUP_ID
   associatePublicIp: false
   image: kope.io/k8s-1.5-debian-jessie-amd64-hvm-ebs-2017-01-09
   machineType: t2.small
@@ -42,11 +42,11 @@ apiVersion: kops/v1alpha2
 kind: InstanceGroup
 metadata:
   labels:
-    kops.k8s.io/cluster: cluster.example.com
+    kops.k8s.io/cluster: CLUSTER_NAME
   name: master-eu-west-1c
 spec:
   additionalSecurityGroups:
-  - SECURITY_GROUP_ID
+  - EXTRA_MASTER_SECURITY_GROUP_ID
   associatePublicIp: false
   image: kope.io/k8s-1.5-debian-jessie-amd64-hvm-ebs-2017-01-09
   machineType: t2.small
