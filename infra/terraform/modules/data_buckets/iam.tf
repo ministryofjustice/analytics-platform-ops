@@ -6,15 +6,15 @@
 # See: https://aws.amazon.com/blogs/security/writing-iam-policies-how-to-grant-access-to-an-amazon-s3-bucket/
 
 resource "aws_iam_group" "managers" {
-    name = "analytics-managers"
+    name = "${var.env}-managers"
 }
 
 resource "aws_iam_group" "analysts" {
-    name = "analytics-analysts"
+    name = "${var.env}-analysts"
 }
 
 resource "aws_iam_group_policy" "managers_s3" {
-    name = "analytics-managers"
+    name = "${var.env}-managers"
     group = "${aws_iam_group.managers.id}"
     policy = <<EOF
 {
@@ -61,7 +61,7 @@ EOF
 }
 
 resource "aws_iam_group_policy" "analysts_s3" {
-    name = "analytics-analysts"
+    name = "${var.env}-analysts"
     group = "${aws_iam_group.analysts.id}"
     policy = <<EOF
 {
@@ -113,7 +113,7 @@ EOF
 }
 
 resource "aws_iam_user" "shared_analyst" {
-    name = "shared-analyst"
+    name = "${var.env}-shared-analyst"
 }
 
 resource "aws_iam_access_key" "shared_analyst" {
@@ -121,7 +121,7 @@ resource "aws_iam_access_key" "shared_analyst" {
 }
 
 resource "aws_iam_group_membership" "analysts" {
-    name = "analyst_members"
+    name = "${var.env}-analyst-members"
     users = ["${aws_iam_user.shared_analyst.name}"]
     group = "${aws_iam_group.analysts.name}"
 }
