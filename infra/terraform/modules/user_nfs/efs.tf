@@ -1,5 +1,5 @@
 resource "aws_efs_file_system" "users" {
-  creation_token = "users"
+  creation_token = "${var.env}-users"
   performance_mode = "generalPurpose"
 
   tags {
