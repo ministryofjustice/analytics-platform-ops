@@ -7,6 +7,8 @@ resource "aws_subnet" "dmz" {
   tags = {
     Name = "dmz-${element(var.availability_zones, count.index)}.${var.name}"
     Cluster = "${var.name}"
+    KubernetesCluster = "${var.name}"
+    "kubernetes.io/role/elb" = ""
   }
 }
 
@@ -26,6 +28,7 @@ resource "aws_subnet" "private" {
   tags = {
     Name = "private-${element(var.availability_zones, count.index)}.${var.name}"
     Cluster = "${var.name}"
+    KubernetesCluster = "${var.name}"
   }
 }
 
