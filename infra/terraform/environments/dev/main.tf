@@ -57,6 +57,7 @@ module "logging_elasticsearch" {
 
 module "lambda_functions" {
     source = "../../modules/lambda_functions"
+    env = "${var.env}"
     bucket_id = "${module.data_buckets.scratch_bucket_id}"
     bucket_arn = "${module.data_buckets.scratch_bucket_arn}"
 }
