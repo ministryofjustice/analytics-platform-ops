@@ -93,6 +93,8 @@ Once complete your AWS resources should be in place
 | `EXTRA_MASTER_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_master_sg_id` |
 | `EXTRA_NODE_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_node_sg_id` |
 
+4. Set Kops state store environment variable:
+  `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET`
 4. Plan Kops cluster resource creation:
   ```
   $ kops create -f cluster.yml
