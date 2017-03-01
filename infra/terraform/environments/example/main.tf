@@ -54,3 +54,10 @@ module "logging_elasticsearch" {
     vpc_cidr = "${var.vpc_cidr}"
     ingress_ips = "${module.aws_vpc.nat_gateway_public_ips}"
 }
+
+module "lambda_functions" {
+    source = "../../modules/lambda_functions"
+    env = "${var.env}"
+    bucket_id = "${module.data_buckets.scratch_bucket_id}"
+    bucket_arn = "${module.data_buckets.scratch_bucket_arn}"
+}
