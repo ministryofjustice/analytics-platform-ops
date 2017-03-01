@@ -65,12 +65,6 @@ Initialization is only required once per local checkout.
 
 `$BUCKET_NAME` and `$AWS_REGION` must match the values provided in `terraform.tfvars`; `$ENV_NAME` should match your environment name.
 
-### Create EC2 instance SSH key
-Only required when creating a new environment:
-
-1. Create keys: `$ ssh-keygen -t rsa -b 4096`
-2. Add key to Kops cluster: `$ kops create secret --name CLUSTER_NAME sshpublickey admin -i PATH_TO_PUBLIC_KEY`
-
 After cluster creation you can ssh into the bastion instance with `$ ssh -Att admin@bastion.CLUSTER_NAME`. From there you can SSH into master or worker nodes.
 
 ### Creating AWS resources, or applying changes to existing environment
@@ -106,9 +100,13 @@ Once complete your AWS resources should be in place
   $ kops create -f masters.yml
   $ kops create -f nodes.yml
   ```
-5. Plan overall cluster creation:
-  `$ kops create cluster $CLUSTER_NAME` - where `$CLUSTER_NAME` matches the name provided in YAML files
-6. Execute cluster creation:
+5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
+6. Add key to Kops cluster:
+  `$ kops create secret --name CLUSTER_NAME sshpublickey admin -i PATH_TO_PUBLIC_KEY`
+  Where `$CLUSTER_NAME` matches the name provided in YAML files
+7. Plan overall cluster creation:
+  `$ kops create cluster $CLUSTER_NAME`
+8. Execute cluster creation:
   `$ kops create cluster $CLUSTER_NAME --yes`
 
 
