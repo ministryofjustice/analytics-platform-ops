@@ -14,6 +14,7 @@ resource "aws_lambda_function" "encrypt_s3_object" {
     role = "${aws_iam_role.encrypt_s3_object_role.arn}"
     handler = "index.handler"
     runtime = "nodejs4.3"
+    timeout = 300 # 5 minutes
     depends_on = ["data.archive_file.lambda_function_package"]
 }
 
