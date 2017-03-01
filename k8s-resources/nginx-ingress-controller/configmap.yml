@@ -7,7 +7,5 @@ data:
   use-proxy-protocol: "true"
   enable-sticky-sessions: "true"
   server-name-hash-bucket-size: "128"
-  proxy-buffers: "8 16k"
-  proxy-buffer-size: "16k"
   proxy-read-timeout: "3600"
   proxy-send-timeout: "3600"
