@@ -61,12 +61,7 @@ Initialization is only required once per local checkout.
 
 ### Initialize Terraform remote state
 1. `$ cd infra/terraform/environments/YOUR_ENV`
-2. ```
-   terraform remote config \
-    -backend=s3 \
-    -backend-config="bucket=$BUCKET_NAME" \
-    -backend-config="key=$ENV_NAME/terraform.tfstate" \
-    -backend-config="region=$AWS_REGION```
+2. `./init_terraform_state.sh BUCKET_NAME YOUR_ENV AWS_REGION` - where `BUCKET_NAME` matches `terraform_bucket_name` above
 
 `$BUCKET_NAME` and `$AWS_REGION` must match the values provided in `terraform.tfvars`; `$ENV_NAME` should match your environment name.
 
