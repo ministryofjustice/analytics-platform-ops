@@ -13,7 +13,7 @@ data "terraform_remote_state" "base" {
 
 
 module "aws_vpc" {
-    source = "../modules/aws_vpc"
+    source = "../../modules/aws_vpc"
 
     name = "${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
     cidr = "${var.vpc_cidr}"
@@ -21,7 +21,7 @@ module "aws_vpc" {
 }
 
 module "cluster_dns" {
-    source = "../modules/cluster_dns"
+    source = "../../modules/cluster_dns"
 
     env = "${var.env}"
     root_zone_name = "${data.terraform_remote_state.base.xyz_dns_zone_name}"
@@ -30,14 +30,15 @@ module "cluster_dns" {
 }
 
 module "data_buckets" {
-    source = "../modules/data_buckets"
+    source = "../../modules/data_buckets"
 
     env = "${var.env}"
 }
 
 module "user_nfs" {
-    source = "../modules/user_nfs"
+    source = "../../modules/user_nfs"
 
+    env = "${var.env}"
     cluster_name = "${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
     vpc_id = "${module.aws_vpc.vpc_id}"
     node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
@@ -46,7 +47,7 @@ module "user_nfs" {
 }
 
 module "logging_elasticsearch" {
-    source = "../modules/logging_elasticsearch"
+    source = "../../modules/logging_elasticsearch"
 
     name = "logging-es.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
     domain_name = "logging-${var.env}"
@@ -55,7 +56,7 @@ module "logging_elasticsearch" {
 }
 
 module "lambda_functions" {
-    source = "../modules/lambda_functions"
+    source = "../../modules/lambda_functions"
     bucket_id = "${module.data_buckets.scratch_bucket_id}"
     bucket_arn = "${module.data_buckets.scratch_bucket_arn}"
 }
