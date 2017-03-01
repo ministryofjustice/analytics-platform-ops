@@ -106,10 +106,12 @@ Once complete your AWS resources should be in place
 6. Add key to Kops cluster:
   `$ kops create secret --name CLUSTER_NAME sshpublickey admin -i PATH_TO_PUBLIC_KEY`
   Where `$CLUSTER_NAME` matches the name provided in YAML files
-7. Plan overall cluster creation:
-  `$ kops create cluster $CLUSTER_NAME`
-8. Execute cluster creation:
-  `$ kops create cluster $CLUSTER_NAME --yes`
+7. Plan and create cluster:
+  ```
+  $ kops create cluster $CLUSTER_NAME
+  $ kops update cluster $CLUSTER_NAME
+  $ kops update cluster $CLUSTER_NAME --yes
+  ```
 
 
 ### Verify cluster creation
