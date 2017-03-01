@@ -13,12 +13,12 @@ exports.handler = (event, context, callback) => {
     const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
 
     console.log('key:', JSON.stringify(key, null, 2));
-    const getParams = {
+    const headParams = {
         Bucket: bucket,
         Key: key,
     };
 
-    s3.getObject(getParams, function(err, data) {
+    s3.headObject(headParams, function(err, data) {
         if (err) {
             const error_msg = `Error getting object ${key} from bucket ${bucket}`;
             console.log(error_msg);
