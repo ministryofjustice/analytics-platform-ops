@@ -4,7 +4,7 @@ metadata:
   name: nginx-ingress-controller
   namespace: kube-system
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:eu-west-1:593291632749:certificate/b3cfb0ff-41e9-43cb-93b2-99b84e3c1533"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:eu-west-1:593291632749:certificate/1031b54b-778a-4079-acd8-be34310610ee"
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
