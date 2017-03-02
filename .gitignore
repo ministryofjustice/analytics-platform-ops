@@ -3,3 +3,4 @@
 *.tfstate*
 *.tgz
 .DS_STORE
+/infra/terraform/modules/lambda_functions/*.zip
