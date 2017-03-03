@@ -68,6 +68,8 @@ spec:
           env:
             - name: USER
               value: {{.Username}}
+            - name: AWS_DEFAULT_REGION
+              value: {{.AWSDefaultRegion}}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
