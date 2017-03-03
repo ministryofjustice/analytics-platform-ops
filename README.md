@@ -2,6 +2,8 @@
 
 A collection of Terraform resources for AWS infrastructure, and Kubernetes resources for the Kubernetes-based Analytics platform.
 
+Contact robin.linacre@digital.justice.gov.uk if you're in government and interested in talking to us about analytics platforms.
+
 ## Directory structure
 
 * `infra`
