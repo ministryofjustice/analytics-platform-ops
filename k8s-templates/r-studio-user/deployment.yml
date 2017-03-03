@@ -60,7 +60,7 @@ spec:
             periodSeconds: 5
 
         - name: r-studio-server
-          image: quay.io/mojanalytics/rstudio:8a7454fb
+          image: quay.io/mojanalytics/rstudio:3948a04b
           imagePullPolicy: Always
           ports:
             - name: http
