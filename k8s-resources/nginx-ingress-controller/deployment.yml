@@ -43,8 +43,21 @@ spec:
           hostPort: 80
         - containerPort: 443
           hostPort: 443
+        - containerPort: 8000
+          hostPort: 8000
         - containerPort: 8080
         args:
         - /nginx-ingress-controller
         - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
         - --configmap=$(POD_NAMESPACE)/nginx-ingress-controller
+        volumeMounts:
+        - name: nginxtmpl
+          mountPath: /etc/nginx/template
+
+      volumes:
+        - name: nginxtmpl
+          configMap:
+            name: nginx-ingress-controller-tmpl
+            items:
+            - key: nginx.tmpl
+              path: nginx.tmpl
