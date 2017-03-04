@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A default http service that returns a 404
+name: default-http-backend
+version: 0.1.0
