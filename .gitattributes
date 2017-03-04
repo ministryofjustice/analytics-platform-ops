@@ -6,4 +6,5 @@ k8s-resources/grafana/config.yml filter=git-crypt diff=git-crypt
 k8s-resources/kibana-auth-proxy/envs/**/* filter=git-crypt diff=git-crypt
 k8s-resources/fluentd/envs/**/* filter=git-crypt diff=git-crypt
 k8s-resources/jenkins/envs/**/* filter=git-crypt diff=git-crypt
+k8s-resources/prometheus/envs/**/* filter=git-crypt diff=git-crypt
 infra/kops/clusters/**/* filter=git-crypt diff=git-crypt
