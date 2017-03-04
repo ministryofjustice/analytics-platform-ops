@@ -14,11 +14,14 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  # commented out until a good solution for HTTP->HTTPS redirect when
-  # terminating TLS at the ELB emerges
-  # - port: 80
-  #   targetPort: 80
-  #   name: http
+
+  # HTTP directed to nginx server{} block that redirects everything to
+  # HTTPS equivalent
+  - port: 80
+    targetPort: 8000
+    name: http
+
+  # HTTPS directed to nginx port 80, as ELB terminates TLS and proxies as HTTP
   - port: 443
     targetPort: 80
     name: https
