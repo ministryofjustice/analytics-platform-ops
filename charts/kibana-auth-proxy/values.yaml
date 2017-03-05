@@ -1,0 +1,21 @@
+replicaCount: 1
+image:
+  repository: quay.io/mojanalytics/kibana-auth-proxy
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 3000
+resources: {}
+auth:
+  clientSecret: ""
+  clientID: ""
+  domain: ""
+  callbackURL: ""
+  cookieSecret: ""
+elasticsearch:
+  host: "es.example.com"
+  port: 9200
+ingress:
+  host: "example.com"
