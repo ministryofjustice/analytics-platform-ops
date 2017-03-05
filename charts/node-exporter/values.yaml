@@ -1,0 +1,18 @@
+replicaCount: 1
+image:
+  repository: prom/node-exporter
+  tag: "v0.13.0"
+  pullPolicy: IfNotPresent
+service:
+  name: scrape
+  type: ClusterIP
+  externalPort: 9100
+  internalPort: 9100
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
