@@ -1,0 +1,24 @@
+replicaCount: 1
+
+image:
+  repository: gcr.io/google_containers/kubernetes-dashboard-amd64
+  tag: v1.5.1
+  pullPolicy: IfNotPresent
+
+service:
+  name: http
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 9090
+
+# ingress:
+#   host: "example.com"
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
