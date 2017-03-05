@@ -8,7 +8,12 @@ controller:
     tag: "0.8.3"
     pullPolicy: IfNotPresent
 
-  config: {}
+  config:
+    use-proxy-protocol: "true"
+    enable-sticky-sessions: "true"
+    server-name-hash-bucket-size: "128"
+    proxy-read-timeout: "3600"
+    proxy-send-timeout: "3600"
 
   ## Required only if defaultBackend.enabled = false
   ## Must be <namespace>/<service_name>
