@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: heapster
-  namespace: kube-system
   labels:
     k8s-addon: monitoring-standalone.addons.k8s.io
     k8s-app: heapster
