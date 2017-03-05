@@ -1,0 +1,15 @@
+description: An nginx Ingress controller that uses ConfigMap to store the nginx configuration.
+engine: gotpl
+icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/500px-Nginx_logo.svg.png
+keywords:
+- ingress
+- nginx
+maintainers:
+- email: jack.zampolin@gmail.com
+  name: Jack Zampolin
+- email: mgoodness@gmail.com
+  name: Michael Goodness
+name: nginx-ingress
+sources:
+- https://github.com/kubernetes/contrib/tree/master/ingress/controllers/nginx
+version: 0.3.0
