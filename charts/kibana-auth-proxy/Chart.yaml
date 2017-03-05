@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+name: kibana-auth-proxy
+version: 0.1.0
