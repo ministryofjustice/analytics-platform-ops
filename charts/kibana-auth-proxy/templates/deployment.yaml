@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+      annotations:
+        checksum/config: {{ include (print $.Chart.Name "/templates/secrets.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: {{ .Values.service.name }}
+          containerPort: {{ .Values.service.internalPort }}
+        env:
+          - name: AUTH0_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: client_secret
+          - name: AUTH0_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: client_id
+          - name: AUTH0_DOMAIN
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: domain
+          - name: AUTH0_CALLBACK_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: callback_url
+          - name: COOKIE_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: cookie_secret
+          - name: KIBANA_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: kibana_url
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
