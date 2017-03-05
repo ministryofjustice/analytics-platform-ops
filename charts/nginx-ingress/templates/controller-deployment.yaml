@@ -29,9 +29,13 @@ spec:
           args:
             - /nginx-ingress-controller
             - --default-backend-service={{ if .Values.defaultBackend.enabled }}{{ .Release.Namespace }}/{{ template "defaultBackend.fullname" . }}{{ else }}{{ .Values.controller.defaultBackendService }}{{ end }}
-            - --configmap={{ .Release.Namespace }}/{{ template "controller.fullname" . }}
+            - --nginx-configmap={{ .Release.Namespace }}/{{ template "controller.fullname" . }}
+            {{- if .Values.tcp }}
             - --tcp-services-configmap={{ .Release.Namespace }}/{{ template "fullname" . }}-tcp
+            {{ end -}}
+            {{- if .Values.udp }}
             - --udp-services-configmap={{ .Release.Namespace }}/{{ template "fullname" . }}-udp
+            {{ end -}}
           {{- range $key, $value := .Values.controller.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
