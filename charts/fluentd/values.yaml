@@ -1,0 +1,14 @@
+image:
+  repository: quay.io/fluent/fluentd-kubernetes-daemonset
+  tag: latest
+  pullPolicy: IfNotPresent
+elasticsearch:
+  host: elasticsearch-logging
+  port: "9200"
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
