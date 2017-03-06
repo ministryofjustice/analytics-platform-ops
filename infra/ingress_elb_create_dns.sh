@@ -17,7 +17,7 @@ HOSTED_ZONE_ID=$(
 )
 
 ELB_HOSTNAME=$(
-    kubectl get svc nginx-ingress-controller -n kube-system -o template \
+    kubectl get svc cluster-ingress-nginx-ingress-controller -o template \
         --template="{{(index .status.loadBalancer.ingress 0).hostname}}"
 )
 
