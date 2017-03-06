@@ -1,7 +1,10 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: nfs-homes
+  name: nfs-home
+  namespace: user-{{ .Values.Username }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
     volume.beta.kubernetes.io/storage-class: efs
 spec:
@@ -9,7 +12,8 @@ spec:
     - ReadWriteMany
   selector:
     matchLabels:
-      mounttype: "root"
+      mounttype: user
+      user: {{ .Values.Username }}
   resources:
     requests:
-      storage: 100Gi
+      storage: 10Gi

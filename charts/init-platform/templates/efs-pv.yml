@@ -5,6 +5,7 @@ metadata:
   annotations:
     volume.beta.kubernetes.io/storage-class: efs
   labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     mounttype: "root"
 spec:
   capacity:
@@ -12,5 +13,5 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: {{.EFSHostname}}
+    server: {{ .Values.EFSHostname }}
     path: "/"
