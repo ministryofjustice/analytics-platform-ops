@@ -1,17 +1,19 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nfs-home-{{.Username}}
+  name: nfs-home-{{ .Values.Username }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
     volume.beta.kubernetes.io/storage-class: efs
   labels:
     mounttype: user
-    user: {{.Username}}
+    user: {{ .Values.Username }}
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteMany
   nfs:
-    server: {{.EFSHostname}}
-    path: "/{{.Username}}"
+    server: {{ .Values.EFSHostname }}
+    path: "/home/{{ .Values.Username }}"
