@@ -1,0 +1,11 @@
+Username: ""
+ToolsDomain: ""
+CookieSecret: ""
+OAuth:
+  ClientSecret: ""
+  ClientId: ""
+  Domain: ""
+AWS:
+  AccessKeyId: ""
+  SecretAccessKey: ""
+  DefaultRegion: "eu-west-1"
