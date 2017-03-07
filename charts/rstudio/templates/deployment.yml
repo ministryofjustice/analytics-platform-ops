@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: r-studio
+  name: {{ template "fullname" . }}
   labels:
     app: r-studio
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
