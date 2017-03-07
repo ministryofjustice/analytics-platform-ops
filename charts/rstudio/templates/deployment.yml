@@ -1,9 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: r-studio
+  name: {{ template "fullname" . }}
   labels:
     app: r-studio
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: 1
   template:
@@ -20,7 +21,7 @@ spec:
               containerPort: 3000
           env:
             - name: USER
-              value: {{.Username}}
+              value: {{ .Values.Username }}
             - name: AUTH0_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -67,9 +68,12 @@ spec:
               containerPort: 8787
           env:
             - name: USER
-              value: {{.Username}}
+              value: {{ .Values.Username }}
             - name: AWS_DEFAULT_REGION
-              value: {{.AWSDefaultRegion}}
+              valueFrom:
+                secretKeyRef:
+                  name: r-studio-config
+                  key: aws_default_region
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -88,7 +92,7 @@ spec:
             periodSeconds: 5
           volumeMounts:
             - name: home
-              mountPath: "/home/{{.Username}}"
+              mountPath: "/home/{{ .Values.Username }}"
       volumes:
         - name: home
           persistentVolumeClaim:
