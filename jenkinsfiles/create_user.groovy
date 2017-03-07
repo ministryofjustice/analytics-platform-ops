@@ -1,33 +1,18 @@
 node {
 
-    checkout scm
-
-    withCredentials([
-        file(credentialsId: 'analytics-ops-gpg.key', variable: 'GPG_KEY')]) {
-
-        sh "git-crypt unlock ${GPG_KEY}"
+    stage ("Git checkout") {
+        git "https://github.com/ministryofjustice/analytics-platform-ops.git"
     }
 
-    stage ("Apply resources") {
-        sh """
-        USERNAME=\$(echo '${env.USERNAME}' | tr '[:upper:]' '[:lower:]')
+    stage ("Decrypt secrets") {
+        withCredentials([
+            file(credentialsId: 'analytics-ops-gpg.key', variable: 'GPG_KEY')]) {
 
-        for f in k8s-templates/user-base/default-namespace/*
-        do
-            cat \$f \\
-            | sed \\
-                -e s/{{\\.Username}}/\$USERNAME/g \\
-                -e s/{{\\.EFSHostname}}/${env.EFS_HOSTNAME}/g \\
-            | kubectl apply -f -
-        done
+            sh "git-crypt unlock ${GPG_KEY}"
+        }
+    }
 
-        for f in k8s-templates/user-base/user-namespace/*
-        do
-            cat \$f \\
-            | sed \\
-                -e s/{{\\.Username}}/\$USERNAME/g \\
-            | kubectl apply -n user-\$USERNAME -f -
-        done
-        """
+    stage ("Create platform user") {
+        sh "./create_user.sh"
     }
 }
