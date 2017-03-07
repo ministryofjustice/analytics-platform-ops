@@ -10,8 +10,6 @@ BUCKET_NAME=${1}
 ENV_NAME=${2}
 REGION=${3}
 
-cd $TF_ENV_DIR
-
 terraform remote config \
     -backend=s3 \
     -backend-config="bucket=${BUCKET_NAME}" \
