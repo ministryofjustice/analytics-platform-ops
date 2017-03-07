@@ -9,7 +9,7 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: {{ Values.Username }}-rstudio.{{ .Values.ToolsDomain }}
+  - host: {{ .Values.Username }}-rstudio.{{ .Values.ToolsDomain }}
     http:
       paths:
       - backend:
