@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 PLATFORM_ENV=$1
 USERNAME=$(echo $2 | tr '[:upper:]' '[:lower:]')
