@@ -29,7 +29,7 @@ resource "aws_s3_bucket_notification" "object_created_in_scratch" {
 
 # Role running the lambda function
 resource "aws_iam_role" "encrypt_s3_object_role" {
-    name = "encrypt_s3_object_role"
+    name = "${var.env}_encrypt_s3_object_role"
     assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -48,7 +48,7 @@ EOF
 
 # Policies for the 'encrypt_s3_object_role' role
 resource "aws_iam_role_policy" "encrypt_s3_object_role_policy" {
-    name = "encrypt_s3_object_role_policy"
+    name = "${var.env}_encrypt_s3_object_role_policy"
     role = "${aws_iam_role.encrypt_s3_object_role.id}"
     policy = <<EOF
 {
