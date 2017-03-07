@@ -1,0 +1,11 @@
+Username: ""
+ToolsDomain: "tools.EXAMPLE.COM"
+CookieSecret: ""
+OAuth:
+  ClientSecret: ""
+  ClientId: ""
+  Domain: "AUTH0_USER.eu.auth0.com"
+AWS:
+  AccessKeyId: ""
+  SecretAccessKey: ""
+  DefaultRegion: "eu-west-1"

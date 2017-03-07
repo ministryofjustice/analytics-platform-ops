@@ -4,6 +4,7 @@ metadata:
   name: r-studio
   labels:
     app: r-studio
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   sessionAffinity: ClientIP
   selector:

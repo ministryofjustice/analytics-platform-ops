@@ -1,3 +1,5 @@
+// NOTE: RStudio is not installed as helm chart
+//       This should be delete or updated
 node {
 
     checkout scm
@@ -34,4 +36,3 @@ node {
         """
     }
 }
-
