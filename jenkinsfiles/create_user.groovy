@@ -13,6 +13,6 @@ node {
     }
 
     stage ("Create platform user") {
-        sh "jenkinsfiles/create_user.sh"
+        sh "jenkinsfiles/create_user.sh ${env.PLATFORM_ENV} ${env.USERNAME}"
     }
 }
