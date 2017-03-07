@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-USERNAME=$(echo $1 | tr '[:upper:]' '[:lower:]')
-PLATFORM_ENV=$2
+PLATFORM_ENV=$1
+USERNAME=$(echo $2 | tr '[:upper:]' '[:lower:]')
 
 # initialize Helm client
 helm init -c
