@@ -2,9 +2,21 @@
 //       This should be delete or updated
 node {
 
-    checkout scm
+    stage ("Git checkout") {
+        git "https://github.com/ministryofjustice/analytics-platform-ops.git"
+    }
 
-    stage ("Deploy RStudio") {
+    stage ("Decrypt secrets") {
+        withCredentials([
+            file(credentialsId: 'analytics-ops-gpg.key', variable: 'GPG_KEY')]) {
+
+            sh "git-crypt unlock ${GPG_KEY}"
+        }
+    }
+
+    stage ("Deploy RStudio for user") {
+        sh "jenkinsfiles/deploy_rstudio_for_user.sh ${env.PLATFORM_ENV} ${env.USERNAME}"
+
         sh """
         USERNAME=\$(echo '${env.USERNAME}' | tr '[:upper:]' '[:lower:]')
         TOOLS_DOMAIN=${env.TOOLS_DOMAIN}
