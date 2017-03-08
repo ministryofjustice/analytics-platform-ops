@@ -1,7 +1,7 @@
 node {
 
     stage ("Git checkout") {
-        git "https://github.com/ministryofjustice/analytics-platform-ops.git"
+        checkout scm
     }
 
     stage ("Decrypt secrets") {
