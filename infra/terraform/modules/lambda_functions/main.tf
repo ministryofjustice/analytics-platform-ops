@@ -2,13 +2,13 @@
 data "archive_file" "lambda_function_package" {
     type        = "zip"
     source_dir  = "${path.module}/encrypt_s3_object"
-    output_path = "${path.module}/encrypt_s3_object.zip"
+    output_path = "/tmp/encrypt_s3_object.zip"
 }
 
 # Lambda function which encrypts S3 objects
 resource "aws_lambda_function" "encrypt_s3_object" {
     description = "Encrypt S3 objects using AWS' server side encryption"
-    filename = "${path.module}/encrypt_s3_object.zip"
+    filename = "/tmp/encrypt_s3_object.zip"
     source_code_hash = "${data.archive_file.lambda_function_package.output_base64sha256}"
     function_name = "${var.env}_encrypt_s3_object"
     role = "${aws_iam_role.encrypt_s3_object_role.arn}"
