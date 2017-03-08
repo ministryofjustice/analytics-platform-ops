@@ -14,7 +14,8 @@ if [[ -z "$(helm list ${RELEASE_NAME})" ]]; then
     helm install charts/rstudio \
         -f chart-env-config/${PLATFORM_ENV}/rstudio.yml \
         --name ${RELEASE_NAME} \
-        --set Username=${USERNAME}
+        --set Username=${USERNAME} \
+        --namespace user-${USERNAME}
 else
     helm upgrade ${RELEASE_NAME} charts/rstudio \
         -f chart-env-config/${PLATFORM_ENV}/rstudio.yml \
