@@ -17,7 +17,8 @@ spec:
       containers:
 
         - name: rstudio-auth-proxy
-          image: quay.io/mojanalytics/rstudio-auth-proxy:0153ad9c
+          image: "{{ .Values.AuthProxy.Image.Repository }}:{{ .Values.AuthProxy.Image.Tag }}"
+          imagePullPolicy: {{ .Values.AuthProxy.Image.PullPolicy }}
           ports:
             - name: http
               containerPort: 3000
@@ -83,8 +84,8 @@ spec:
               mountPath: /var/log/rstudio-server
 
         - name: r-studio-server
-          image: quay.io/mojanalytics/rstudio:3846e3d7
-          imagePullPolicy: Always
+          image: "{{ .Values.RStudio.Image.Repository }}:{{ .Values.RStudio.Image.Tag }}"
+          imagePullPolicy: {{ .Values.RStudio.Image.PullPolicy }}
           ports:
             - name: http
               containerPort: 8787
