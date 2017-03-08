@@ -7,7 +7,7 @@ USERNAME=$(echo $2 | tr '[:upper:]' '[:lower:]')
 # initialize Helm client
 helm init -c
 
-RELEASE_NAME=rstudio-${USERNAME}
+RELEASE_NAME=${USERNAME}-rstudio
 
 # Install if release isn't currently listed, otherwise upgrade
 if [[ -z "$(helm list ${RELEASE_NAME})" ]]; then
