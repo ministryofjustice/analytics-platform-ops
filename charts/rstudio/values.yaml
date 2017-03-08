@@ -17,3 +17,13 @@ Fluentd:
     Repository: quay.io/fluent/fluentd-kubernetes-daemonset
     Tag: latest
     PullPolicy: "IfNotPresent"
+AuthProxy:
+  Image:
+    Repository: quay.io/mojanalytics/rstudio-auth-proxy
+    Tag: latest
+    PullPolicy: "IfNotPresent"
+RStudio:
+  Image:
+    Repository: quay.io/mojanalytics/rstudio
+    Tag: latest
+    PullPolicy: "IfNotPresent"
