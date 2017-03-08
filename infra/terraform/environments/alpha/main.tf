@@ -53,6 +53,7 @@ module "logging_elasticsearch" {
     domain_name = "logging-${var.env}"
     vpc_cidr = "${var.vpc_cidr}"
     ingress_ips = "${module.aws_vpc.nat_gateway_public_ips}"
+    instance_count = 3
 }
 
 module "lambda_functions" {
