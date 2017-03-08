@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: r-studio
+      annotations:
+        checksum/fluentd-config: {{ include (print $.Template.BasePath "/fluentd-configmap.yaml") . | sha256sum }}
     spec:
       containers:
 
@@ -60,6 +62,26 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
 
+        - name: fluentd
+          image: "{{ .Values.Fluentd.Image.Repository }}:{{ .Values.Fluentd.Image.Tag }}"
+          imagePullPolicy: {{ .Values.Fluentd.Image.PullPolicy }}
+          env:
+            - name:  FLUENT_ELASTICSEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ template "fullname" . }}-fluentd
+                  key: elasticsearch_host
+            - name:  FLUENT_ELASTICSEARCH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ template "fullname" . }}-fluentd
+                  key: elasticsearch_port
+          volumeMounts:
+            - name: fluentd-config
+              mountPath: /fluentd/etc
+            - name: varlogrstudioserver
+              mountPath: /var/log/rstudio-server
+
         - name: r-studio-server
           image: quay.io/mojanalytics/rstudio:3846e3d7
           imagePullPolicy: Always
@@ -93,7 +115,18 @@ spec:
           volumeMounts:
             - name: home
               mountPath: "/home/{{ .Values.Username }}"
+            - name: varlogrstudioserver
+              mountPath: /var/log/rstudio-server
+
       volumes:
         - name: home
           persistentVolumeClaim:
             claimName: nfs-home
+        - name: varlogrstudioserver
+          emptyDir: {}
+        - name: fluentd-config
+          configMap:
+            name: {{ template "fullname" . }}-fluentd
+            items:
+            - key: fluent.conf
+              path: fluent.conf

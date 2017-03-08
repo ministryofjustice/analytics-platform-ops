@@ -9,3 +9,11 @@ AWS:
   AccessKeyId: ""
   SecretAccessKey: ""
   DefaultRegion: "eu-west-1"
+Elasticsearch:
+  Host: "elasticsearch-server"
+  Port: 9200
+Fluentd:
+  Image:
+    Repository: quay.io/fluent/fluentd-kubernetes-daemonset
+    Tag: latest
+    PullPolicy: "IfNotPresent"
