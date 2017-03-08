@@ -83,7 +83,7 @@ spec:
               mountPath: /var/log/rstudio-server
 
         - name: r-studio-server
-          image: quay.io/mojanalytics/rstudio:3846e3d7
+          image: quay.io/mojanalytics/rstudio:7db3f332
           imagePullPolicy: Always
           ports:
             - name: http
