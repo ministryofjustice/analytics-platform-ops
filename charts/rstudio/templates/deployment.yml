@@ -28,27 +28,27 @@ spec:
             - name: AUTH0_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: client_secret
             - name: AUTH0_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: client_id
             - name: AUTH0_DOMAIN
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: domain
             - name: AUTH0_CALLBACK_URL
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: callback_url
             - name: COOKIE_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: cookie_secret
             - name: SHINY_HOST
               value: localhost
@@ -95,17 +95,17 @@ spec:
             - name: AWS_DEFAULT_REGION
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: aws_default_region
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: aws_access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: r-studio-config
+                  name: {{ template "fullname" . }}
                   key: aws_secret_access_key
           readinessProbe:
             httpGet:
