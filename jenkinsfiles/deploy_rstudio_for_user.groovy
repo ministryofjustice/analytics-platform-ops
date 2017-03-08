@@ -1,9 +1,7 @@
-// NOTE: RStudio is not installed as helm chart
-//       This should be delete or updated
 node {
 
     stage ("Git checkout") {
-        git "https://github.com/ministryofjustice/analytics-platform-ops.git"
+        checkout scm
     }
 
     stage ("Decrypt secrets") {
