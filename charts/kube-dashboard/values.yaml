@@ -13,7 +13,7 @@ auth:
   docker:
     repository: quay.io/mojanalytics/auth-proxy
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   oauth:
     domain: ""
     clientID: ""
