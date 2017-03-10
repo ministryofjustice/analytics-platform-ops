@@ -15,9 +15,11 @@ if [[ -z "$(helm list ${RELEASE_NAME})" ]]; then
         -f chart-env-config/${PLATFORM_ENV}/rstudio.yml \
         --name ${RELEASE_NAME} \
         --set Username=${USERNAME} \
-        --namespace user-${USERNAME}
+        --namespace user-${USERNAME} \
+        --wait
 else
     helm upgrade ${RELEASE_NAME} charts/rstudio \
         -f chart-env-config/${PLATFORM_ENV}/rstudio.yml \
-        --set Username=${USERNAME}
+        --set Username=${USERNAME} \
+        --wait
 fi
