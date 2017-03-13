@@ -2,8 +2,8 @@ resource "aws_route_table" "dmz" {
   vpc_id = "${aws_vpc.main.id}"
 
   tags = {
-    Name = "dev.mojanalytics.xyz"
-    Cluster = "dev.mojanalytics.xyz"
+    Name = "${var.name}"
+    Cluster = "${var.name}"
   }
 }
 
@@ -20,7 +20,7 @@ resource "aws_route_table" "private" {
 
   tags = {
     Name = "private-${element(var.availability_zones, count.index)}.${var.name}"
-    Cluster = "dev.mojanalytics.xyz"
+    Cluster = "${var.name}"
   }
 }
 
