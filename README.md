@@ -1,51 +1,70 @@
 # MOJ Analytics Platform Ops and Infrastructure
 
-A collection of Terraform resources for AWS infrastructure, and Kubernetes resources for the Kubernetes-based Analytics platform.
+[Kubernetes][kubernetes]-based data analysis platform, using [Terraform][terraform], [Kops][kops] and [Helm][helm] charts.
 
 Contact robin.linacre@digital.justice.gov.uk if you're in government and interested in talking to us about analytics platforms.
 
 ## Directory structure
 
 * `infra`
-Terraform resources for AWS infrastructure and Kops resources for Kubernetes clusters
+[Terraform][terraform] resources for AWS infrastructure and [Kops][kops] resources for Kubernetes clusters
 * `jenkinsfiles`
-Jenkins scripts for deployment and management tasks
-* `k8s-resources`
-Kubernetes resources that can be deployed as-is with `kubectl apply`
-* `k8s-templates`
-Templated Kubernetes resources that require variable interpolation before deployment. These templates use Go-style `{{.Variables}}`, although currently Jenkinsfiles interpolate variables using `sed` rather than Go.
+[Jenkins][jenkins] scripts for deployment and management tasks
+* `charts`
+[Helm][helm] charts for platform software and platform/user setup
+* `chart-env-config`
+Per-environment values and configuration for [Helm][helm] charts
+
+## Prerequisites
+Install:
+
+  * [Terraform][terraform]
+  * [Kops][kops]
+  * [git-crypt][gitcrypt]
 
 ## Infrastructure Overview
 
 A combination of [Terraform](https://www.terraform.io) and [Kops](https://github.com/kubernetes/kops) are used to create and manage AWS environments and Kubernetes clusters.
 
+**Terraform** is used to provision the base AWS environment (VPC, NAT Gateways, subnets etc.) and non-Kubernetes, off-cluster resources such as S3, EFS, IAM policies, Lambda functions, etc).
+
 **Kops** is used to provision and manage Kubernetes clusters (EC2 instances, ELBs, Security Groups, AutoScaling Groups, Route53 DNS entries, etc).
 
-**Terraform** is used to provision non-Kubernetes/off-cluster resources (VPC, NAT Gateways, RDS, S3, EFS, IAM, etc).
+This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely S3 buckets for Terraform and Kops, and a Route53 DNS zone.
 
-Because both Terraform and Kops create AWS resources, and in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
+Because both Terraform and Kops create AWS resources in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
 
 1. `terraform apply` for 'global' resources shared across all environments. This currently consists of root DNS records, and S3 buckets for Terraform and Kops state storage. These resources only needed to be created once for all environments.
-2. `terraform apply` for the specific environment. This creates the VPC, subnets, gateways etc. for non-cluster resources (RDS etc.), env-specific DNS records, S3 data buckets for the platform, and EFS file storage.
+2. `terraform apply` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and EFS file storage.
 3. `kops create|update cluster` for the Kubernetes cluster itself. This creates EC2 instances, AutoScaling groups, Security Groups, ELBs, etc. within the Terraform-created VPC.
-
-**Both Kops and Terraform require valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ## Secrets and git-crypt
 
-Terraform `terraform.tfvars` files and some Kubernetes resources (notably ingress rules) contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
+Terraform `terraform.tfvars` files and env-specific [Helm][helm] values files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
 
-## Managing global AWS resources, and preparing Terraform remote state
+## Kubernetes resource management
 
-The global AWS resources (DNS and S3 buckets) will almost certainly already be in place - if not, ask a repo admin. However, you must initialize Terraform's remote state so that per-environment Terraform resources can reference it. To initialize remote state in your working repository:
+All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are currently stored in the `charts/` directory, and chart values for each environment are stored in the `chart-env-config/` directory.
+
+## Creating global AWS resources, and preparing Terraform remote state
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+
+Global AWS resources (DNS and S3 buckets) only need to be created once, and are then used by all environments created subsequently. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
+
+  2. `$ cd infra/terraform/global`
+  3. `$ terraform plan` - check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53.
+  4. `$ terraform apply` to create resources
+
+### Remote state setup
+You **must** configure your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing. 
 
 1. `$ cd infra/terraform/global` - (you must cd to this directory)
-2. `$ ./init.sh`
-
-Initialization is only required once per local checkout.
-
+2. `$ ./init.sh $BUCKET_NAME $REGION`
 
 ## Creating/updating environments with Terraform
+
+Before working with an existing environment you must carry out the remote state setup steps detailed below. If you are creating a new environment, you must create the environment directory in `infra/terraform/environments` before setting up remote state.
 
 ### Defining new environment
 1. Copy example Terraform resources from `infra/terraform/environments/example` to `infra/terraform/environments/YOUR_ENV`
@@ -62,24 +81,28 @@ Initialization is only required once per local checkout.
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
 
 ### Initialize Terraform remote state
+You **must** configure your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing. 
+
 1. `$ cd infra/terraform/environments/YOUR_ENV`
-2. `./init_terraform_state.sh BUCKET_NAME YOUR_ENV AWS_REGION` - where `BUCKET_NAME` matches `terraform_bucket_name` above
+2. `./init_terraform_state.sh BUCKET_NAME YOUR_ENV AWS_REGION`  
+  where `BUCKET_NAME` matches `terraform_bucket_name` above
 
-`$BUCKET_NAME` and `$AWS_REGION` must match the values provided in `terraform.tfvars`; `$ENV_NAME` should match your environment name.
-
-After cluster creation you can ssh into the bastion instance with `$ ssh -Att admin@bastion.CLUSTER_NAME`. From there you can SSH into master or worker nodes.
+`BUCKET_NAME` and `AWS_REGION` must match the values provided in `terraform.tfvars`; `ENV_NAME` should match your environment name.
 
 ### Creating AWS resources, or applying changes to existing environment
 
-1. `$ terraform plan` - this will preview the changes Terraform plans to make
-2. `$ terraform apply` - applies the above changes
+Once remote Terraform state has been configured you can now apply changes to existing environments, or create a new environment:
 
-Once complete your AWS resources should be in place
+1. `$ cd infra/terraform/environments/YOUR_ENV`
+2. `$ terraform plan` - this will preview the changes Terraform plans to make
+3. `$ terraform apply` - applies the above changes
+
+Once complete your base AWS resources should be in place
 
 
 ### Create Kubernetes cluster
 
-1. Install [kubectl](https://kubernetes.io/docs/user-guide/prereqs/) and [Kops](https://github.com/kubernetes/kops) if you haven't already
+1. Install [kubectl](https://kubernetes.io/docs/user-guide/prereqs/) and [Kops][kops] if you haven't already
 2. `$ cp -R infra/kops/example_cluster infra/kops/clusters/YOUR_ENV`
 3. `$ cd infra/kops/clusters/YOUR_ENV`
 4. Replace placeholders in all YAML files for your cluster with appropriate Terraform output values:
@@ -96,21 +119,22 @@ Once complete your AWS resources should be in place
 | `EXTRA_NODE_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_node_sg_id` |
 
 4. Set Kops state store environment variable:
-  `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET`
+  `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET_NAME`
 4. Plan Kops cluster resource creation:
-  ```
-  $ kops create -f cluster.yml
-  $ kops create -f bastions.yml
-  $ kops create -f masters.yml
-  $ kops create -f nodes.yml
-  ```
+
+	```
+	$ kops create -f cluster.yml
+	$ kops create -f bastions.yml
+	$ kops create -f masters.yml
+	$ kops create -f nodes.yml
+	```
 5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
 6. Add key to Kops cluster:
   `$ kops create secret --name CLUSTER_NAME sshpublickey admin -i PATH_TO_PUBLIC_KEY`
   Where `$CLUSTER_NAME` matches the name provided in YAML files
 7. Plan and create cluster:
+
   ```
-  $ kops create cluster $CLUSTER_NAME
   $ kops update cluster $CLUSTER_NAME
   $ kops update cluster $CLUSTER_NAME --yes
   ```
@@ -132,3 +156,9 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
   * Make changes to the cluster spec and save
   * Apply changes: `$ kops update cluster $CLUSTER_NAME --yes`
 
+[terraform]: https://www.terraform.io
+[kops]: https://github.com/kubernetes/kops
+[helm]: https://github.com/kubernetes/helm/
+[kubernetes]: https://kubernetes.io
+[jenkins]: https://jenkins.io
+[gitcrypt]: https://www.agwa.name/projects/git-crypt/
