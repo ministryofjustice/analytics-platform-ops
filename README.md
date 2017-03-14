@@ -26,9 +26,11 @@ Install:
 
 A combination of [Terraform](https://www.terraform.io) and [Kops](https://github.com/kubernetes/kops) are used to create and manage AWS environments and Kubernetes clusters.
 
-**Terraform** is used to provision the base AWS environment (VPC, NAT Gateways, subnets etc.) and non-Kubernetes, off-cluster resources such as S3, EFS, IAM policies, Lambda functions, etc).
+**[Terraform][terraform]** is used to provision the base AWS environment (VPC, NAT Gateways, subnets etc.) and non-Kubernetes, off-cluster resources such as S3, EFS, IAM policies, Lambda functions, etc).
 
-**Kops** is used to provision and manage Kubernetes clusters (EC2 instances, ELBs, Security Groups, AutoScaling Groups, Route53 DNS entries, etc).
+**[Kops][kops]** is used to provision and manage Kubernetes clusters (EC2 instances, ELBs, Security Groups, AutoScaling Groups, Route53 DNS entries, etc).
+
+**[Helm][helm]** is used to manage installation and updates of all Kubernetes resources, including end-user software.
 
 This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely S3 buckets for Terraform and Kops, and a Route53 DNS zone.
 
