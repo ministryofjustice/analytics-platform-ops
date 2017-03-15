@@ -87,6 +87,15 @@ $ helm install stable/grafana -f chart-env-config/dev/grafana.yml --namespace ku
 ```
 
 
+## init-platform
+
+Creates k8s resources related to the users homes (AWS EFS).
+
+```bash
+$ helm install charts/init-platform -f chart-env-config/dev/init-platform.yml --namespace kube-system --name init-platform
+```
+
+
 ## jenkins
 
 Control panel with jobs to set up users and spawn analysys platforms.
