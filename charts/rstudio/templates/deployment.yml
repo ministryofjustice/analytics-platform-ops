@@ -107,6 +107,8 @@ spec:
                 secretKeyRef:
                   name: {{ template "fullname" . }}
                   key: aws_secret_access_key
+            - name: TOOLS_DOMAIN
+              value: {{ .Values.ToolsDomain }}
           readinessProbe:
             httpGet:
               path: /health-check
