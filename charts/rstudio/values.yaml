@@ -20,10 +20,10 @@ Fluentd:
 AuthProxy:
   Image:
     Repository: quay.io/mojanalytics/rstudio-auth-proxy
-    Tag: latest
+    Tag: "a750b612"
     PullPolicy: "IfNotPresent"
 RStudio:
   Image:
     Repository: quay.io/mojanalytics/rstudio
-    Tag: latest
+    Tag: "45674223"
     PullPolicy: "IfNotPresent"
