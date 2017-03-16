@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Configure the user (e.g. git setup, etc...)
+name: config-user
+version: 0.1.0
