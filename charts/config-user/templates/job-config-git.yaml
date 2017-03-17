@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: config-git-{{ .Values.Username }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  template:
+    metadata:
+      name: git-config
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:16.04
+        env:
+          - name: EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: user-secrets
+                key: email
+          - name: FULLNAME
+            valueFrom:
+              secretKeyRef:
+                name: user-secrets
+                key: fullname
+        command: ["/bin/sh", "-c", "chmod a+x /tmp/git-config.sh && /tmp/git-config.sh"]
+        volumeMounts:
+          - name: home
+            mountPath: "/home/{{ .Values.Username }}"
+          - name: git-config-script
+            mountPath: /tmp
+      restartPolicy: Never
+      volumes:
+      - name: home
+        persistentVolumeClaim:
+          claimName: nfs-home
+      - name: git-config-script
+        configMap:
+          name: git-config-configmap
+          # mode: 0500
