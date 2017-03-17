@@ -19,3 +19,5 @@ data:
     echo -e "[user]" > $GIT_CONFIG
     echo -e "\tname = $FULLNAME" >> $GIT_CONFIG
     echo -e "\temail = $EMAIL" >> $GIT_CONFIG
+
+    chown 1001:staff $GIT_CONFIG
