@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: git-config-configmap
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+data:
+  git-config.sh: |
+    #!/bin/bash
+    set -ex
+
+    GIT_CONFIG=/home/{{ .Values.Username }}/.gitconfig
+
+    # Check file existence
+    if [ -f $GIT_CONFIG ]; then
+      exit 0
+    fi
+
+    echo -e "[user]" > $GIT_CONFIG
+    echo -e "\tname = $FULLNAME" >> $GIT_CONFIG
+    echo -e "\temail = $EMAIL" >> $GIT_CONFIG
+
+    chown 1001:staff $GIT_CONFIG
