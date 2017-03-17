@@ -21,3 +21,9 @@ helm upgrade ${RELEASE_NAME} charts/init-user \
     --set Email="$EMAIL" \
     --set Fullname="$FULLNAME" \
     --install --wait
+
+# Install/upgrade the config-user helm chart
+helm upgrade ${RELEASE_NAME} charts/config-user \
+    --namespace user-${USERNAME} \
+    --set Username="$USERNAME" \
+    --install --wait
