@@ -12,10 +12,8 @@ FULLNAME=$4
 # initialize Helm client
 helm init -c
 
-RELEASE_NAME=init-user-${USERNAME}
-
 # Install/upgrade the init-user helm chart
-helm upgrade ${RELEASE_NAME} charts/init-user \
+helm upgrade init-user-${USERNAME} charts/init-user \
     -f chart-env-config/${PLATFORM_ENV}/init-user.yml \
     --set Username="$USERNAME" \
     --set Email="$EMAIL" \
@@ -23,7 +21,7 @@ helm upgrade ${RELEASE_NAME} charts/init-user \
     --install --wait
 
 # Install/upgrade the config-user helm chart
-helm upgrade ${RELEASE_NAME} charts/config-user \
+helm upgrade config-user-${USERNAME} charts/config-user \
     --namespace user-${USERNAME} \
     --set Username="$USERNAME" \
     --install --wait
