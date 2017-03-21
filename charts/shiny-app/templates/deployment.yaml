@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+        - name: shiny-app
+          image: "{{ .Values.shinyApp.docker.repository }}:{{ .Values.shinyApp.docker.tag }}"
+          imagePullPolicy: {{ .Values.shinyApp.docker.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.shinyApp.port }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.shinyApp.port }}
+          volumeMounts:
+            - mountPath: /srv
+              name: shiny-app
+          resources:
+            requests:
+              cpu: 10m
+        - name: git-sync
+          image: "{{ .Values.gitSync.docker.repository }}:{{ .Values.gitSync.docker.tag }}"
+          imagePullPolicy: {{ .Values.gitSync.docker.pullPolicy }}
+          volumeMounts:
+            - mountPath: /git
+              name: shiny-app
+          env:
+            - name: GIT_SYNC_REPO
+              value: {{ .Values.gitSync.repository }}
+            - name: GIT_SYNC_REV
+              value: {{ .Values.gitSync.revision }}
+            - name: GIT_SYNC_ROOT
+              value: /git
+            - name: GIT_SYNC_BRANCH
+              value: {{ .Values.gitSync.branch }}
+          resources:
+            requests:
+              cpu: 10m
+      volumes:
+        - name: shiny-app
+          emptyDir: {}
