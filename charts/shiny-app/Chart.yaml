@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Shiny app Helm chart for Kubernetes
+name: shiny-app
+version: 0.1.0
