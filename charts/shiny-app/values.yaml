@@ -6,15 +6,6 @@ app:
 shinyApp:
   port: 3838
   docker:
-    repository: rocker/shiny
+    repository: ""
     tag: latest
-    pullPolicy: Always
-# Git repository with the shiny app to run ('shiny-server' directory)
-gitSync:
-  repository: ""
-  branch: master
-  revision: HEAD
-  docker:
-    repository: openweb/git-sync
-    tag: 0.0.1
     pullPolicy: Always
