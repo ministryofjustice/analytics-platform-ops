@@ -8,7 +8,7 @@
 To install an rstudio instance for the user specified in the Username variable (Github username):
 
 ```bash
-$ helm install charts/shiny-app -f chart-env-config/ENV/shiny-app.yml --name shiny-app-APPNAME --set app.name=APPNAME --set shinyApp.docker.repository=YOUR_SHINY_APP_DOCKER_IMAGE --namespace apps
+$ helm install charts/shiny-app -f chart-env-config/ENV/shiny-app.yml --name shiny-app-APPNAME --set app.name=APPNAME --set shinyApp.docker.repository=YOUR_SHINY_APP_DOCKER_IMAGE --set shinyApp.docker.tag=YOUR_SHINY_APP_DOCKER_TAG --namespace apps
 ```
 
 The instance will be available in <https://APPNAME.apps.ENV.mojanalytics.xyz>.
