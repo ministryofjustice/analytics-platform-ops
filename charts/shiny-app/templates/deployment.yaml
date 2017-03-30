@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+        - name: shiny-app
+          image: "{{ .Values.shinyApp.docker.repository }}:{{ .Values.shinyApp.docker.tag }}"
+          imagePullPolicy: {{ .Values.shinyApp.docker.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.shinyApp.port }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.shinyApp.port }}
+          resources:
+            requests:
+              cpu: 10m
