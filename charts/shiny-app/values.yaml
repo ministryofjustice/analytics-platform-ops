@@ -1,0 +1,11 @@
+app:
+  name: ""
+  baseHost: ""
+  replicaCount: 3
+  port: 80
+shinyApp:
+  port: 3838
+  docker:
+    repository: ""
+    tag: latest
+    pullPolicy: Always
