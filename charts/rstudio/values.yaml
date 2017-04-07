@@ -27,3 +27,4 @@ RStudio:
     Repository: quay.io/mojanalytics/rstudio
     Tag: "45674223"
     PullPolicy: "IfNotPresent"
+  resources: {}
