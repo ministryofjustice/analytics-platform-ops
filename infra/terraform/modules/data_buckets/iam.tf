@@ -119,9 +119,3 @@ resource "aws_iam_user" "shared_analyst" {
 resource "aws_iam_access_key" "shared_analyst" {
     user = "${aws_iam_user.shared_analyst.name}"
 }
-
-resource "aws_iam_group_membership" "analysts" {
-    name = "${var.env}-analyst-members"
-    users = ["${aws_iam_user.shared_analyst.name}"]
-    group = "${aws_iam_group.analysts.name}"
-}
