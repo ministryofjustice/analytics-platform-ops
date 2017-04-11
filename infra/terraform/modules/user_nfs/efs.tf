@@ -1,6 +1,6 @@
 resource "aws_efs_file_system" "users" {
   creation_token = "${var.env}-users"
-  performance_mode = "maxIO"
+  performance_mode = "generalPurpose"
 
   tags {
     Name = "users.${var.cluster_name}"
