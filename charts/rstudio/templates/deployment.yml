@@ -13,6 +13,7 @@ spec:
         app: "{{ .Chart.Name }}"
       annotations:
         checksum/fluentd-config: {{ include (print $.Template.BasePath "/fluentd-configmap.yaml") . | sha256sum }}
+        checksum/rstudio-secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
     spec:
       containers:
 
