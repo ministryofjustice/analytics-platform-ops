@@ -32,3 +32,13 @@ output "shared_analyst_access_key_id" {
 output "shared_analyst_access_key_secret" {
   value = "${aws_iam_access_key.shared_analyst.secret}"
 }
+
+# CREST bucket
+
+output "crest_bucket_arn" {
+    value = "${aws_s3_bucket.crest.arn}"
+}
+
+output "crest_bucket_id" {
+    value = "${aws_s3_bucket.crest.id}"
+}

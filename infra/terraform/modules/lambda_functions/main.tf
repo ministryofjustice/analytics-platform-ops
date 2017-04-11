@@ -10,7 +10,7 @@ resource "aws_lambda_function" "encrypt_s3_object" {
     description = "Encrypt S3 objects using AWS' server side encryption"
     filename = "/tmp/encrypt_s3_object.zip"
     source_code_hash = "${data.archive_file.lambda_function_package.output_base64sha256}"
-    function_name = "${var.env}_encrypt_s3_object"
+    function_name = "${var.env}_encrypt_${var.bucket_id}_s3_objects"
     role = "${aws_iam_role.encrypt_s3_object_role.arn}"
     handler = "index.handler"
     runtime = "nodejs4.3"
@@ -19,7 +19,7 @@ resource "aws_lambda_function" "encrypt_s3_object" {
 }
 
 # Bucket notification to trigger lambda function
-resource "aws_s3_bucket_notification" "object_created_in_scratch" {
+resource "aws_s3_bucket_notification" "object_created" {
     bucket = "${var.bucket_id}"
     lambda_function {
         lambda_function_arn = "${aws_lambda_function.encrypt_s3_object.arn}"
@@ -29,7 +29,7 @@ resource "aws_s3_bucket_notification" "object_created_in_scratch" {
 
 # Role running the lambda function
 resource "aws_iam_role" "encrypt_s3_object_role" {
-    name = "${var.env}_encrypt_s3_object_role"
+    name = "${var.env}_encrypt_${var.bucket_id}_s3_objects_role"
     assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -48,7 +48,7 @@ EOF
 
 # Policies for the 'encrypt_s3_object_role' role
 resource "aws_iam_role_policy" "encrypt_s3_object_role_policy" {
-    name = "${var.env}_encrypt_s3_object_role_policy"
+    name = "${var.env}_encrypt_${var.bucket_id}_s3_objects_role_policy"
     role = "${aws_iam_role.encrypt_s3_object_role.id}"
     policy = <<EOF
 {
