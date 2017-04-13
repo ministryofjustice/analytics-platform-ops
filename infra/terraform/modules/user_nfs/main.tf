@@ -9,6 +9,9 @@ variable "subnet_ids" {
 variable "availability_zones" {
     type = "list"
 }
+variable "performance_mode" {
+    default = "generalPurpose"
+}
 
 output "efs_dns_name" {
     value = "${aws_efs_mount_target.storage.0.dns_name}"
