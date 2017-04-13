@@ -1,8 +1,24 @@
+Username: ""
+ToolsDomain: "tools.EXAMPLE.COM"
+CookieSecret: ""
 app:
   name: ""
   baseHost: ""
   replicaCount: 3
   port: 80
+AuthProxy:
+  Image:
+    Repository: quay.io/mojanalytics/auth-proxy
+    Tag: "a6b91b97"
+    PullPolicy: "IfNotPresent"
+AWS:
+  AccessKeyId: ""
+  SecretAccessKey: ""
+  DefaultRegion: "eu-west-1"
+OAuth:
+  ClientSecret: ""
+  ClientId: ""
+  Domain: "AUTH0_USER.eu.auth0.com"
 shinyApp:
   port: 3838
   docker:
