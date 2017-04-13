@@ -46,6 +46,8 @@ spec:
                 secretKeyRef:
                   name: {{ template "fullname" . }}
                   key: cookie_secret
+            - name: TARGET_URL
+              value: "http://localhost:{{ .Values.shinyApp.port }}/"
             - name: AUTH0_PASSWORDLESS
               value: "true"
             - name: SHINY_HOST
@@ -70,6 +72,8 @@ spec:
             httpGet:
               path: /
               port: {{ .Values.shinyApp.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             requests:
               cpu: 10m
