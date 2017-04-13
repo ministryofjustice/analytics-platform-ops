@@ -44,6 +44,7 @@ module "user_nfs" {
     node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
     subnet_ids = "${module.aws_vpc.storage_subnet_ids}"
     availability_zones = "${var.availability_zones}"
+    performance_mode = "maxIO"
 }
 
 module "logging_elasticsearch" {
