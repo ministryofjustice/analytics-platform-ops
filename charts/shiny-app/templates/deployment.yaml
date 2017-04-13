@@ -12,6 +12,55 @@ spec:
         app: {{ template "fullname" . }}
     spec:
       containers:
+        - name: auth-proxy
+          image: "{{ .Values.AuthProxy.Image.Repository }}:{{ .Values.AuthProxy.Image.Tag }}"
+          imagePullPolicy: {{ .Values.AuthProxy.Image.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: USER
+              value: {{ .Values.Username }}
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: client_secret
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: client_id
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: domain
+            - name: AUTH0_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: callback_url
+            - name: COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: cookie_secret
+            - name: AUTH0_PASSWORDLESS
+              value: "true"
+            - name: SHINY_HOST
+              value: localhost
+            - name: SHINY_PORT
+              value: "{{ .Values.shinyApp.port }}"
+            - name: PORT
+              value: "3000"
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
         - name: shiny-app
           image: "{{ .Values.shinyApp.docker.repository }}:{{ .Values.shinyApp.docker.tag }}"
           imagePullPolicy: {{ .Values.shinyApp.docker.pullPolicy }}
