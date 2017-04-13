@@ -8,7 +8,7 @@ spec:
   sessionAffinity: ClientIP
   ports:
   - port: {{ .Values.app.port }}
-    targetPort: {{ .Values.shinyApp.port }}
+    targetPort: 3000
     protocol: TCP
   selector:
     app: {{ template "fullname" . }}
