@@ -69,3 +69,8 @@ module "encrypt_crest_lambda_function" {
     bucket_id = "${module.data_buckets.crest_bucket_id}"
     bucket_arn = "${module.data_buckets.crest_bucket_arn}"
 }
+
+module "container_registry" {
+    source = "../../modules/container_registry"
+    env = "${var.env}"
+}
