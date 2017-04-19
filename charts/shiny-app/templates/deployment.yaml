@@ -50,10 +50,6 @@ spec:
               value: "http://localhost:{{ .Values.shinyApp.port }}/"
             - name: AUTH0_PASSWORDLESS
               value: "true"
-            - name: SHINY_HOST
-              value: localhost
-            - name: SHINY_PORT
-              value: "{{ .Values.shinyApp.port }}"
             - name: PORT
               value: "3000"
           readinessProbe:
