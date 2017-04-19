@@ -4,3 +4,5 @@
 *.tgz
 .DS_STORE
 /infra/terraform/modules/lambda_functions/*.zip
+*.sublime-project
+*.sublime-workspace
