@@ -1,0 +1,1 @@
+git+https://github.com/auth0/auth0-python.git@cbce31b#egg=auth0-python
