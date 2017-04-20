@@ -4,12 +4,17 @@
 
 import argparse
 import requests
+import logging
 from auth0.v3.authentication import GetToken
 from auth0.v3.management import Auth0
 
 
 ROLE_NAME = 'app-viewer'
 PERMISSION_NAME = 'view:app'
+
+logging.basicConfig()
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 def main():
@@ -50,7 +55,7 @@ def create_passwordless_user(auth0_client, email):
     if users_list['length'] > 0:
         # return existing user
         user = users_list['users'][0]
-        print("  [DEBUG]: User already exists = ", user)
+        LOG.info("User already exists = {}".format(user))
         return user
     else:
         # create new user
@@ -59,7 +64,7 @@ def create_passwordless_user(auth0_client, email):
             "connection": "email",
             "email_verified": True
         })
-        print("  [DEBUG] User created = ", user)
+        LOG.info("User created = {}".format(user))
         return user
 
 
@@ -67,8 +72,9 @@ def get_app(auth0_client, app_name):
     apps = auth0_client.clients.all()
     for app in apps:
         if app['name'] == app_name:
-            print("  [DEBUG] App found = ", app)
+            LOG.debug("App found = {}".format(app))
             return app
+    LOG.critical("App with name '{}' not found".format(app_name))
 
 
 def get_authz_token(domain, client_id, client_secret):
@@ -89,7 +95,7 @@ def create_permission(authz_api, authz_token, app_id, permission_name):
         }
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to get permissions: expected 200, got {}: {}".format(resp.status_code, resp.text))
+        LOG.debug("Failed to get permissions: expected 200, got {}: {}".format(resp.status_code, resp.text))
         return None
     permissions = resp.json()
     permission = None
@@ -100,7 +106,7 @@ def create_permission(authz_api, authz_token, app_id, permission_name):
             break
     if permission:
         # Return existing permission
-        print("  [DEBUG] Permission already exists = ", permission)
+        LOG.debug("Permission already exists = {}".format(permission))
         return permission
 
     # Create new permission
@@ -111,17 +117,17 @@ def create_permission(authz_api, authz_token, app_id, permission_name):
         },
         json={
           'name': permission_name,
-          'description': 'Can view shiny app',
+          'description': permission_name,
           'applicationId': app_id,
           'applicationType': 'client',
         }
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to create permission: expected 200, got {}: {}".format(resp.status_code, resp.text))
+        LOG.error("Failed to create permission: expected 200, got {}: {}".format(resp.status_code, resp.text))
         return None
     permission = resp.json()
 
-    print("  [DEBUG] Permission created = ", permission)
+    LOG.debug("Permission created = {}".format(permission))
     return permission
 
 def create_role(authz_api, authz_token, app_id, role_name):
@@ -133,7 +139,7 @@ def create_role(authz_api, authz_token, app_id, role_name):
         }
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to get roles: expected 200, got {}: {}".format(resp.status_code, resp.text))
+        LOG.error("Failed to get roles: expected 200, got {}: {}".format(resp.status_code, resp.text))
         return None
 
     roles = resp.json()
@@ -146,7 +152,7 @@ def create_role(authz_api, authz_token, app_id, role_name):
             break
     if role:
         # Return existing role
-        print("  [DEBUG] Role already exists = ", role)
+        LOG.debug("Role already exists = {}".format(role))
         return role
 
     # Create new role
@@ -163,12 +169,12 @@ def create_role(authz_api, authz_token, app_id, role_name):
         }
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to create role: expected 200, got {}: {}".format(resp.status_code, resp.text))
+        LOG.error("Failed to create role: expected 200, got {}: {}".format(resp.status_code, resp.text))
         return None
 
     role = resp.json()
 
-    print("  [DEBUG] Role created = ", role)
+    LOG.debug("Role created = {}".format(role))
     return role
 
 
@@ -193,10 +199,10 @@ def add_permission_to_role(authz_api, authz_token, role, permission_id):
         json=payload,
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to add permission ({}) to role ({}): expected 200, got {}: {}".format(permission_id, role['_id'], resp.status_code, resp.text))
+        LOG.error("Failed to add permission ({}) to role ({}): expected 200, got {}: {}".format(permission_id, role['_id'], resp.status_code, resp.text))
         return None
 
-    print("  [DEBUG] Permission ({}) added to role ({})".format(permission_id, role['_id']))
+    LOG.debug("Permission ({}) added to role ({})".format(permission_id, role['_id']))
     return resp.json()
 
 
@@ -209,7 +215,7 @@ def create_group(authz_api, authz_token, group_name, role_id):
         }
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to get groups: expected 200, got {}: {}".format(resp.status_code, resp.text))
+        LOG.error("Failed to get groups: expected 200, got {}: {}".format(resp.status_code, resp.text))
         return None
 
     groups = resp.json()
@@ -222,7 +228,7 @@ def create_group(authz_api, authz_token, group_name, role_id):
             break
     if group:
         # Return existing group
-        print("  [DEBUG] Group already exists = ", group)
+        LOG.debug("Group already exists = {}".format(group))
         return group
 
     # Create new group
@@ -237,11 +243,11 @@ def create_group(authz_api, authz_token, group_name, role_id):
         }
     )
     if resp.status_code != 200:
-        print("  [ERROR] Failed to create group: expected 200, got {}: {}".format(resp.status_code, resp.text))
+        LOG.error("Failed to create group: expected 200, got {}: {}".format(resp.status_code, resp.text))
         return None
     group = resp.json()
 
-    print("  [DEBUG] Group created = ", group)
+    LOG.debug("Group created = {}".format(group))
     return group
 
 
@@ -257,14 +263,13 @@ def add_role_to_group(authz_api, authz_token, group, role_id):
         json=[role_id],
     )
     if resp.status_code != 204:
-        print("  [ERROR] Failed to add role ({}) to group ({}): expected 204, got {}: {}".format(role_id, group_id, resp.status_code, resp.text))
+        LOG.error("Failed to add role ({}) to group ({}): expected 204, got {}: {}".format(role_id, group_id, resp.status_code, resp.text))
         return None
 
-    print("  [DEBUG] Role ({}) added to group ({})".format(role_id, group_id))
+    LOG.debug("Role ({}) added to group ({})".format(role_id, group_id))
     return group
 
 
-# TODO
 def add_user_to_group(authz_api, authz_token, group, user_id):
     group_id = group['_id']
     # Update the group
@@ -276,10 +281,10 @@ def add_user_to_group(authz_api, authz_token, group, user_id):
         json=[user_id],
     )
     if resp.status_code != 204:
-        print("  [ERROR] Failed to add user ({}) to group ({}): expected 204, got {}: {}".format(user_id, group_id, resp.status_code, resp.text))
+        LOG.error("Failed to add user ({}) to group ({}): expected 204, got {}: {}".format(user_id, group_id, resp.status_code, resp.text))
         return None
 
-    print("  [DEBUG] User ({}) added to group ({})".format(user_id, group_id))
+    LOG.debug("User ({}) added to group ({})".format(user_id, group_id))
     return group
 
 
