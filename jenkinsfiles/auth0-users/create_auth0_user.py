@@ -2,6 +2,9 @@
 
 # Authorization Extension API doc: https://kerinmoj.eu.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/configuration/api
 
+from group_api import GroupAPI
+from role_api import RoleAPI
+
 import argparse
 import requests
 import logging
@@ -130,163 +133,6 @@ def create_permission(authz_api, authz_token, app_id, permission_name):
     LOG.debug("Permission created = {}".format(permission))
     return permission
 
-def create_role(authz_api, authz_token, app_id, role_name):
-    # Get existing roles
-    resp = requests.get(
-        '{}/roles'.format(authz_api),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        }
-    )
-    if resp.status_code != 200:
-        LOG.error("Failed to get roles: expected 200, got {}: {}".format(resp.status_code, resp.text))
-        return None
-
-    roles = resp.json()
-
-    # Check if role already exists
-    role = None
-    for r in roles['roles']:
-        if r['applicationId'] == app_id and r['name'] == role_name:
-            role = r
-            break
-    if role:
-        # Return existing role
-        LOG.debug("Role already exists = {}".format(role))
-        return role
-
-    # Create new role
-    resp = requests.post(
-        '{}/roles'.format(authz_api),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token),
-        },
-        json={
-          'name': role_name,
-          'description': role_name,
-          'applicationId': app_id,
-          'applicationType': "client",
-        }
-    )
-    if resp.status_code != 200:
-        LOG.error("Failed to create role: expected 200, got {}: {}".format(resp.status_code, resp.text))
-        return None
-
-    role = resp.json()
-
-    LOG.debug("Role created = {}".format(role))
-    return role
-
-
-def add_permission_to_role(authz_api, authz_token, role, permission_id):
-    payload = {
-        'name': role['name'],
-        'description': role['description'],
-        'applicationId': role['applicationId'],
-        'applicationType': role['applicationType'],
-        'permissions': role['permissions'],
-    }
-    # Authorization Extension doesn't check for duplicated permissions
-    if permission_id not in payload['permissions']:
-        payload['permissions'].append(permission_id)
-
-    # Update the role
-    resp = requests.put(
-        '{}/roles/{}'.format(authz_api, role['_id']),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        },
-        json=payload,
-    )
-    if resp.status_code != 200:
-        LOG.error("Failed to add permission ({}) to role ({}): expected 200, got {}: {}".format(permission_id, role['_id'], resp.status_code, resp.text))
-        return None
-
-    LOG.debug("Permission ({}) added to role ({})".format(permission_id, role['_id']))
-    return resp.json()
-
-
-def create_group(authz_api, authz_token, group_name, role_id):
-    # Get existing roles
-    resp = requests.get(
-        '{}/groups'.format(authz_api),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        }
-    )
-    if resp.status_code != 200:
-        LOG.error("Failed to get groups: expected 200, got {}: {}".format(resp.status_code, resp.text))
-        return None
-
-    groups = resp.json()
-
-    # Check if group already exists
-    group = None
-    for g in groups['groups']:
-        if g['name'] == group_name:
-            group = g
-            break
-    if group:
-        # Return existing group
-        LOG.debug("Group already exists = {}".format(group))
-        return group
-
-    # Create new group
-    resp = requests.post(
-        '{}/groups'.format(authz_api),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token),
-        },
-        json={
-          'name': group_name,
-          'description': group_name,
-        }
-    )
-    if resp.status_code != 200:
-        LOG.error("Failed to create group: expected 200, got {}: {}".format(resp.status_code, resp.text))
-        return None
-    group = resp.json()
-
-    LOG.debug("Group created = {}".format(group))
-    return group
-
-
-def add_role_to_group(authz_api, authz_token, group, role_id):
-    group_id = group['_id']
-
-    # Update the group
-    resp = requests.patch(
-        '{}/groups/{}/roles'.format(authz_api, group_id),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        },
-        json=[role_id],
-    )
-    if resp.status_code != 204:
-        LOG.error("Failed to add role ({}) to group ({}): expected 204, got {}: {}".format(role_id, group_id, resp.status_code, resp.text))
-        return None
-
-    LOG.debug("Role ({}) added to group ({})".format(role_id, group_id))
-    return group
-
-
-def add_user_to_group(authz_api, authz_token, group, user_id):
-    group_id = group['_id']
-    # Update the group
-    resp = requests.patch(
-        '{}/groups/{}/members'.format(authz_api, group_id),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        },
-        json=[user_id],
-    )
-    if resp.status_code != 204:
-        LOG.error("Failed to add user ({}) to group ({}): expected 204, got {}: {}".format(user_id, group_id, resp.status_code, resp.text))
-        return None
-
-    LOG.debug("User ({}) added to group ({})".format(user_id, group_id))
-    return group
-
 
 def process(domain, client_id, client_secret, authz_api, app_name, email):
     # create API client
@@ -305,13 +151,17 @@ def process(domain, client_id, client_secret, authz_api, app_name, email):
     permission = create_permission(authz_api, authz_token, app_id, PERMISSION_NAME)
     permission_id = permission['_id']
 
-    role = create_role(authz_api, authz_token, app_id, ROLE_NAME)
-    role = add_permission_to_role(authz_api, authz_token, role, permission_id)
-    role_id = role['_id']
+    role_api = RoleAPI(authz_api, authz_token, LOG)
+    role = role_api \
+        .create(app_id, ROLE_NAME) \
+        .add_permission(permission_id)
+    role_id = role.id()
 
-    group = create_group(authz_api, authz_token, app_name, role_id)
-    group = add_role_to_group(authz_api, authz_token, group, role_id)
-    group = add_user_to_group(authz_api, authz_token, group, user_id)
+    group_api = GroupAPI(authz_api, authz_token, LOG)
+    group = group_api \
+        .create(app_name) \
+        .add_role(role_id) \
+        .add_user(user_id)
 
 
 if __name__ == '__main__':
