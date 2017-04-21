@@ -13,7 +13,7 @@ class RoleAPI(object):
     def create(self, app_id, role_name):
         role_data = self._get_role(app_id, role_name)
         if not role_data:
-            role_data = self._create_role(role_name)
+            role_data = self._create_role(app_id, role_name)
 
         return Role(self.authz_api, self.authz_token, self.log, role_data)
 
