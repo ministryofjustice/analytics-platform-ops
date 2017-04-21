@@ -1,21 +1,26 @@
 from group import Group
 
 import requests
+import logging
+
+
+logging.basicConfig()
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 class GroupAPI(object):
 
-    def __init__(self, authz_api, authz_token, logger):
+    def __init__(self, authz_api, authz_token):
         self.authz_api = authz_api
         self.authz_token = authz_token
-        self.log = logger
 
     def create(self, group_name):
         group_data = self._get_group(group_name)
         if not group_data:
             group_data = self._create_group(group_name)
 
-        return Group(self.authz_api, self.authz_token, self.log, group_data)
+        return Group(self.authz_api, self.authz_token, group_data)
 
     def _get_all(self):
         # Get existing groups
@@ -26,7 +31,7 @@ class GroupAPI(object):
             }
         )
         if resp.status_code != 200:
-            self.log.error("Failed to get groups: expected 200, got {}: {}".format(resp.status_code, resp.text))
+            LOG.error("Failed to get groups: expected 200, got {}: {}".format(resp.status_code, resp.text))
             return None
 
         return resp.json()['groups']
@@ -53,10 +58,10 @@ class GroupAPI(object):
             }
         )
         if resp.status_code != 200:
-            self.log.error("Failed to create group: expected 200, got {}: {}".format(resp.status_code, resp.text))
+            LOG.error("Failed to create group: expected 200, got {}: {}".format(resp.status_code, resp.text))
             return None
         group = resp.json()
 
-        self.log.debug("Group created = {}".format(group))
+        LOG.debug("Group created = {}".format(group))
         return group
 

@@ -1,16 +1,21 @@
 import requests
+import logging
+
+
+logging.basicConfig()
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 class Group(object):
 
-    def __init__(self, authz_api, authz_token, logger, group_data):
+    def __init__(self, authz_api, authz_token, group_data):
         if not group_data:
             raise ValueError("group_data can't be empty")
 
         self.authz_api = authz_api
         self.authz_token = authz_token
         self.data = group_data
-        self.log = logger
 
     def id(self):
         return self.data["_id"]
@@ -25,10 +30,10 @@ class Group(object):
             json=[role_id],
         )
         if resp.status_code != 204:
-            self.log.error("Failed to add role ({}) to group ({}): expected 204, got {}: {}".format(role_id, self.id(), resp.status_code, resp.text))
+            LOG.error("Failed to add role ({}) to group ({}): expected 204, got {}: {}".format(role_id, self.id(), resp.status_code, resp.text))
             return None
 
-        self.log.debug("Role ({}) added to group ({})".format(role_id, self.id()))
+        LOG.debug("Role ({}) added to group ({})".format(role_id, self.id()))
         return self
 
 
@@ -42,8 +47,8 @@ class Group(object):
             json=[user_id],
         )
         if resp.status_code != 204:
-            self.log.error("Failed to add user ({}) to group ({}): expected 204, got {}: {}".format(user_id, self.id(), resp.status_code, resp.text))
+            LOG.error("Failed to add user ({}) to group ({}): expected 204, got {}: {}".format(user_id, self.id(), resp.status_code, resp.text))
             return None
 
-        self.log.debug("User ({}) added to group ({})".format(user_id, self.id()))
+        LOG.debug("User ({}) added to group ({})".format(user_id, self.id()))
         return self
