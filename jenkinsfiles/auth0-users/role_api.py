@@ -1,21 +1,26 @@
 from role import Role
 
 import requests
+import logging
+
+
+logging.basicConfig()
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 class RoleAPI(object):
 
-    def __init__(self, authz_api, authz_token, logger):
+    def __init__(self, authz_api, authz_token):
         self.authz_api = authz_api
         self.authz_token = authz_token
-        self.log = logger
 
     def create(self, app_id, role_name):
         role_data = self._get_role(app_id, role_name)
         if not role_data:
             role_data = self._create_role(app_id, role_name)
 
-        return Role(self.authz_api, self.authz_token, self.log, role_data)
+        return Role(self.authz_api, self.authz_token, role_data)
 
     def _get_all(self):
         # Get existing roles
@@ -26,7 +31,7 @@ class RoleAPI(object):
             }
         )
         if resp.status_code != 200:
-            self.log.error("Failed to get roles: expected 200, got {}: {}".format(resp.status_code, resp.text))
+            LOG.error("Failed to get roles: expected 200, got {}: {}".format(resp.status_code, resp.text))
             return None
 
         return resp.json()['roles']
@@ -55,10 +60,10 @@ class RoleAPI(object):
             }
         )
         if resp.status_code != 200:
-            self.log.error("Failed to create role: expected 200, got {}: {}".format(resp.status_code, resp.text))
+            LOG.error("Failed to create role: expected 200, got {}: {}".format(resp.status_code, resp.text))
             return None
 
         role = resp.json()
 
-        self.log.debug("Role created = {}".format(role))
+        LOG.debug("Role created = {}".format(role))
         return role

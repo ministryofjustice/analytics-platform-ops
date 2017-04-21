@@ -104,16 +104,16 @@ def process(domain, client_id, client_secret, authz_api, app_name, email):
     app = get_app(auth0, app_name)
     app_id = app['client_id']
 
-    permission_api = PermissionAPI(authz_api, authz_token, LOG)
+    permission_api = PermissionAPI(authz_api, authz_token)
     permission = permission_api.create(app_id, PERMISSION_NAME)
 
-    role_api = RoleAPI(authz_api, authz_token, LOG)
+    role_api = RoleAPI(authz_api, authz_token)
     role = role_api \
         .create(app_id, ROLE_NAME) \
         .add_permission(permission.id())
     role_id = role.id()
 
-    group_api = GroupAPI(authz_api, authz_token, LOG)
+    group_api = GroupAPI(authz_api, authz_token)
     group = group_api \
         .create(app_name) \
         .add_role(role_id) \

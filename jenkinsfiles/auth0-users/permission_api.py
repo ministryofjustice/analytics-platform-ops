@@ -1,21 +1,26 @@
 from permission import Permission
 
 import requests
+import logging
+
+
+logging.basicConfig()
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 class PermissionAPI(object):
 
-    def __init__(self, authz_api, authz_token, logger):
+    def __init__(self, authz_api, authz_token):
         self.authz_api = authz_api
         self.authz_token = authz_token
-        self.log = logger
 
     def create(self, app_id, permission_name):
         permission_data = self._get_permission(app_id, permission_name)
         if not permission_data:
             permission_data = self._create_permission(app_id, permission_name)
 
-        return Permission(self.authz_api, self.authz_token, self.log, permission_data)
+        return Permission(self.authz_api, self.authz_token, permission_data)
 
 
     def _get_permission(self, app_id, permission_name):
@@ -35,7 +40,7 @@ class PermissionAPI(object):
             }
         )
         if resp.status_code != 200:
-            self.log.debug("Failed to get permissions: expected 200, got {}: {}".format(resp.status_code, resp.text))
+            LOG.debug("Failed to get permissions: expected 200, got {}: {}".format(resp.status_code, resp.text))
             return None
         return resp.json()['permissions']
 
@@ -55,9 +60,9 @@ class PermissionAPI(object):
             }
         )
         if resp.status_code != 200:
-            self.log.error("Failed to create permission: expected 200, got {}: {}".format(resp.status_code, resp.text))
+            LOG.error("Failed to create permission: expected 200, got {}: {}".format(resp.status_code, resp.text))
             return None
         permission = resp.json()
 
-        self.log.debug("Permission created = {}".format(permission))
+        LOG.debug("Permission created = {}".format(permission))
         return permission
