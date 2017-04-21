@@ -1,16 +1,21 @@
 import requests
+import logging
+
+
+logging.basicConfig()
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.DEBUG)
 
 
 class Role(object):
 
-    def __init__(self, authz_api, authz_token, logger, role_data):
+    def __init__(self, authz_api, authz_token, role_data):
         if not role_data:
             raise ValueError("role_data can't be empty")
 
         self.authz_api = authz_api
         self.authz_token = authz_token
         self.data = role_data
-        self.log = logger
 
     def id(self):
         return self.data["_id"]
@@ -52,9 +57,9 @@ class Role(object):
             json=payload,
         )
         if resp.status_code != 200:
-            self.log.error("Failed to add permission ({}) to role ({}): expected 200, got {}: {}".format(permission_id, self.id(), resp.status_code, resp.text))
+            LOG.error("Failed to add permission ({}) to role ({}): expected 200, got {}: {}".format(permission_id, self.id(), resp.status_code, resp.text))
             return None
 
-        self.log.debug("Permission ({}) added to role ({})".format(permission_id, self.id()))
+        LOG.debug("Permission ({}) added to role ({})".format(permission_id, self.id()))
         self.data = resp.json()
         return self
