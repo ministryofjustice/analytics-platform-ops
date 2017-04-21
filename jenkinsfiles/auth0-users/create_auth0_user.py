@@ -4,6 +4,7 @@
 
 from group_api import GroupAPI
 from role_api import RoleAPI
+from permission_api import PermissionAPI
 
 import argparse
 import requests
@@ -89,51 +90,6 @@ def get_authz_token(domain, client_id, client_secret):
     return credentials['access_token']
 
 
-def create_permission(authz_api, authz_token, app_id, permission_name):
-    # Get existing permissions
-    resp = requests.get(
-        '{}/permissions'.format(authz_api),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        }
-    )
-    if resp.status_code != 200:
-        LOG.debug("Failed to get permissions: expected 200, got {}: {}".format(resp.status_code, resp.text))
-        return None
-    permissions = resp.json()
-    permission = None
-    # Check if permission already exists
-    for p in permissions['permissions']:
-        if p['applicationId'] == app_id and p['name'] == permission_name:
-            permission = p
-            break
-    if permission:
-        # Return existing permission
-        LOG.debug("Permission already exists = {}".format(permission))
-        return permission
-
-    # Create new permission
-    resp = requests.post(
-        '{}/permissions'.format(authz_api),
-        headers={
-            "Authorization": "Bearer {}".format(authz_token)
-        },
-        json={
-          'name': permission_name,
-          'description': permission_name,
-          'applicationId': app_id,
-          'applicationType': 'client',
-        }
-    )
-    if resp.status_code != 200:
-        LOG.error("Failed to create permission: expected 200, got {}: {}".format(resp.status_code, resp.text))
-        return None
-    permission = resp.json()
-
-    LOG.debug("Permission created = {}".format(permission))
-    return permission
-
-
 def process(domain, client_id, client_secret, authz_api, app_name, email):
     # create API client
     auth0 = get_auth0_client(domain, client_id, client_secret)
@@ -148,13 +104,13 @@ def process(domain, client_id, client_secret, authz_api, app_name, email):
     app = get_app(auth0, app_name)
     app_id = app['client_id']
 
-    permission = create_permission(authz_api, authz_token, app_id, PERMISSION_NAME)
-    permission_id = permission['_id']
+    permission_api = PermissionAPI(authz_api, authz_token, LOG)
+    permission = permission_api.create(app_id, PERMISSION_NAME)
 
     role_api = RoleAPI(authz_api, authz_token, LOG)
     role = role_api \
         .create(app_id, ROLE_NAME) \
-        .add_permission(permission_id)
+        .add_permission(permission.id())
     role_id = role.id()
 
     group_api = GroupAPI(authz_api, authz_token, LOG)
