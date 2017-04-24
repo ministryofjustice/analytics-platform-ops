@@ -11,7 +11,7 @@ spec:
       labels:
         app: {{ template "fullname" . }}
       annotations:
-        checksum/secrets: {{ include (print $.Template.BasePath "secrets.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
     spec:
       containers:
         - name: auth-proxy
