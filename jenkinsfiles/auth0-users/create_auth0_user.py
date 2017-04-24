@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
-# Authorization Extension API doc: https://kerinmoj.eu.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/configuration/api
-
-from group_api import GroupAPI
-from role_api import RoleAPI
-from permission_api import PermissionAPI
+# Authorization Extension API doc:
+# https://kerinmoj.eu.webtask.io/adf6e2f2b84784b57522e3b19dfc9201/configuration/api
 
 import argparse
-import requests
 import logging
+import requests
+
 from auth0.v3.authentication import GetToken
 from auth0.v3.management import Auth0
+
+from group_api import GroupAPI
+from permission_api import PermissionAPI
+from role_api import RoleAPI
 
 
 ROLE_NAME = 'app-viewer'
@@ -23,8 +25,39 @@ LOG.setLevel(logging.DEBUG)
 
 def main():
     args = get_args()
-    process(args.domain, args.client_id, args.client_secret, args.authz_api,
-            args.app_name, args.email)
+
+    # create API client
+    auth0_client = get_auth0_client(
+        args.domain,
+        args.client_id,
+        args.client_secret,
+    )
+
+    # get authorization extension token
+    authz_token = get_token(
+        args.domain,
+        args.client_id,
+        args.client_secret,
+        'urn:auth0-authz-api',
+    )
+
+    user = create_passwordless_user(auth0_client, args.email)
+
+    # Get shiny app by name
+    app = get_app(auth0_client, args.app_name)
+    app_id = app['client_id']
+
+    permission_api = PermissionAPI(args.authz_api, authz_token)
+    permission = permission_api.create(app_id, PERMISSION_NAME)
+
+    role_api = RoleAPI(args.authz_api, authz_token)
+    role = role_api.create(app_id, ROLE_NAME)
+    role.add_permission(permission.id())
+
+    group_api = GroupAPI(args.authz_api, authz_token)
+    group = group_api.create(args.app_name)
+    group.add_role(role.id())
+    group.add_user(user['user_id'])
 
 
 def get_args():
@@ -39,15 +72,28 @@ def get_args():
     return parser.parse_args()
 
 
+def get_token(domain, client_id, client_secret, audience):
+    token_api = GetToken(domain)
+    credentials = token_api.client_credentials(
+        client_id,
+        client_secret,
+        audience,
+    )
+
+    return credentials['access_token']
+
+
 def get_auth0_client(domain, client_id, client_secret):
-    # get management API token
-    get_token = GetToken(domain)
-    token = get_token.client_credentials(client_id, client_secret,
-                                         'https://{}/api/v2/'.format(domain))
-    mgmt_api_token = token['access_token']
+    # Get management API token
+    token = get_token(
+        domain,
+        client_id,
+        client_secret,
+        'https://{}/api/v2/'.format(domain)
+    )
 
     # Return Auth0 API client
-    return Auth0(domain, mgmt_api_token)
+    return Auth0(domain, token)
 
 
 def create_passwordless_user(auth0_client, email):
@@ -56,11 +102,11 @@ def create_passwordless_user(auth0_client, email):
         q='identities.connection:"email" AND email:"{}"'.format(email)
     )
 
+    user = None
     if users_list['length'] > 0:
         # return existing user
         user = users_list['users'][0]
         LOG.info("User already exists = {}".format(user))
-        return user
     else:
         # create new user
         user = auth0_client.users.create({
@@ -69,7 +115,7 @@ def create_passwordless_user(auth0_client, email):
             "email_verified": True
         })
         LOG.info("User created = {}".format(user))
-        return user
+    return user
 
 
 def get_app(auth0_client, app_name):
@@ -78,48 +124,11 @@ def get_app(auth0_client, app_name):
         if app['name'] == app_name:
             LOG.debug("App found = {}".format(app))
             return app
-    LOG.critical("App with name '{}' not found".format(app_name))
 
-
-def get_authz_token(domain, client_id, client_secret):
-    get_token = GetToken(domain)
-    credentials = get_token.client_credentials(
-        client_id, client_secret, 'urn:auth0-authz-api'
-    )
-
-    return credentials['access_token']
-
-
-def process(domain, client_id, client_secret, authz_api, app_name, email):
-    # create API client
-    auth0 = get_auth0_client(domain, client_id, client_secret)
-
-    # get authorization extension token
-    authz_token = get_authz_token(domain, client_id, client_secret)
-
-    user = create_passwordless_user(auth0, email)
-    user_id = user['user_id']
-
-    # Get shiny app by name
-    app = get_app(auth0, app_name)
-    app_id = app['client_id']
-
-    permission_api = PermissionAPI(authz_api, authz_token)
-    permission = permission_api.create(app_id, PERMISSION_NAME)
-
-    role_api = RoleAPI(authz_api, authz_token)
-    role = role_api \
-        .create(app_id, ROLE_NAME) \
-        .add_permission(permission.id())
-    role_id = role.id()
-
-    group_api = GroupAPI(authz_api, authz_token)
-    group = group_api \
-        .create(app_name) \
-        .add_role(role_id) \
-        .add_user(user_id)
+    msg = "App with name '{}' not found".format(app_name)
+    LOG.critical(msg)
+    raise Exception(msg)
 
 
 if __name__ == '__main__':
-    import sys
-    sys.exit(main())
+    main()

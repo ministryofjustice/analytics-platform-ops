@@ -1,5 +1,5 @@
-import requests
 import logging
+import requests
 
 
 logging.basicConfig()
@@ -11,7 +11,7 @@ class Group(object):
 
     def __init__(self, authz_api, authz_token, group_data):
         if not group_data:
-            raise ValueError("group_data can't be empty")
+            raise Exception("group_data can't be empty")
 
         self.authz_api = authz_api
         self.authz_token = authz_token
@@ -21,34 +21,40 @@ class Group(object):
         return self.data["_id"]
 
     def add_role(self, role_id):
-        # Update the group
-        resp = requests.patch(
-            '{}/groups/{}/roles'.format(self.authz_api, self.id()),
-            headers={
-                "Authorization": "Bearer {}".format(self.authz_token)
-            },
-            json=[role_id],
-        )
-        if resp.status_code != 204:
-            LOG.error("Failed to add role ({}) to group ({}): expected 204, got {}: {}".format(role_id, self.id(), resp.status_code, resp.text))
-            return None
+        endpoint = '{}/groups/{}/roles'.format(self.authz_api, self.id())
+
+        if not self._add_child(endpoint, self.authz_token, role_id):
+            msg = "Failed to add role ({}) to group ({})".format(
+                role_id, self.id())
+            LOG.error(msg)
+            raise Exception(msg)
 
         LOG.debug("Role ({}) added to group ({})".format(role_id, self.id()))
-        return self
-
 
     def add_user(self, user_id):
-        # Update the group
+        endpoint = '{}/groups/{}/members'.format(self.authz_api, self.id())
+
+        if not self._add_child(endpoint, self.authz_token, user_id):
+            msg = "Failed to add user ({}) to group ({})".format(
+                user_id, self.id())
+            LOG.error(msg)
+            raise Exception(msg)
+
+        LOG.debug("User ({}) added to group ({})".format(user_id, self.id()))
+
+
+    def _add_child(self, endpoint, authz_token, child_id):
         resp = requests.patch(
-            '{}/groups/{}/members'.format(self.authz_api, self.id()),
+            endpoint,
             headers={
                 "Authorization": "Bearer {}".format(self.authz_token)
             },
-            json=[user_id],
+            json=[child_id],
         )
         if resp.status_code != 204:
-            LOG.error("Failed to add user ({}) to group ({}): expected 204, got {}: {}".format(user_id, self.id(), resp.status_code, resp.text))
-            return None
-
-        LOG.debug("User ({}) added to group ({})".format(user_id, self.id()))
-        return self
+            LOG.error("Request failed: expected 204, got {}: PATCH {} failed: {}".format(
+                resp.status_code, endpoint, resp.text
+            ))
+            return False
+        else:
+            return True
