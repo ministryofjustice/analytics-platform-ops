@@ -4,6 +4,17 @@ node {
         checkout scm
     }
 
+    // See details on broken pip https://askubuntu.com/a/528625
+    stage ("Set up python3 environment") {
+        // sh "python3 -m venv venv"
+        sh "python3 -m venv --without-pip venv"
+        sh "curl https://bootstrap.pypa.io/get-pip.py | venv/bin/python3"
+    }
+
+    stage ("Install script dependencies") {
+        sh "venv/bin/pip3 install -r jenkinsfiles/auth0-users/requirements.txt"
+    }
+
     // Also does the following in Authorization Extension:
     // - creates group ${env.APP_NAME}
     // - creates role 'app-viewer' for app
@@ -22,7 +33,7 @@ node {
         [$class: 'StringBinding', credentialsId: 'AUTHZ_API', variable:
 'AUTHZ_API']
       ]) {
-        sh "jenkinsfiles/auth0-users/create_auth0_user.py ${env.AUTH0_DOMAIN} ${env.AUTH0_CLIENT_ID} ${env.AUTH0_CLIENT_SECRET} ${env.AUTHZ_API} \\'${env.APP_NAME}\\' ${env.EMAIL}"
+        sh 'venv/bin/python3 jenkinsfiles/auth0-users/create_auth0_user.py ${env.AUTH0_DOMAIN} ${env.AUTH0_CLIENT_ID} ${env.AUTH0_CLIENT_SECRET} ${env.AUTHZ_API} \\"${env.APP_NAME}\\" ${env.EMAIL}'
       }
     }
 }
