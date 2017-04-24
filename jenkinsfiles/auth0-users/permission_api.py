@@ -1,7 +1,7 @@
-from permission import Permission
-
-import requests
 import logging
+import requests
+
+from permission import Permission
 
 
 logging.basicConfig()
@@ -22,14 +22,11 @@ class PermissionAPI(object):
 
         return Permission(self.authz_api, self.authz_token, permission_data)
 
-
     def _get_permission(self, app_id, permission_name):
         permissions = self._get_all()
         for permission in permissions:
             if permission['applicationId'] == app_id and permission['name'] == permission_name:
                 return permission
-        return None
-
 
     def _get_all(self):
         # Get existing permissions
@@ -40,10 +37,12 @@ class PermissionAPI(object):
             }
         )
         if resp.status_code != 200:
-            LOG.debug("Failed to get permissions: expected 200, got {}: {}".format(resp.status_code, resp.text))
-            return None
-        return resp.json()['permissions']
+            msg = "Failed to get permissions: expected 200, got {}: {}".format(
+                resp.status_code, resp.text)
+            LOG.error(msg)
+            raise Exception(msg)
 
+        return resp.json()['permissions']
 
     def _create_permission(self, app_id, permission_name):
         # Create new permission
@@ -53,16 +52,18 @@ class PermissionAPI(object):
                 "Authorization": "Bearer {}".format(self.authz_token)
             },
             json={
-              'name': permission_name,
-              'description': permission_name,
-              'applicationId': app_id,
-              'applicationType': 'client',
+                'name': permission_name,
+                'description': permission_name,
+                'applicationId': app_id,
+                'applicationType': 'client',
             }
         )
         if resp.status_code != 200:
-            LOG.error("Failed to create permission: expected 200, got {}: {}".format(resp.status_code, resp.text))
-            return None
-        permission = resp.json()
+            msg = "Failed to create permission: expected 200, got {}: {}".format(
+                resp.status_code, resp.text)
+            LOG.error(msg)
+            raise Exception(msg)
 
+        permission = resp.json()
         LOG.debug("Permission created = {}".format(permission))
         return permission

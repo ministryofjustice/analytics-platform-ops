@@ -1,7 +1,7 @@
-from group import Group
-
-import requests
 import logging
+import requests
+
+from group import Group
 
 
 logging.basicConfig()
@@ -31,19 +31,18 @@ class GroupAPI(object):
             }
         )
         if resp.status_code != 200:
-            LOG.error("Failed to get groups: expected 200, got {}: {}".format(resp.status_code, resp.text))
-            return None
+            msg = "Failed to get groups: expected 200, got {}: {}".format(
+                resp.status_code, resp.text)
+            LOG.error(msg)
+            raise Exception(msg)
 
         return resp.json()['groups']
-
 
     def _get_group(self, group_name):
         groups = self._get_all()
         for group in groups:
             if group['name'] == group_name:
                 return group
-        return None
-
 
     def _create_group(self, group_name):
         # Create new group
@@ -53,15 +52,16 @@ class GroupAPI(object):
                 "Authorization": "Bearer {}".format(self.authz_token),
             },
             json={
-              'name': group_name,
-              'description': group_name,
+                'name': group_name,
+                'description': group_name,
             }
         )
         if resp.status_code != 200:
-            LOG.error("Failed to create group: expected 200, got {}: {}".format(resp.status_code, resp.text))
-            return None
-        group = resp.json()
+            msg = "Failed to create group: expected 200, got {}: {}".format(
+                resp.status_code, resp.text)
+            LOG.error(msg)
+            raise Exception(msg)
 
+        group = resp.json()
         LOG.debug("Group created = {}".format(group))
         return group
-
