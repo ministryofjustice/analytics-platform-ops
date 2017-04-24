@@ -33,7 +33,10 @@ node {
         [$class: 'StringBinding', credentialsId: 'AUTHZ_API', variable:
 'AUTHZ_API']
       ]) {
-        sh 'venv/bin/python3 jenkinsfiles/auth0-users/create_auth0_user.py ${env.AUTH0_DOMAIN} ${env.AUTH0_CLIENT_ID} ${env.AUTH0_CLIENT_SECRET} ${env.AUTHZ_API} \\"${env.APP_NAME}\\" ${env.EMAIL}'
+        // See "Escaping quotes in Groovy strings":
+        //     http://mrhaki.blogspot.co.uk/2009/04/escaping-quotes-in-groovy-strings.html
+        params = /${env.AUTH0_DOMAIN} ${env.AUTH0_CLIENT_ID} ${env.AUTH0_CLIENT_SECRET} ${env.AUTHZ_API} "${env.APP_NAME}" ${env.EMAIL}/
+        sh "venv/bin/python3 jenkinsfiles/auth0-users/create_auth0_user.py ${params}"
       }
     }
 }
