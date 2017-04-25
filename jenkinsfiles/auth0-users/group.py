@@ -9,6 +9,9 @@ LOG.setLevel(logging.DEBUG)
 
 
 class Group(object):
+    """
+    Auth0 Authorization Extension's Group
+    """
 
     def __init__(self, authz_api, authz_token, group_data):
         if not group_data:
@@ -22,6 +25,19 @@ class Group(object):
         return self.data["_id"]
 
     def add_role(self, role_id):
+        """
+        Adds role to the group
+
+        Raises an exception if it can't.
+
+        Args:
+            role_id (string): ID of the role to add
+
+        Required scopes:
+            * ``read:groups``
+            * ``update:groups``
+        """
+
         endpoint = '{}/groups/{}/roles'.format(self.authz_api, self.id())
 
         if not self._add_child(endpoint, self.authz_token, role_id):
@@ -33,6 +49,19 @@ class Group(object):
         LOG.debug("Role ({}) added to group ({})".format(role_id, self.id()))
 
     def add_user(self, user_id):
+        """
+        Adds user to the group
+
+        Raises an exception if it can't.
+
+        Args:
+            user_id (string): ID of the user to add
+
+        Required scopes:
+            * ``read:groups``
+            * ``update:groups``
+        """
+
         endpoint = '{}/groups/{}/members'.format(self.authz_api, self.id())
 
         if not self._add_child(endpoint, self.authz_token, user_id):
