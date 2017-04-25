@@ -36,10 +36,10 @@ function (user, context, callback) {
   });
 
   function canViewShinyApp(user) {
-    // NOTE: 'view-shiny-app' is the name of the permission but the
+    // NOTE: 'view:app' is the name of the permission but the
     //       authorization plugin only expose the permissions for the current
     //       client the user is trying to log into.
-    return _.includes(user.permissions, 'view-shiny-app');
+    return _.includes(user.permissions, 'view:app');
   }
 
   // Get the policy for the user.
