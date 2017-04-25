@@ -11,12 +11,32 @@ LOG.setLevel(logging.DEBUG)
 
 
 class PermissionAPI(object):
+    """
+    Auth0 Authorization Extension's Permission API abstraction
+    """
 
     def __init__(self, authz_api, authz_token):
         self.authz_api = authz_api
         self.authz_token = authz_token
 
     def create(self, app_id, permission_name):
+        """
+        Creates a permission
+
+        If the permission already exists it returns it
+
+        Args:
+            app_id (string): ID of the client on which create permission
+            permission_name (string): name of the permission to create
+
+        Returns:
+            created permission (Permission) or raises an exception
+
+        Required scopes:
+            * ``read:permissions``
+            * ``create:permissions``
+        """
+
         permission_data = self._get_permission(app_id, permission_name)
         if not permission_data:
             permission_data = self._create_permission(app_id, permission_name)
