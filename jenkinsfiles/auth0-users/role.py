@@ -9,6 +9,9 @@ LOG.setLevel(logging.DEBUG)
 
 
 class Role(object):
+    """
+    Auth0 Authorization Extension's Role
+    """
 
     def __init__(self, authz_api, authz_token, role_data):
         if not role_data:
@@ -37,6 +40,19 @@ class Role(object):
         return self.data["permissions"]
 
     def add_permission(self, permission_id):
+        """
+        Adds permission to the role
+
+        Raises an exception if it can't.
+
+        Args:
+            permission_id (string): ID of the permission to add
+
+        Required scopes:
+            * ``read:roles``
+            * ``update:roles``
+        """
+
         payload = {
             'name': self.name(),
             'description': self.description(),

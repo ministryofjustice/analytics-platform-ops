@@ -11,12 +11,30 @@ LOG.setLevel(logging.DEBUG)
 
 
 class GroupAPI(object):
+    """
+    Auth0 Authorization Extension's Group API abstraction
+    """
 
     def __init__(self, authz_api, authz_token):
         self.authz_api = authz_api
         self.authz_token = authz_token
 
     def create(self, group_name):
+        """
+        Creates a group with group_name name
+
+        If the group already exists it returns it
+
+        Args:
+            group_name (string): name of the group to create
+
+        Returns:
+            created group (Group) or raises an exception
+
+        Required scopes:
+            * ``read:groups``
+            * ``create:groups``
+        """
         group_data = self._get_group(group_name)
         if not group_data:
             group_data = self._create_group(group_name)

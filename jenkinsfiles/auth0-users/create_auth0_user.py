@@ -73,6 +73,19 @@ def get_args():
 
 
 def get_token(domain, client_id, client_secret, audience):
+    """
+    Gets Auth0 token
+
+    Args:
+        domain (string): Auth0 domain
+        client_id (string): Auth0 client_id
+        client_secret (string): Auth0 client_secret
+        audience (string): what the token will be used for
+
+    Returns:
+        Auth0 token (string)
+    """
+
     token_api = GetToken(domain)
     credentials = token_api.client_credentials(
         client_id,
@@ -84,6 +97,18 @@ def get_token(domain, client_id, client_secret, audience):
 
 
 def get_auth0_client(domain, client_id, client_secret):
+    """
+    Gets Auth0 client
+
+    Args:
+        domain (string): Auth0 domain
+        client_id (string): Auth0 client_id
+        client_secret (string): Auth0 client_secret
+
+    Returns:
+        Auth0 client (auth0.v3.management.Auth0)
+    """
+
     # Get management API token
     token = get_token(
         domain,
@@ -97,6 +122,23 @@ def get_auth0_client(domain, client_id, client_secret):
 
 
 def create_passwordless_user(auth0_client, email):
+    """
+    Creates an Auth0 user with 'email' connection (passwordless)
+
+    Checks if the user already exists first.
+
+    Args:
+        auth0_client (auth0.v3.management.Auth0): Auth0 client
+        email (string): email address of the user to create
+
+    Returns:
+        user (dictionary)
+
+    Required scopes:
+        * ``read:users``
+        * ``create:users``
+    """
+
     users_list = auth0_client.users.list(
         search_engine='v2',
         q='identities.connection:"email" AND email:"{}"'.format(email)
@@ -119,6 +161,20 @@ def create_passwordless_user(auth0_client, email):
 
 
 def get_app(auth0_client, app_name):
+    """
+    Gets the Auth0 client by name
+
+    Args:
+        auth0_client (auth0.v3.management.Auth0): Auth0 client
+        app_name (string): client name to get
+
+    Returns:
+        client (dictionary) or raises an exception if not found
+
+    Required scopes:
+        * ``read:clients``
+    """
+
     apps = auth0_client.clients.all()
     for app in apps:
         if app['name'] == app_name:

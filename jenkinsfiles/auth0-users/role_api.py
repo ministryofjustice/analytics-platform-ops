@@ -11,12 +11,32 @@ LOG.setLevel(logging.DEBUG)
 
 
 class RoleAPI(object):
+    """
+    Auth0 Authorization Extension's Role API abstraction
+    """
 
     def __init__(self, authz_api, authz_token):
         self.authz_api = authz_api
         self.authz_token = authz_token
 
     def create(self, app_id, role_name):
+        """
+        Creates the role_name role on the app_id client
+
+        If the role already exists it returns it
+
+        Args:
+            app_id (string): ID of the client on which create role
+            role_name (string): name of the role to create
+
+        Returns:
+            created role (Role) or raises an exception
+
+        Required scopes:
+            * ``read:roles``
+            * ``create:roles``
+        """
+
         role_data = self._get_role(app_id, role_name)
         if not role_data:
             role_data = self._create_role(app_id, role_name)

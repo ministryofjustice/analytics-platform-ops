@@ -1,4 +1,7 @@
 class Permission(object):
+    """
+    Auth0 Authorization Extension's Permission
+    """
 
     def __init__(self, authz_api, authz_token, permission_data):
         if not permission_data:
