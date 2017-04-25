@@ -5,8 +5,8 @@
 
 import argparse
 import logging
-import requests
 
+import requests
 from auth0.v3.authentication import GetToken
 from auth0.v3.management import Auth0
 
