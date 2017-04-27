@@ -1,0 +1,6 @@
+host_interface: docker0
+base_role: ""
+image:
+  repository: jtblin/kube2iam
+  tag: latest
+  pullPolicy: Always
