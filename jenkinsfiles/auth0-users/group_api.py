@@ -7,7 +7,7 @@ from group import Group
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.DEBUG)
+LOG.setLevel(logging.WARNING)
 
 
 class GroupAPI(object):
@@ -19,26 +19,29 @@ class GroupAPI(object):
         self.authz_api = authz_api
         self.authz_token = authz_token
 
-    def create(self, group_name):
+    def get(self, group_name):
         """
-        Creates a group with group_name name
-
-        If the group already exists it returns it
+        Returns the group with group_name name
 
         Args:
-            group_name (string): name of the group to create
+            group_name (string): name of the group to get
 
         Returns:
-            created group (Group) or raises an exception
+            group (Group) or raises an exception
 
         Required scopes:
             * ``read:groups``
-            * ``create:groups``
         """
         group_data = self._get_group(group_name)
         if not group_data:
-            group_data = self._create_group(group_name)
+            msg = "Group with name '{}' not found.".format(
+                group_name)
+            LOG.error(msg)
+            raise Exception(msg)
 
+        msg = "Group with name '{}' found: {}".format(
+                group_name, group_data)
+        LOG.debug(msg)
         return Group(self.authz_api, self.authz_token, group_data)
 
     def _get_all(self):
@@ -62,25 +65,3 @@ class GroupAPI(object):
         for group in groups:
             if group['name'] == group_name:
                 return group
-
-    def _create_group(self, group_name):
-        # Create new group
-        resp = requests.post(
-            '{}/groups'.format(self.authz_api),
-            headers={
-                "Authorization": "Bearer {}".format(self.authz_token),
-            },
-            json={
-                'name': group_name,
-                'description': group_name,
-            }
-        )
-        if resp.status_code != 200:
-            msg = "Failed to create group: expected 200, got {}: {}".format(
-                resp.status_code, resp.text)
-            LOG.error(msg)
-            raise Exception(msg)
-
-        group = resp.json()
-        LOG.debug("Group created = {}".format(group))
-        return group
