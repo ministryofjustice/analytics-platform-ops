@@ -15,14 +15,9 @@ node {
         sh "venv/bin/pip3 install -r jenkinsfiles/auth0-users/requirements.txt"
     }
 
-    // Also does the following in Authorization Extension:
-    // - creates group ${env.APP_NAME}
-    // - creates role 'app-viewer' for app
-    // - creates permission 'view:app' for app
-    // - adds this permission to role
-    // - adds this role to this group
-    // - adds created user to this group
-    stage ("Create Auth0 passwordless user") {
+    // Creates passwordless user in Auth0 and adds to app group
+    // NOTE: Groups provided by Auth0 Authorization Extension
+    stage ("Create Auth0 passwordless user and add to app group") {
       withCredentials([
         [$class: 'StringBinding', credentialsId: 'AUTH0_DOMAIN', variable:
 'AUTH0_DOMAIN'],
@@ -36,7 +31,7 @@ node {
         // See "Escaping quotes in Groovy strings":
         //     http://mrhaki.blogspot.co.uk/2009/04/escaping-quotes-in-groovy-strings.html
         params = /${env.AUTH0_DOMAIN} ${env.AUTH0_CLIENT_ID} ${env.AUTH0_CLIENT_SECRET} ${env.AUTHZ_API} "${env.APP_NAME}" ${env.EMAIL}/
-        sh "venv/bin/python3 jenkinsfiles/auth0-users/create_auth0_user.py ${params}"
+        sh "venv/bin/python3 jenkinsfiles/auth0-users/grant_access_to_app.py ${params}"
       }
     }
 }
