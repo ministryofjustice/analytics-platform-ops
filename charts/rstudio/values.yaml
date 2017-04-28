@@ -25,6 +25,6 @@ AuthProxy:
 RStudio:
   Image:
     Repository: quay.io/mojanalytics/rstudio
-    Tag: "15798505"
+    Tag: "9f9d9a94"
     PullPolicy: "IfNotPresent"
   resources: {}
