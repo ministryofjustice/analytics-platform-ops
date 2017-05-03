@@ -83,3 +83,8 @@ module "container_registry" {
     source = "../../modules/container_registry"
     env = "${var.env}"
 }
+
+module "data_access" {
+    source = "../../modules/data_access"
+    env = "${var.env}"
+}
