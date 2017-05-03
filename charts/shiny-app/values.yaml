@@ -6,6 +6,7 @@ app:
   baseHost: ""
   replicaCount: 3
   port: 80
+  repo: ""
 AuthProxy:
   Image:
     Repository: quay.io/mojanalytics/auth-proxy
