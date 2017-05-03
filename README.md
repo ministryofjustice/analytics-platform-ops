@@ -54,19 +54,11 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 Global AWS resources (DNS and S3 buckets) only need to be created once, and are then used by all environments created subsequently. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
 
-  2. `$ cd infra/terraform/global`
+  1. `$ cd infra/terraform/global`
+  2. `$ terraform init` - set up remote state backend and pull modules
   3. `$ terraform plan` - check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53.
   4. `$ terraform apply` to create resources
 
-### Remote state setup
-You **must** configure your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing. 
-
-1. `$ cd infra/terraform/global` - (you must cd to this directory)
-2. `$ ./init.sh $BUCKET_NAME $REGION`
-
-## Creating/updating environments with Terraform
-
-Before working with an existing environment you must carry out the remote state setup steps detailed below. If you are creating a new environment, you must create the environment directory in `infra/terraform/environments` before setting up remote state.
 
 ### Defining new environment
 1. Copy example Terraform resources from `infra/terraform/environments/example` to `infra/terraform/environments/YOUR_ENV`
@@ -82,14 +74,12 @@ Before working with an existing environment you must carry out the remote state 
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
 
-### Initialize Terraform remote state
-You **must** configure your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing. 
+
+### Working with an existing environment
+You must initialize your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing.
 
 1. `$ cd infra/terraform/environments/YOUR_ENV`
-2. `./init_terraform_state.sh BUCKET_NAME YOUR_ENV AWS_REGION`  
-  where `BUCKET_NAME` matches `terraform_bucket_name` above
-
-`BUCKET_NAME` and `AWS_REGION` must match the values provided in `terraform.tfvars`; `ENV_NAME` should match your environment name.
+2. `$ terraform init` - initialize remote state and pull required modules
 
 ### Creating AWS resources, or applying changes to existing environment
 
