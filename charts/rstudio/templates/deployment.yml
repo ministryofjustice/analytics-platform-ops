@@ -13,6 +13,7 @@ spec:
         app: "{{ .Chart.Name }}"
       annotations:
         checksum/fluentd-config: {{ include (print $.Template.BasePath "/fluentd-configmap.yaml") . | sha256sum }}
+        iam.amazonaws.com/role: {{ .Values.AWS.IAMRole }}
     spec:
       containers:
 
@@ -97,16 +98,6 @@ spec:
                 secretKeyRef:
                   name: {{ template "fullname" . }}
                   key: aws_default_region
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "fullname" . }}
-                  key: aws_access_key_id
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "fullname" . }}
-                  key: aws_secret_access_key
             - name: TOOLS_DOMAIN
               value: {{ .Values.ToolsDomain }}
           readinessProbe:
