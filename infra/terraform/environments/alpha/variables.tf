@@ -9,3 +9,6 @@ variable "vpc_cidr" {}
 variable "availability_zones" {
     type = "list"
 }
+
+variable "sns_arn" {}
+variable "gh_hook_secret" {}
