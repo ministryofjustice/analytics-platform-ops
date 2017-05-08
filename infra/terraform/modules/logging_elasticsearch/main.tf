@@ -7,7 +7,7 @@ variable "ingress_ips" {
 }
 
 variable "es_version" {
-    default = "5.1"
+    default = "2.3"
 }
 
 variable "instance_type" {
