@@ -19,9 +19,9 @@ output "kops_bucket_name" {
 }
 
 output "auth0_ses_access_key_id" {
-    value = "${aws_iam_access_key.auth0_ses_user.id}"
+    value = "${aws_iam_access_key.auth0_ses.id}"
 }
 
 output "auth0_ses_secret_key" {
-    value = "${aws_iam_access_key.auth0_ses_user.secret}"
+    value = "${aws_iam_access_key.auth0_ses.secret}"
 }
