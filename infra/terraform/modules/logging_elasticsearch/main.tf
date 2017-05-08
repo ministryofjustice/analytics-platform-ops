@@ -1,6 +1,7 @@
 variable "name" {}
 variable "domain_name" {}
 variable "vpc_cidr" {}
+variable "dns_zone_id" {}
 
 variable "ingress_ips" {
     type = "list"
