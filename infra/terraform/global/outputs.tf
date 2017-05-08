@@ -17,3 +17,11 @@ output "xyz_root_domain" {
 output "kops_bucket_name" {
     value = "${var.kops_bucket_name}"
 }
+
+output "auth0_ses_access_key_id" {
+    value = "${aws_iam_access_key.auth0_ses_user.id}"
+}
+
+output "auth0_ses_secret_key" {
+    value = "${aws_iam_access_key.auth0_ses_user.secret}"
+}
