@@ -62,6 +62,7 @@ module "logging_elasticsearch" {
     domain_name = "logging-${var.env}"
     vpc_cidr = "${var.vpc_cidr}"
     ingress_ips = "${module.aws_vpc.nat_gateway_public_ips}"
+    dns_zone_id = "${module.cluster_dns.dns_zone_id}"
 }
 
 module "encrypt_scratch_lambda_function" {
