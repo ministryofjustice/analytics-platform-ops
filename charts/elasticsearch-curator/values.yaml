@@ -2,6 +2,7 @@ image:
   repository: bobrik/curator
   tag: 3.5.1
   pullPolicy: IfNotPresent
+# every day at 1am
 schedule: "0 1 * * *"
 curator:
   older_than_days: "30"
