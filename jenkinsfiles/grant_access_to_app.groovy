@@ -1,5 +1,18 @@
 node {
 
+    properties([
+        parameters([
+            string(
+                name: 'APP_NAME',
+                description: 'Shiny App name',
+                defaultValue: ''),
+            string(
+                name: 'EMAILS',
+                description: 'Semicolon delimited list of email addresses',
+                defaultValue: ''),
+        ])
+    ])
+
     stage ("Git checkout") {
         checkout scm
     }
@@ -22,7 +35,7 @@ node {
             credentialsId: 'AUTH0_DOMAIN',
             variable: 'AUTH0_DOMAIN')
       ]) {
-        sh "/usr/local/bin/grant_access ${env.APP_NAME} ${env.EMAIL}"
+        sh "/usr/local/bin/grant_access ${env.APP_NAME} ${env.EMAILS}"
       }
     }
 }
