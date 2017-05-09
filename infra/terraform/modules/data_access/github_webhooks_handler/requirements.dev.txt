@@ -1,0 +1,6 @@
+boto3
+moto
+
+pytest
+pytest-spec
+pytest-watch
