@@ -1,0 +1,51 @@
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  schedule: "{{ .Values.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ template "fullname" . }}
+          annotations:
+            checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        spec:
+          containers:
+          - name: curator
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            args:
+            - --host
+            - "$(ELASTICSEARCH_HOST)"
+            - --port
+            - "$(ELASTICSEARCH_PORT)"
+            - delete
+            - indices
+            - --older-than
+            - "$(OLDER_THAN_DAYS)"
+            - --time-unit
+            - days
+            - --timestring
+            - "%Y.%m.%d"
+            env:
+            - name: ELASTICSEARCH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_host
+            - name: ELASTICSEARCH_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_port
+            - name: OLDER_THAN_DAYS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: older_than_days
+          restartPolicy: OnFailure
