@@ -1,5 +1,5 @@
 import json
-from moto import mock_sns
+
 import pytest
 
 import github_webhooks
@@ -10,11 +10,6 @@ import github_webhooks
     "given_invalid_signature",
 )
 def test_cannot_publish_to_sns(event):
-    '''
-    when the signature is not valid
-    it responds {401, "Invalid signature"}
-    '''
-
     response = github_webhooks.publish_to_sns(event, "context not used")
     response_body = json.loads(response["body"])
 
@@ -27,15 +22,8 @@ def test_cannot_publish_to_sns(event):
     "given_the_env_is_set",
     "given_valid_signature",
     "given_sns_is_available",
-    "given_the_topic_doesnt_exist",
 )
 def test_nonexistent_topic(event, topic_arn):
-    '''
-    when the signature is valid
-    but the topic doesn't exist
-    it responds {404, "SNS topic not found"}
-    '''
-
     response = github_webhooks.publish_to_sns(event, "context not used")
     response_body = json.loads(response["body"])
 
@@ -51,12 +39,6 @@ def test_nonexistent_topic(event, topic_arn):
     "given_the_topic_exists",
 )
 def test_publish_success(event):
-    '''
-    when the signature is valid
-    and the topic exists
-    it responds {201, "Event published to SNS"}
-    '''
-
     response = github_webhooks.publish_to_sns(event, "context not used")
     response_body = json.loads(response["body"])
 

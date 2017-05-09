@@ -1,16 +1,19 @@
 from hashlib import sha1
-from moto import mock_sns
-import boto3
 import hmac
 import json
-import os
+from unittest.mock import patch
 
+import boto3
+from moto import mock_sns
 import pytest
 
 
-#################
-#  Tests state  #
-#################
+TEST_SECRET = "The secret shared with GitHub"
+TEST_MESSAGE = "hello this is dog"
+TEST_SIGNATURE = "sha1=877781130156a6ee684aab8bb16fa5158e7d160b"
+TEST_SNS_ARN = "arn:aws:sns:eu-west-1:123456789012"
+TEST_TOPIC = "test_github_team_events"
+TEST_TOPIC_ARN = "{}:{}".format(TEST_SNS_ARN, TEST_TOPIC)
 
 
 @pytest.fixture
@@ -21,14 +24,9 @@ def state():
                 "X-Hub-Signature": "signature",
                 "X-GitHub-Event": "team",
             },
-            "body": "{\"a JSON string\": true}",
+            "body": '{"json event payload": true}',
         }
     }
-
-
-###########
-#  Event  #
-###########
 
 
 @pytest.fixture
@@ -37,84 +35,29 @@ def event(state):
 
 
 @pytest.fixture
-def event_type(event):
-    return event["headers"]["X-GitHub-Event"]
-
-
-###############
-#  Signature  #
-###############
-
-
-@pytest.fixture
 def given_invalid_signature(state):
     state["event"]["headers"]["X-Hub-Signature"] = "sha3=invalid"
 
 
 @pytest.fixture
-def given_valid_signature(state, secret):
-    message = "hello this is dog"
-    signature = sha1_signature(message, secret)
-
-    state["event"]["body"] = message
-    state["event"]["headers"]["X-Hub-Signature"] = signature
+def given_valid_signature(state):
+    state["event"]["body"] = TEST_MESSAGE
+    state["event"]["headers"]["X-Hub-Signature"] = TEST_SIGNATURE
 
 
-def sha1_signature(message, secret):
-    mac = hmac.new(
-        secret.encode("utf-8"),
-        msg=message.encode("utf-8"),
-        digestmod=sha1
-    )
-    return "sha1={}".format(mac.hexdigest())
-
-
-############
-#  Config  #
-############
+@pytest.yield_fixture
+def given_the_env_is_set():
+    with patch.dict('os.environ', {
+        "SNS_ARN": TEST_SNS_ARN,
+        "STAGE": "test",
+        "GH_HOOK_SECRET": TEST_SECRET,
+    }):
+        yield
 
 
 @pytest.fixture
-def given_the_env_is_set(sns_arn, secret):
-    os.environ["SNS_ARN"] = sns_arn
-    os.environ["STAGE"] = "test"
-    os.environ["GH_HOOK_SECRET"] = secret
-
-
-@pytest.fixture
-def sns_arn():
-    return "arn:aws:sns:eu-west-1:123456789012"
-
-
-@pytest.fixture
-def secret():
-    return "The secret shared with GitHub"
-
-
-###############
-#  SNS Topic  #
-###############
-
-
-@pytest.fixture
-def topic(event_type):
-    return "{stage}_github_{event_type}_events".format(
-        stage=os.environ["STAGE"],
-        event_type=event_type,
-    )
-
-
-@pytest.fixture
-def topic_arn(sns_arn, topic):
-    return "{sns_arn}:{topic}".format(
-        sns_arn=sns_arn,
-        topic=topic
-    )
-
-
-######################
-#  SNS setup / Moto  #
-######################
+def topic_arn():
+    return TEST_TOPIC_ARN
 
 
 @pytest.yield_fixture
@@ -124,17 +67,7 @@ def given_sns_is_available():
 
 
 @pytest.fixture
-def given_the_topic_exists(topic):
+def given_the_topic_exists():
     sns = boto3.client("sns")
     # NOTE: create_topic() gets the topic name *not* the full topic ARN
-    sns.create_topic(Name=topic)
-
-
-@pytest.fixture
-def given_the_topic_doesnt_exist(topic_arn):
-    sns = boto3.client("sns")
-    topics = sns.list_topics()["Topics"]
-
-    for t in topics:
-        if t["TopicArn"] == topic_arn:
-            sns.delete_topic(TopicArn=topic)
+    sns.create_topic(Name=TEST_TOPIC)
