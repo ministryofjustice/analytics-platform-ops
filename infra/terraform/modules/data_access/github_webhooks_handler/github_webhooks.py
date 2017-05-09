@@ -7,11 +7,13 @@ import boto3
 from botocore.exceptions import ClientError
 
 
-SNS_ARN = os.environ["SNS_ARN"]
-STAGE = os.environ["STAGE"]
-GH_HOOK_SECRET = os.environ["GH_HOOK_SECRET"].encode("utf-8")
-
-sns = boto3.client("sns")
+'''
+Environment variables required:
+ - SNS_ARN, e.g. "arn:aws:sns:eu-west-1:1234"
+ - STAGE, e.g. "dev", "alpha", etc...
+ - GH_HOOK_SECRET, secret used in GitHub webhook
+ =
+'''
 
 
 class SNSTopicNotFound(Exception):
@@ -32,7 +34,7 @@ def publish_to_sns(event, context):
             topic=topic_arn(event["headers"]["X-GitHub-Event"]),
             message=message
         )
-        return response(201, "event published to SNS")
+        return response(201, "Event published to SNS")
     except SNSTopicNotFound as error:
         return response(404, "SNS topic '{}' not found".format(error))
 
@@ -45,8 +47,8 @@ def topic_arn(event):
     "arn:aws:sns:eu-west-1:1234:dev_github_team_events"
     """
     return "{sns_arn}:{stage}_github_{event}_events".format(
-        sns_arn=SNS_ARN,
-        stage=STAGE,
+        sns_arn=os.environ["SNS_ARN"],
+        stage=os.environ["STAGE"],
         event=event,
     )
 
@@ -58,6 +60,7 @@ def publish(topic, message):
     ))
 
     try:
+        sns = boto3.client("sns")
         sns.publish(
             TopicArn=topic,
             Message=message
@@ -84,7 +87,7 @@ def valid_signature(hmac_signature, message):
     sha_name, signature = hmac_signature.split("=")
     if sha_name == "sha1":
         mac = hmac.new(
-            GH_HOOK_SECRET,
+            os.environ["GH_HOOK_SECRET"].encode("utf-8"),
             msg=message.encode("utf-8"),
             digestmod=sha1
         )
