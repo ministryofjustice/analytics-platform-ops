@@ -1,0 +1,10 @@
+image:
+  repository: bobrik/curator
+  tag: 3.5.1
+  pullPolicy: IfNotPresent
+schedule: "0 1 * * *"
+curator:
+  older_than_days: "30"
+elasticsearch:
+  host: ""
+  port: "9200"
