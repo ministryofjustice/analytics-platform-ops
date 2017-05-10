@@ -1,5 +1,5 @@
 # Zip the lambda function before the actual deploy
-data "archive_file" "lambda_function_package" {
+data "archive_file" "encrypt_s3_object_zip" {
     type        = "zip"
     source_dir  = "${path.module}/encrypt_s3_object"
     output_path = "/tmp/encrypt_s3_object.zip"
@@ -9,13 +9,13 @@ data "archive_file" "lambda_function_package" {
 resource "aws_lambda_function" "encrypt_s3_object" {
     description = "Encrypt S3 objects using AWS' server side encryption"
     filename = "/tmp/encrypt_s3_object.zip"
-    source_code_hash = "${data.archive_file.lambda_function_package.output_base64sha256}"
+    source_code_hash = "${data.archive_file.encrypt_s3_object_zip.output_base64sha256}"
     function_name = "${var.env}_encrypt_${var.bucket_id}_s3_objects"
     role = "${aws_iam_role.encrypt_s3_object_role.arn}"
     handler = "index.handler"
     runtime = "nodejs4.3"
     timeout = 300 # 5 minutes
-    depends_on = ["data.archive_file.lambda_function_package"]
+    depends_on = ["data.archive_file.encrypt_s3_object_zip"]
 }
 
 # Bucket notification to trigger lambda function
