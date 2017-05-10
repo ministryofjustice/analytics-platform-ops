@@ -31,3 +31,6 @@ Fluentd:
     Repository: quay.io/fluent/fluentd-kubernetes-daemonset
     Tag: latest
     PullPolicy: "IfNotPresent"
+Elasticsearch:
+  Host: ""
+  Port: "9200"
