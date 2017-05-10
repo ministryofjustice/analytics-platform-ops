@@ -34,7 +34,7 @@ def publish_to_sns(event, context):
             topic=topic_arn(event["headers"]["X-GitHub-Event"]),
             message=message
         )
-        return response(201, "Event published to SNS")
+        return response(202, "Event published to SNS")
     except SNSTopicNotFound as error:
         return response(404, "SNS topic '{}' not found".format(error))
 
