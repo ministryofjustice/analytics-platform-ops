@@ -26,3 +26,8 @@ shinyApp:
     repository: ""
     tag: latest
     pullPolicy: Always
+Fluentd:
+  Image:
+    Repository: quay.io/fluent/fluentd-kubernetes-daemonset
+    Tag: latest
+    PullPolicy: "IfNotPresent"
