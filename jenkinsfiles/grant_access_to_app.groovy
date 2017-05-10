@@ -37,7 +37,7 @@ node {
             credentialsId: 'AUTH0_DOMAIN',
             variable: 'AUTH0_DOMAIN')
       ]) {
-        sh "/usr/local/bin/grant_access ${env.APP_NAME} ${env.EMAILS}"
+        sh "/usr/local/bin/grant_access ${env.APP_NAME} '${env.EMAILS}'"
       }
     }
 }
