@@ -77,3 +77,41 @@ spec:
           resources:
             requests:
               cpu: 10m
+          volumeMounts:
+            - name: varlogshinyserver
+              mountPath: /var/log/shiny-server
+
+        - name: fluentd
+          image: "{{ .Values.Fluentd.Image.Repository }}:{{ .Values.Fluentd.Image.Tag }}"
+          imagePullPolicy: {{ .Values.Fluentd.Image.PullPolicy }}
+          env:
+            - name:  FLUENT_ELASTICSEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ template "fullname" . }}-fluentd
+                  key: elasticsearch_host
+            - name:  FLUENT_ELASTICSEARCH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ template "fullname" . }}-fluentd
+                  key: elasticsearch_port
+            - name:  FLUENT_SOURCE_TAG
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ template "fullname" . }}-fluentd
+                  key: source_tag
+          volumeMounts:
+            - name: fluentd-config
+              mountPath: /fluentd/etc
+            - name: varlogshinyserver
+              mountPath: /var/log/shiny-server
+
+      volumes:
+        - name: varlogshinyserver
+          emptyDir: {}
+        - name: fluentd-config
+          configMap:
+            name: {{ template "fullname" . }}-fluentd
+            items:
+            - key: fluent.conf
+              path: fluent.conf
