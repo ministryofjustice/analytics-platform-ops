@@ -42,6 +42,6 @@ def test_publish_success(event):
     response = github_webhooks.publish_to_sns(event, "context not used")
     response_body = json.loads(response["body"])
 
-    assert response["statusCode"] == 201
+    assert response["statusCode"] == 202
     assert response_body["message"] == "Event published to SNS"
     assert response["headers"]["Content-Type"] == "application/json"
