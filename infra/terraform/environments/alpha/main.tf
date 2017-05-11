@@ -86,6 +86,8 @@ module "container_registry" {
 
 module "data_access" {
     source = "../../modules/data_access"
+
+    region = "${var.region}"
     env = "${var.env}"
     sns_arn = "${var.sns_arn}"
     gh_hook_secret = "${var.gh_hook_secret}"
