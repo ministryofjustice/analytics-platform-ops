@@ -17,14 +17,34 @@ Fluentd:
     Repository: quay.io/fluent/fluentd-kubernetes-daemonset
     Tag: latest
     PullPolicy: "IfNotPresent"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 25m
+      memory: 64Mi
 AuthProxy:
   Image:
     Repository: quay.io/mojanalytics/rstudio-auth-proxy
     Tag: "a750b612"
     PullPolicy: "IfNotPresent"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 25m
+      memory: 64Mi
 RStudio:
   Image:
     Repository: quay.io/mojanalytics/rstudio
     Tag: "v1.2.0"
     PullPolicy: "IfNotPresent"
-  resources: {}
+  resources:
+    limits:
+      cpu: 1.5
+      memory: 6Gi
+    requests:
+      cpu: 200m
+      memory: 1Gi
