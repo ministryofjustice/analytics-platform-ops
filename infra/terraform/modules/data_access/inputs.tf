@@ -1,3 +1,4 @@
+variable "region" {}
 variable "env" {}
 
 variable "sns_arn" {}
