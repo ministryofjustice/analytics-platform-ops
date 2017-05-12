@@ -19,7 +19,7 @@ resource "aws_lambda_function" "github_webhooks_handler" {
     environment {
       variables = {
         STAGE = "${var.env}"
-        SNS_ARN = "${var.sns_arn}"
+        SNS_ARN_BASE = "${var.sns_arn_base}"
         GH_HOOK_SECRET = "${var.gh_hook_secret}"
       }
     }
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy" "github_webhooks_handler_role_policy" {
         "sns:Publish"
       ],
       "Resource": [
-        "${var.sns_arn}:${var.env}_github_*_events"
+        "${var.sns_arn_base}:${var.env}_github_*_events"
       ]
     },
     {
