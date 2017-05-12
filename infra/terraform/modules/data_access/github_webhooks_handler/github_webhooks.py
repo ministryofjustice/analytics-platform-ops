@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 
 '''
 Environment variables required:
- - SNS_ARN, e.g. "arn:aws:sns:eu-west-1:1234"
+ - SNS_ARN_BASE, e.g. "arn:aws:sns:eu-west-1:1234"
  - STAGE, e.g. "dev", "alpha", etc...
  - GH_HOOK_SECRET, secret used in GitHub webhook
  =
@@ -43,11 +43,11 @@ def topic_arn(event):
     """
     Returns the SNS Topic ARN for the event in the form of
 
-    "{sns_arn}:{stage}_gh_{event}_events", for example:
+    "{sns_arn_base}:{stage}_gh_{event}_events", for example:
     "arn:aws:sns:eu-west-1:1234:dev_github_team_events"
     """
-    return "{sns_arn}:{stage}_github_{event}_events".format(
-        sns_arn=os.environ["SNS_ARN"],
+    return "{sns_arn_base}:{stage}_github_{event}_events".format(
+        sns_arn_base=os.environ["SNS_ARN_BASE"],
         stage=os.environ["STAGE"],
         event=event,
     )
