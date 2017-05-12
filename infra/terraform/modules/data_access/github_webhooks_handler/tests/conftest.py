@@ -11,9 +11,9 @@ import pytest
 TEST_SECRET = "The secret shared with GitHub"
 TEST_MESSAGE = "hello this is dog"
 TEST_SIGNATURE = "sha1=877781130156a6ee684aab8bb16fa5158e7d160b"
-TEST_SNS_ARN = "arn:aws:sns:eu-west-1:123456789012"
+TEST_SNS_ARN_BASE = "arn:aws:sns:eu-west-1:123456789012"
 TEST_TOPIC = "test_github_team_events"
-TEST_TOPIC_ARN = "{}:{}".format(TEST_SNS_ARN, TEST_TOPIC)
+TEST_TOPIC_ARN = "{}:{}".format(TEST_SNS_ARN_BASE, TEST_TOPIC)
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def given_valid_signature(state):
 @pytest.yield_fixture
 def given_the_env_is_set():
     with patch.dict('os.environ', {
-        "SNS_ARN": TEST_SNS_ARN,
+        "SNS_ARN_BASE": TEST_SNS_ARN_BASE,
         "STAGE": "test",
         "GH_HOOK_SECRET": TEST_SECRET,
     }):
