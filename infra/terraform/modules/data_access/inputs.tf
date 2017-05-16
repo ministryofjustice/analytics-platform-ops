@@ -1,5 +1,6 @@
 variable "region" {}
+variable "account_id" {}
 variable "env" {}
 
-variable "sns_arn_base" {}
+
 variable "gh_hook_secret" {}

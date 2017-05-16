@@ -10,6 +10,8 @@ provider "aws" {
   region = "${var.region}"
 }
 
+data "aws_caller_identity" "current" {}
+
 data "terraform_remote_state" "base" {
     backend = "s3"
     config {
@@ -88,7 +90,8 @@ module "data_access" {
     source = "../../modules/data_access"
 
     region = "${var.region}"
+    account_id = "${data.aws_caller_identity.current.account_id}"
     env = "${var.env}"
-    sns_arn_base = "${var.sns_arn_base}"
+
     gh_hook_secret = "${var.gh_hook_secret}"
 }
