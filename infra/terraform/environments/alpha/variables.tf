@@ -10,5 +10,4 @@ variable "availability_zones" {
     type = "list"
 }
 
-variable "sns_arn_base" {}
 variable "gh_hook_secret" {}
