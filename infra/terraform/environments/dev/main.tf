@@ -86,8 +86,17 @@ module "container_registry" {
     env = "${var.env}"
 }
 
-module "data_access" {
-    source = "../../modules/data_access"
+module "webhooks_api" {
+    source = "../../modules/webhooks_api"
+
+    region = "${var.region}"
+    env = "${var.env}"
+
+    github_webhooks_handler_arn = "${module.notifications.github_webhooks_handler_arn}"
+}
+
+module "notifications" {
+    source = "../../modules/notifications"
 
     region = "${var.region}"
     account_id = "${data.aws_caller_identity.current.account_id}"
