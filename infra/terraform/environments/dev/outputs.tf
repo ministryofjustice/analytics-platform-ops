@@ -7,6 +7,6 @@ output "github_webhooks_secret" {
     sensitive = true
 }
 
-output "api_url" {
-    value = "${module.data_access.api_url}"
+output "webhooks_api_url" {
+    value = "${module.webhooks_api.url}"
 }
