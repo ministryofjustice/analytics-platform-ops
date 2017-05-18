@@ -104,3 +104,10 @@ module "notifications" {
 
     gh_hook_secret = "${var.gh_hook_secret}"
 }
+
+module "data_access" {
+    source = "../../modules/data_access"
+
+    env = "${var.env}"
+    account_id = "${data.aws_caller_identity.current.account_id}"
+}

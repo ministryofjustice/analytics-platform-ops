@@ -1,3 +1,2 @@
-# variable "region" {}
-# variable "account_id" {}
-# variable "env" {}
+variable "account_id" {}
+variable "env" {}
