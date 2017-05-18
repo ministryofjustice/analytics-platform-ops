@@ -1,0 +1,9 @@
+boto3
+
+# moto's implementation of IAM's delete_role is in a branch currently
+# moto
+git+git://github.com/JackDanger/moto.git@implement_iam_delete_role#egg=moto
+
+pytest
+pytest-spec
+pytest-watch
