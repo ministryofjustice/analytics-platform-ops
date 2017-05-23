@@ -31,6 +31,15 @@ resource "aws_sns_topic_subscription" "organization_events" {
     endpoint = "${aws_lambda_function.organization_events.arn}"
 }
 
+# Permission to invoke the lambda function
+resource "aws_lambda_permission" "allow_organization_events_invocation" {
+    statement_id = "AllowExecutionFromSNS"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.organization_events.arn}"
+    principal = "sns.amazonaws.com"
+    source_arn = "${var.organization_events_topic_arn}"
+}
+
 # Role running the lambda function
 resource "aws_iam_role" "organization_events_role" {
     name = "${var.env}_organization_events_role"
@@ -85,13 +94,4 @@ resource "aws_iam_role_policy" "organization_events_role_policy" {
   ]
 }
 EOF
-}
-
-# Permission to invoke the lambda function
-resource "aws_lambda_permission" "allow_organization_events_invocation" {
-    statement_id = "AllowExecutionFromSNS"
-    action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.organization_events.arn}"
-    principal = "sns.amazonaws.com"
-    source_arn = "${var.organization_events_topic_arn}"
 }
