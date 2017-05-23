@@ -18,8 +18,8 @@ resource "aws_lambda_function" "create_user_role" {
     depends_on = ["data.archive_file.users_zip"]
     environment {
         variables = {
-            ACCOUNT_ID = "${var.account_id}",
             STAGE = "${var.env}",
+            SAML_PROVIDER_ARN = "arn:aws:iam::${var.account_id}:saml-provider/auth0",
         }
     }
 }
@@ -128,7 +128,9 @@ resource "aws_iam_role_policy" "delete_user_role_policy" {
       "Sid": "CanDeleteRoles",
       "Effect": "Allow",
       "Action": [
-        "iam:DeleteRole"
+        "iam:DeleteRole",
+        "iam:ListAttachedRolePolicies",
+        "iam:DetachRolePolicy"
       ],
       "Resource": [
         "arn:aws:iam::${var.account_id}:role/users/${var.env}_*"

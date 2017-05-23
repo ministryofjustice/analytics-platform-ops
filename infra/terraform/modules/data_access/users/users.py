@@ -7,7 +7,7 @@ import boto3
 '''
 Environment variables:
  - STAGE, e.g. "dev", "alpha", etc...
- - ACCOUNT_ID, AWS Account ID
+ - SAML_PROVIDER_ARN, SAML provider used to login
 '''
 
 
@@ -23,7 +23,7 @@ def create_user_role(event, context):
             {
                 "Effect": "Allow",
                 "Principal": {
-                    "Federated": "arn:aws:iam::{}:saml-provider/auth0".format(os.environ["ACCOUNT_ID"])
+                    "Federated": os.environ["SAML_PROVIDER_ARN"],
                 },
                 "Action": "sts:AssumeRoleWithSAML",
                 "Condition": {
@@ -49,10 +49,23 @@ def delete_user_role(event, context):
 
     event = {"username": "alice"}
     """
+    name = role_name(event["username"])
+
+    detach_role_policies(name)
+
     client = boto3.client("iam")
-    client.delete_role(
-        RoleName=role_name(event["username"])
-    )
+    client.delete_role(RoleName=name)
+
+
+def detach_role_policies(role_name):
+    client = boto3.client("iam")
+
+    policies = client.list_attached_role_policies(RoleName=role_name)
+    for policy in policies["AttachedPolicies"]:
+        client.detach_role_policy(
+            RoleName=role_name,
+            PolicyArn=policy["PolicyArn"],
+        )
 
 
 def role_name(username):
