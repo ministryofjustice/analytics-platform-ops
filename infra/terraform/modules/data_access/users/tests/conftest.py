@@ -86,13 +86,3 @@ def iam_client_mock(role_policies):
 def given_iam_is_available(iam_client_mock):
     with mock.patch.object(boto3, "client", return_value=iam_client_mock):
         yield
-
-
-@pytest.fixture
-def given_the_role_exists(role_name):
-    client = boto3.client("iam")
-    client.create_role(
-        RoleName=role_name,
-        Path="/users/",
-        AssumeRolePolicyDocument="a trust relationship policy",
-    )
