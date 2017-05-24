@@ -1,7 +1,23 @@
 import json
+import logging
 import os
 
 import boto3
+
+
+'''
+Environment variables:
+ - CREATE_ROLE_ARN, ARN of the lambda function to create the IAM role
+ - DELETE_ROLE_ARN, ARN of the lambda function to delete the IAM role
+ - LOG_LEVEL, change the logging level (default is "DEBUG"). Must be one of
+   the python logging supported levels: "CRITICAL", "ERROR", "WARNING",
+   "INFO" or "DEBUG" (See: https://docs.python.org/2/library/logging.html#logging-levels)
+'''
+
+
+LOG = logging.getLogger(__package__)
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+LOG.setLevel(LOG_LEVEL)
 
 
 def event_received(sns_event, context):
@@ -10,7 +26,7 @@ def event_received(sns_event, context):
         "member_removed": os.environ["DELETE_ROLE_ARN"],
     }
 
-    print("SNS event received = {}".format(json.dumps(sns_event)))
+    LOG.debug("SNS event received = {}".format(json.dumps(sns_event)))
     for record in sns_event["Records"]:
         event = json.loads(record["Sns"]["Message"])
         action = event["action"]
