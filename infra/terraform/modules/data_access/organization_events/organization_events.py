@@ -4,39 +4,22 @@ import os
 import boto3
 
 
-LAMBDA_ARNS = {
-    "create_user_role": os.environ["CREATE_ROLE_ARN"],
-    "delete_user_role": os.environ["DELETE_ROLE_ARN"],
-}
-
-
 def event_received(sns_event, context):
+    EVENT_HANDLERS = {
+        "member_added": os.environ["CREATE_ROLE_ARN"],
+        "member_removed": os.environ["DELETE_ROLE_ARN"],
+    }
+
     print("SNS event received = {}".format(json.dumps(sns_event)))
     for record in sns_event["Records"]:
         event = json.loads(record["Sns"]["Message"])
         action = event["action"]
-        if action == "member_added":
-            member_added(event)
-        elif action == "member_removed":
-            member_removed(event)
 
-
-def member_added(event):
-    print("Handling 'member_added' event: {}".format(event))
-
-    invoke_lambda(
-        function=LAMBDA_ARNS["create_user_role"],
-        payload=payload(event)
-    )
-
-
-def member_removed(event):
-    print("Handling 'member_removed' event: {}".format(event))
-
-    invoke_lambda(
-        function=LAMBDA_ARNS["delete_user_role"],
-        payload=payload(event)
-    )
+        if action in EVENT_HANDLERS:
+            invoke_lambda(
+                function=EVENT_HANDLERS[action],
+                payload=payload(event)
+            )
 
 
 def invoke_lambda(function, payload):
