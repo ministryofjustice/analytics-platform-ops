@@ -1,9 +1,5 @@
 boto3
 
-# moto's implementation of IAM's delete_role is in a branch currently
-# moto
-git+git://github.com/spulec/moto.git@584352a#egg=moto
-
 pytest
 pytest-spec
 pytest-watch
