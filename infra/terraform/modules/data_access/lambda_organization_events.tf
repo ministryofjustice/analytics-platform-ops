@@ -43,20 +43,7 @@ resource "aws_lambda_permission" "allow_organization_events_invocation" {
 # Role running the lambda function
 resource "aws_iam_role" "organization_events_role" {
     name = "${var.env}_organization_events_role"
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
 }
 
 # Policies for the 'organization_events_role' role
