@@ -27,20 +27,7 @@ resource "aws_lambda_function" "create_user_role" {
 # Role assumed by the 'create_user_role' lambda function
 resource "aws_iam_role" "create_user_role" {
     name = "${var.env}_create_user_role"
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
 }
 
 # Policies for the 'create_user_role' role
@@ -100,20 +87,7 @@ resource "aws_lambda_function" "delete_user_role" {
 # Role assumed by the 'delete_user_role' lambda function
 resource "aws_iam_role" "delete_user_role" {
     name = "${var.env}_delete_user_role"
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
 }
 
 # Policies for the 'delete_user_role' role
