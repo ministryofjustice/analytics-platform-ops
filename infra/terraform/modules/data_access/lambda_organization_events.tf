@@ -18,8 +18,8 @@ resource "aws_lambda_function" "organization_events" {
     depends_on = ["data.archive_file.organization_events_zip"]
     environment {
         variables = {
-            CREATE_ROLE_ARN = "${aws_lambda_function.create_user_role.arn}",
-            DELETE_ROLE_ARN = "${aws_lambda_function.delete_user_role.arn}",
+            LAMBDA_CREATE_ROLE_ARN = "${aws_lambda_function.create_user_role.arn}",
+            LAMBDA_DELETE_ROLE_ARN = "${aws_lambda_function.delete_user_role.arn}",
         }
     }
 }
