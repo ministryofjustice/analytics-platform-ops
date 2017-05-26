@@ -126,4 +126,5 @@ module "data_access" {
     account_id = "${data.aws_caller_identity.current.account_id}"
 
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
+    team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
 }
