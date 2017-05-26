@@ -11,3 +11,4 @@ variable "availability_zones" {
 }
 
 variable "gh_hook_secret" {}
+variable "softnas_ssh_public_key" {}
