@@ -59,6 +59,11 @@ Global AWS resources (DNS and S3 buckets) only need to be created once, and are 
   3. `$ terraform plan` - check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53.
   4. `$ terraform apply` to create resources
 
+### NFS server licensing
+
+User network home directories are provided by [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title). The default image defined in Terraform uses a per-terabyte consumption billing model; if required storage exceeds 1TB the [per server version](https://aws.amazon.com/marketplace/pp/B00PJ9FGVU?qid=1495795249740&sr=0-2&ref_=srh_res_product_title) will be more cost effective.
+
+**Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
 
 ### Defining new environment
 1. Copy example Terraform resources from `infra/terraform/environments/example` to `infra/terraform/environments/YOUR_ENV`
@@ -154,3 +159,42 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
 [kubernetes]: https://kubernetes.io
 [jenkins]: https://jenkins.io
 [gitcrypt]: https://www.agwa.name/projects/git-crypt/
+
+### NFS server administration
+
+By default two SoftNAS instances are deployed, to provide data replication and high-availability. This can be changed to a single-server deployment by changing the `user_nfs_softnas.num_instances` Terraform variable to `1`.
+
+NFS server storage volumes are provided by EBS volumes defined in `infra/terraform/modules/user_nfs_softnas/ebs.tf`, and additional volumes can be defined there as necessary. By default two EBS volumes are created for each Terraform resource defined, to mirror storage between both SoftNAS instances.
+
+SoftNAS does not support any form of configuration management, so NFS server setup must be performed manually via the SoftNAS web interface. As SoftNAS is deployed into private subnets, you must use an SSH tunnel to access the admin interface:
+
+`$ ssh -L 8443:softnas-0.dev.mojanalytics.xyz:443 -L 8444:softnas-1.dev.mojanalytics.xyz:443 admin@bastion.dev.mojanalytics.xyz -N`
+
+The two instances can then be accessed on `https://localhost:8443/` and `https://localhost:8444/`.
+
+#### NFS share setup
+
+1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
+2. Go to `Storage > Disk Devices` and create partitions on attached disks.
+3. Go to `Storage > Storage Pools` and create a pool called `users` and attach disks. Choose `JBOD` pool type - RAID arrays are redundant given that we are using RAID-backed EBS volumes.
+4. Go to `Storage > Volumes` and create a volume called `homes` using the `users` pool with an NFS export, which should be selected by default.
+
+#### NFS replication and high availability setup
+
+##### Replication
+1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
+2. Go to `SnapReplicate` settings
+3. Click `Add replication`
+4. Follow the setup wizard, providing the private IP and SoftNAS login details for the `softnas-1` instance when prompted
+5. Login to the admin UI of `softnas-1` and check the `SnapReplicate` section to confirm that replication setup was successful
+
+##### High Availability
+1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
+2. Go to `SnapReplicate` settings
+3. Click `Add SnapHA`
+4. Enter a contact email address for monitoring alerts
+5. Click `Add SnapHA` again
+6. Follow the setup wizard. The "VirtualIP" the wizard requests is defined in Terraform as `172.16.0.1`. If the wizard complains about invalid AWS credentials, try again - the wizard seems somewhat glitchy at this point
+7. Login to the admin UI of `softnas-1` and check the `SnapReplicate` section to confirm that HA setup was successful
+
+The SoftNAS secondary will monitor availability of the primary, and take over primary status if it cannot ping the current primary. Takeover is performed by updating the AWS routing tables to point the VirtualIP address to the current secondary. Refer to the [SoftNAS HA admin guide](https://www.softnas.com/docs/softnas/v3/snapha-html/ha_operations.html) for more info on how to manage replacement of failed instances, and other HA operations.
