@@ -9,6 +9,17 @@ resource "aws_security_group" "node_extra" {
     }
 }
 
+resource "aws_security_group" "bastion_extra" {
+    name = "bastion_extra"
+    description = "Extra non-Kops-managed node SG to use as target for other SG rules"
+    vpc_id = "${aws_vpc.main.id}"
+
+    tags {
+        Name = "bastion-extra.${var.name}"
+        Cluster = "${var.name}"
+    }
+}
+
 resource "aws_security_group" "master_extra" {
     name = "master_extra"
     description = "Extra non-Kops-managed master SG to use as target for other SG rules"
