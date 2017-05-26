@@ -75,6 +75,10 @@ output "extra_master_sg_id" {
     value = "${aws_security_group.master_extra.id}"
 }
 
+output "extra_bastion_sg_id" {
+    value = "${aws_security_group.bastion_extra.id}"
+}
+
 output "nat_gateway_public_ips" {
   value = ["${aws_nat_gateway.private_gw.*.public_ip}"]
 }
