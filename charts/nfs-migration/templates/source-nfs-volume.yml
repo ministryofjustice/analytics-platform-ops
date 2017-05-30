@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-source
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    volume.beta.kubernetes.io/storage-class: nfs-source
+  labels:
+    mounttype: nfs-source
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: "{{ .Values.source.hostname }}"
+    path: "{{ .Values.source.path }}"
