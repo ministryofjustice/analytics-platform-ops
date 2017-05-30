@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-dest
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    volume.beta.kubernetes.io/storage-class: nfs-dest
+  labels:
+    mounttype: nfs-dest
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: "{{ .Values.dest.hostname }}"
+    path: "{{ .Values.dest.path }}"

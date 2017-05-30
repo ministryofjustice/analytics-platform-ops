@@ -1,0 +1,6 @@
+source:
+  hostname: ""
+  path: "/home"
+dest:
+  hostname: ""
+  path: "/users/homes"
