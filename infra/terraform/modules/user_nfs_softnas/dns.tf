@@ -13,5 +13,8 @@ resource "aws_route53_record" "nfs_mountpoint" {
    name = "nfs.${var.dns_zone_domain}"
    type = "A"
    ttl = "30"
-   records = ["${var.nfs_mountpoint_ip}"]
+
+   # Resolve the to the virtual IP if there are two load-balanced SoftNAS
+   # instances; otherwise use the single instance's private IP
+   records = ["${var.num_instances == 2 ? var.nfs_mountpoint_ip : aws_instance.softnas.0.private_ip}"]
 }
