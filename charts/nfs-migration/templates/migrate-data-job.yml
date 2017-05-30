@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-data
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  template:
+    metadata:
+      name: migrate-data
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:16.04
+        command: ["/bin/sh", "-c",
+          "cp -pR /source/* /dest/"]
+        volumeMounts:
+          - name: source
+            mountPath: "/source"
+          - name: dest
+            mountPath: "/dest"
+      restartPolicy: Never
+      volumes:
+      - name: source
+        persistentVolumeClaim:
+          claimName: nfs-source
+      - name: dest
+        persistentVolumeClaim:
+          claimName: nfs-dest
