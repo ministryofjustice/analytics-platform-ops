@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Allows k8s pods to be started with AWS IAM roles attached
+name: kube2iam
+version: 0.1.0
