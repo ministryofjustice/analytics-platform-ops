@@ -60,6 +60,7 @@ module "user_nfs" {
 module "user_nfs_softnas" {
     source = "../../modules/user_nfs_softnas"
 
+    num_instances = 1
     env = "${var.env}"
     vpc_id = "${module.aws_vpc.vpc_id}"
     node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
