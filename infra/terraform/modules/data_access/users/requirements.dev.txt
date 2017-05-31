@@ -1,5 +1,0 @@
-boto3
-
-pytest
-pytest-spec
-pytest-watch
