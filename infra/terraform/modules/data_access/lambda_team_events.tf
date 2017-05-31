@@ -18,8 +18,8 @@ resource "aws_lambda_function" "team_events" {
     depends_on = ["data.archive_file.team_events_zip"]
     environment {
         variables = {
+            LAMBDA_CREATE_TEAM_BUCKET_ARN = "${aws_lambda_function.create_team_bucket.arn}",
             # TODO: Change with real ARNs. Fake for now
-            LAMBDA_CREATE_TEAM_BUCKET_ARN = "TODO: fake ARN",
             LAMBDA_CREATE_TEAM_BUCKET_POLICIES_ARN = "TODO: fake ARN",
             LAMBDA_DELETE_TEAM_BUCKET_POLICIES_ARN = "TODO: fake ARN",
         }
@@ -52,11 +52,21 @@ resource "aws_iam_role" "team_events_role" {
 resource "aws_iam_role_policy" "team_events_role_policy" {
     name = "${var.env}_team_events_role_policy"
     role = "${aws_iam_role.team_events_role.id}"
-# TODO: Add permission to invoke lambda functions
+# TODO: Add permission to invoke all lambda functions
     policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
+    {
+      "Sid": "CanInvokeLambdaFunctions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "${aws_lambda_function.create_team_bucket.arn}"
+      ]
+    },
     {
       "Sid": "CanLog",
       "Effect": "Allow",
