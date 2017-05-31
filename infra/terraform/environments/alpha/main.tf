@@ -56,6 +56,21 @@ module "user_nfs" {
     availability_zones = "${var.availability_zones}"
 }
 
+module "user_nfs_softnas" {
+    source = "../../modules/user_nfs_softnas"
+
+    num_instances = 2
+    default_volume_size = 250
+    env = "${var.env}"
+    vpc_id = "${module.aws_vpc.vpc_id}"
+    node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
+    bastion_security_group_id = "${module.aws_vpc.extra_bastion_sg_id}"
+    subnet_ids = "${module.aws_vpc.storage_subnet_ids}"
+    ssh_public_key = "${var.softnas_ssh_public_key}"
+    dns_zone_id = "${module.cluster_dns.dns_zone_id}"
+    dns_zone_domain = "${module.cluster_dns.dns_zone_domain}"
+}
+
 module "logging_elasticsearch" {
     source = "../../modules/logging_elasticsearch"
 
