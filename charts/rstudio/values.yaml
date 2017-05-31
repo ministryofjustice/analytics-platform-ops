@@ -39,7 +39,7 @@ AuthProxy:
 RStudio:
   Image:
     Repository: quay.io/mojanalytics/rstudio
-    Tag: "v1.2.0"
+    Tag: "v1.2.1"
     PullPolicy: "IfNotPresent"
   resources:
     limits:
