@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: nfs-homes
   annotations:
-    volume.beta.kubernetes.io/storage-class: efs
+    volume.beta.kubernetes.io/storage-class: nfs
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     mounttype: "root"
@@ -13,5 +13,5 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: {{ .Values.EFSHostname }}
+    server: {{ .Values.NFSHostname }}
     path: "/users/homes"
