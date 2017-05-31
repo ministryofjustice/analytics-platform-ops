@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: nfs-homes
   annotations:
-    volume.beta.kubernetes.io/storage-class: efs
+    volume.beta.kubernetes.io/storage-class: nfs
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:

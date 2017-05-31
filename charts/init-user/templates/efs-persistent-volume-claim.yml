@@ -6,7 +6,7 @@ metadata:
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
-    volume.beta.kubernetes.io/storage-class: efs
+    volume.beta.kubernetes.io/storage-class: nfs
 spec:
   accessModes:
     - ReadWriteMany
