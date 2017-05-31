@@ -122,8 +122,10 @@ module "notifications" {
 module "data_access" {
     source = "../../modules/data_access"
 
+    region = "${var.region}"
     env = "${var.env}"
     account_id = "${data.aws_caller_identity.current.account_id}"
 
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
+    team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
 }
