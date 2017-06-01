@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: "{{ .Chart.Name }}"
+    app: {{ template "fullname" . }}
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
   name: "{{ template "fullname" . }}-fluentd"
