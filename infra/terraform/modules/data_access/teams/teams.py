@@ -1,6 +1,7 @@
 '''
 Environment variables:
  - BUCKET_REGION, region where bucket will be created, e.g. "eu-west-1"
+ - IAM_ARN_BASE, e.g. "arn:aws:iam::1234"
  - STAGE, e.g. "dev", "alpha", etc...
 '''
 
@@ -124,6 +125,92 @@ def get_policy_document(bucket_name, readwrite):
         "Version": "2012-10-17",
         "Statement": statements,
     }
+
+
+def delete_team_bucket_policies(event, context):
+    """
+    Deletes the IAM policies for the team S3 bucket ("*-readonly" and
+    "*-readwrite")
+
+    event = {"team": {"slug": "justice-league"}}
+    """
+    bucket = bucket_name(event["team"]["slug"])
+
+    delete_policy("{}-readonly".format(bucket))
+    delete_policy("{}-readwrite".format(bucket))
+
+
+def delete_policy(name):
+    '''
+    Delete an IAM policy
+
+    NOTE: The policy needs to be detached from every entity first
+    SEE: https://docs.aws.amazon.com/de_de/IAM/latest/APIReference/API_DeletePolicy.html
+    '''
+
+    LOG.debug("Deleting '{}' policy".format(name))
+
+    policy_arn = "{iam_arn_base}:policy/teams/{policy_name}".format(
+        iam_arn_base=os.environ["IAM_ARN_BASE"],
+        policy_name=name,
+    )
+
+    detach_policy_from_entities(policy_arn)
+
+    client = boto3.client("iam")
+    client.delete_policy(PolicyArn=policy_arn)
+
+
+def detach_policy_from_entities(policy_arn):
+    # Get all entities to which policy is attached
+    # See:
+    # http://boto3.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_entities_for_policy
+    client = boto3.client("iam")
+    entities = client.list_entities_for_policy(PolicyArn=policy_arn)
+
+    LOG.debug("Policy is attached to: {}".format(json.dumps(entities)))
+
+    for role in entities["PolicyRoles"]:
+        detach_policy_from_role(policy_arn, role["RoleName"])
+
+    for group in entities["PolicyGroups"]:
+        detach_policy_from_group(policy_arn, group["GroupName"])
+
+    for user in entities["PolicyUsers"]:
+        detach_policy_from_user(policy_arn, user["UserName"])
+
+
+def detach_policy_from_role(policy_arn, role_name):
+    LOG.debug("Detaching policy '{}' from role '{}'".format(
+        policy_arn, role_name
+    ))
+    client = boto3.client("iam")
+    client.detach_role_policy(
+        RoleName=role_name,
+        PolicyArn=policy_arn,
+    )
+
+
+def detach_policy_from_group(policy_arn, group_name):
+    LOG.debug("Detaching policy '{}' from group '{}'".format(
+        policy_arn, group_name
+    ))
+    client = boto3.client("iam")
+    client.detach_group_policy(
+        GroupName=group_name,
+        PolicyArn=policy_arn,
+    )
+
+
+def detach_policy_from_user(policy_arn, user_name):
+    LOG.debug("Detaching policy '{}' from user '{}'".format(
+        policy_arn, user_name
+    ))
+    client = boto3.client("iam")
+    client.detach_user_policy(
+        UserName=user_name,
+        PolicyArn=policy_arn,
+    )
 
 
 def bucket_name(slug):
