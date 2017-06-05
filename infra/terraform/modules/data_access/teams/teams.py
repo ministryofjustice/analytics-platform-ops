@@ -11,6 +11,9 @@ import os
 import boto3
 
 
+READ_ONLY = False
+READ_WRITE = True
+
 LOG = logging.getLogger(__name__)
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 LOG.setLevel(LOG_LEVEL)
@@ -48,34 +51,28 @@ def create_team_bucket_policies(event, context):
     """
     bucket = bucket_name(event["team"]["slug"])
 
-    create_policy(
-        name="{}-readonly".format(bucket),
-        bucket=bucket,
-        readwrite=False,
+    create_policy(readwrite=READ_ONLY, bucket_name=bucket)
+    create_policy(readwrite=READ_WRITE, bucket_name=bucket)
+
+
+def create_policy(readwrite, bucket_name):
+    policy_name = "{bucket_name}-{suffix}".format(
+        bucket_name=bucket_name,
+        suffix="readwrite" if readwrite else "readonly"
     )
 
-    create_policy(
-        name="{}-readwrite".format(bucket),
-        bucket=bucket,
-        readwrite=True,
-    )
-
-
-def create_policy(name, bucket, readwrite):
-    LOG.debug("Creating '{}' policy".format(name))
-
-    policy_document = get_policy_document(bucket, readwrite)
+    LOG.debug("Creating '{}' policy".format(policy_name))
 
     client = boto3.client("iam")
     client.create_policy(
-        PolicyName=name,
+        PolicyName=policy_name,
         Path="/teams/",
-        PolicyDocument=json.dumps(policy_document),
+        PolicyDocument=json.dumps(get_policy_document(bucket_name, readwrite)),
     )
 
 
-def get_policy_document(bucket, readwrite):
-    bucket_arn = "arn:aws:s3:::{}".format(bucket)
+def get_policy_document(bucket_name, readwrite):
+    bucket_arn = "arn:aws:s3:::{}".format(bucket_name)
 
     statements = [
         {
