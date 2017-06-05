@@ -32,6 +32,7 @@ spec:
             - days
             - --timestring
             - "%Y.%m.%d"
+            - --all-indices
             env:
             - name: ELASTICSEARCH_HOST
               valueFrom:
