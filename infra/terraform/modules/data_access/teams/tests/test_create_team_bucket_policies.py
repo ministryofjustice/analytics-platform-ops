@@ -5,8 +5,12 @@ import pytest
 
 import teams
 
-from tests.conftest import TEST_TEAM_SLUG, TEST_READONLY_POLICY_DOCUMENT, \
-    TEST_READWRITE_POLICY_DOCUMENT, TEST_BUCKET_NAME
+from tests.conftest import (
+    TEST_BUCKET_NAME,
+    TEST_READONLY_POLICY_DOCUMENT,
+    TEST_READWRITE_POLICY_DOCUMENT,
+    TEST_TEAM_SLUG,
+)
 
 
 @pytest.mark.usefixtures(
