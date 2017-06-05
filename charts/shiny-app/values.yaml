@@ -10,7 +10,7 @@ app:
 AuthProxy:
   Image:
     Repository: quay.io/mojanalytics/auth-proxy
-    Tag: "a6b91b97"
+    Tag: "355234f4"
     PullPolicy: "IfNotPresent"
 AWS:
   AccessKeyId: ""
