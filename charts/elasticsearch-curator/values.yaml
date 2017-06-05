@@ -5,7 +5,7 @@ image:
 # every day at 1am
 schedule: "0 1 * * *"
 curator:
-  older_than_days: "30"
+  older_than_days: "7"
 elasticsearch:
   host: ""
   port: "9200"
