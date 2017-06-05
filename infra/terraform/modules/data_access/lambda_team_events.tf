@@ -19,8 +19,8 @@ resource "aws_lambda_function" "team_events" {
     environment {
         variables = {
             LAMBDA_CREATE_TEAM_BUCKET_ARN = "${aws_lambda_function.create_team_bucket.arn}",
+            LAMBDA_CREATE_TEAM_BUCKET_POLICIES_ARN = "${aws_lambda_function.create_team_bucket_policies.arn}",
             # TODO: Change with real ARNs. Fake for now
-            LAMBDA_CREATE_TEAM_BUCKET_POLICIES_ARN = "TODO: fake ARN",
             LAMBDA_DELETE_TEAM_BUCKET_POLICIES_ARN = "TODO: fake ARN",
         }
     }
@@ -64,7 +64,8 @@ resource "aws_iam_role_policy" "team_events_role_policy" {
         "lambda:InvokeFunction"
       ],
       "Resource": [
-        "${aws_lambda_function.create_team_bucket.arn}"
+        "${aws_lambda_function.create_team_bucket.arn}",
+        "${aws_lambda_function.create_team_bucket_policies.arn}"
       ]
     },
     {
