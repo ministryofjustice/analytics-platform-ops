@@ -8,7 +8,7 @@ import pytest
 TEST_SAML_PROVIDER_ARN = "arn:aws:iam::123456789012:saml-provider/auth0"
 TEST_STAGE = "test"
 TEST_USERNAME = "alice"
-TEST_ROLE_NAME = "{}_{}_role".format(TEST_STAGE, TEST_USERNAME)
+TEST_ROLE_NAME = "{}_{}".format(TEST_STAGE, TEST_USERNAME)
 
 TEST_ROLE_POLICY_ARN = "test_policy_arn"
 
