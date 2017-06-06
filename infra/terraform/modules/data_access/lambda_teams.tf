@@ -125,3 +125,77 @@ resource "aws_iam_role_policy" "create_team_bucket_policies" {
 }
 EOF
 }
+
+# Lambda function to delete policies for a team S3 bucket
+resource "aws_lambda_function" "delete_team_bucket_policies" {
+    description = "Delete the policies for the team S3 bucket"
+    filename = "/tmp/teams.zip"
+    source_code_hash = "${data.archive_file.teams_zip.output_base64sha256}"
+    function_name = "${var.env}_delete_team_bucket_policies"
+    role = "${aws_iam_role.delete_team_bucket_policies.arn}"
+    handler = "teams.delete_team_bucket_policies"
+    runtime = "python3.6"
+    timeout = 300
+    depends_on = ["data.archive_file.teams_zip"]
+    environment {
+        variables = {
+            STAGE = "${var.env}",
+            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}"
+        }
+    }
+}
+
+# Role assumed by the 'delete_team_bucket_policies' lambda function
+resource "aws_iam_role" "delete_team_bucket_policies" {
+    name = "${var.env}_delete_team_bucket_policies"
+    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
+}
+
+# Policies for the 'delete_team_bucket_policies' role
+resource "aws_iam_role_policy" "delete_team_bucket_policies" {
+    name = "${var.env}_delete_team_bucket_policies"
+    role = "${aws_iam_role.delete_team_bucket_policies.id}"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CanDeleteIAMPolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:DeletePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:policy/teams/${var.env}-*"
+      ]
+    },
+    {
+      "Sid": "CanDetachPolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListEntitiesForPolicy",
+        "iam:DetachGroupPolicy",
+        "iam:DetachRolePolicy",
+        "iam:DetachUserPolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:*"
+      ]
+    },
+    {
+      "Sid": "CanLog",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:*"
+      ]
+    }
+  ]
+}
+EOF
+}
