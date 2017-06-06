@@ -10,7 +10,15 @@ TEST_BUCKET_REGION = "eu-west-1"
 TEST_STAGE = "test"
 TEST_TEAM_SLUG = "justice-league"
 TEST_BUCKET_NAME = "{}-{}".format(TEST_STAGE, TEST_TEAM_SLUG)
+TEST_IAM_ARN_BASE = "arn:aws:iam::1234"
 TEST_BUCKET_ARN = "arn:aws:s3:::{}".format(TEST_BUCKET_NAME)
+TEST_ROLE_NAME = "test-role"
+TEST_GROUP_NAME = "test-group"
+TEST_USER_NAME = "test-user"
+TEST_READONLY_POLICY_ARN = "{}:policy/teams/{}-readonly".format(
+    TEST_IAM_ARN_BASE, TEST_BUCKET_NAME)
+TEST_READWRITE_POLICY_ARN = "{}:policy/teams/{}-readwrite".format(
+    TEST_IAM_ARN_BASE, TEST_BUCKET_NAME)
 TEST_READONLY_POLICY_DOCUMENT = {
     "Version": "2012-10-17",
     "Statement": [
@@ -64,6 +72,7 @@ TEST_READWRITE_POLICY_DOCUMENT["Statement"].append(
 def given_the_env_is_set():
     with mock.patch.dict("os.environ", {
         "BUCKET_REGION": TEST_BUCKET_REGION,
+        "IAM_ARN_BASE": TEST_IAM_ARN_BASE,
         "STAGE": TEST_STAGE,
     }):
         yield
@@ -71,7 +80,18 @@ def given_the_env_is_set():
 
 @pytest.fixture
 def iam_client_mock():
-    return mock.create_autospec(boto3.client("iam"))
+    client = mock.create_autospec(boto3.client("iam"))
+
+    entities_for_policy = {
+        "PolicyRoles": [{"RoleName": TEST_ROLE_NAME}],
+        "PolicyGroups": [{"GroupName": TEST_GROUP_NAME}],
+        "PolicyUsers": [{"UserName": TEST_USER_NAME}],
+    }
+    client.list_entities_for_policy = mock.Mock(
+        return_value=entities_for_policy
+    )
+
+    return client
 
 
 @pytest.fixture

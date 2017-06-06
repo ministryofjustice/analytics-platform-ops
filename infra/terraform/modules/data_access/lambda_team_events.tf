@@ -20,8 +20,7 @@ resource "aws_lambda_function" "team_events" {
         variables = {
             LAMBDA_CREATE_TEAM_BUCKET_ARN = "${aws_lambda_function.create_team_bucket.arn}",
             LAMBDA_CREATE_TEAM_BUCKET_POLICIES_ARN = "${aws_lambda_function.create_team_bucket_policies.arn}",
-            # TODO: Change with real ARNs. Fake for now
-            LAMBDA_DELETE_TEAM_BUCKET_POLICIES_ARN = "TODO: fake ARN",
+            LAMBDA_DELETE_TEAM_BUCKET_POLICIES_ARN = "${aws_lambda_function.delete_team_bucket_policies.arn}",
         }
     }
 }
@@ -52,7 +51,6 @@ resource "aws_iam_role" "team_events_role" {
 resource "aws_iam_role_policy" "team_events_role_policy" {
     name = "${var.env}_team_events_role_policy"
     role = "${aws_iam_role.team_events_role.id}"
-# TODO: Add permission to invoke all lambda functions
     policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -65,7 +63,8 @@ resource "aws_iam_role_policy" "team_events_role_policy" {
       ],
       "Resource": [
         "${aws_lambda_function.create_team_bucket.arn}",
-        "${aws_lambda_function.create_team_bucket_policies.arn}"
+        "${aws_lambda_function.create_team_bucket_policies.arn}",
+        "${aws_lambda_function.delete_team_bucket_policies.arn}"
       ]
     },
     {
