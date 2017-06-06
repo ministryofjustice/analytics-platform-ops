@@ -129,3 +129,8 @@ module "data_access" {
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
     team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
 }
+
+module "federated_identity" {
+    source ="../../modules/federated_identity"
+    env = "${var.env}"
+}

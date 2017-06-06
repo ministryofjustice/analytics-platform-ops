@@ -7,3 +7,4 @@ k8s-resources/jenkins/envs/**/* filter=git-crypt diff=git-crypt
 k8s-resources/prometheus/envs/**/* filter=git-crypt diff=git-crypt
 infra/kops/clusters/**/* filter=git-crypt diff=git-crypt
 chart-env-config/**/* filter=git-crypt diff=git-crypt
+infra/terraform/modules/federated_identity/saml/**/* filter=git-crypt diff=git-crypt
