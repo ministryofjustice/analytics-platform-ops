@@ -19,7 +19,7 @@ resource "aws_lambda_function" "create_user_role" {
     environment {
         variables = {
             STAGE = "${var.env}",
-            SAML_PROVIDER_ARN = "arn:aws:iam::${var.account_id}:saml-provider/auth0",
+            SAML_PROVIDER_ARN = "${var.saml_provider_arn}",
         }
     }
 }
