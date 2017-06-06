@@ -126,6 +126,8 @@ module "data_access" {
     env = "${var.env}"
     account_id = "${data.aws_caller_identity.current.account_id}"
 
+    saml_provider_arn = "${module.federated_identity.saml_provider_arn}"
+
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
     team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
 }
