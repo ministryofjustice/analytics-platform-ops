@@ -69,7 +69,7 @@ def detach_role_policies(role_name):
 
 
 def role_name(username):
-    return "{env}_{username}_role".format(
+    return "{env}_{username}".format(
         env=os.environ["STAGE"],
         username=username,
     )
