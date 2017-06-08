@@ -19,23 +19,17 @@ node {
 
     // Creates passwordless user in Auth0 and adds to app group
     // NOTE: Groups provided by Auth0 Authorization Extension
+    env.AUTHZ_API_ID = "urn:auth0-authz-api"
+    env.AUTH0_DOMAIN = "${env.ENV}-analytics-moj.eu.auth0.com"
     stage ("Create Auth0 passwordless user and add to app group") {
       withCredentials([
+        usernamePassword(
+            credentialsId: 'auth0-api-client',
+            usernameVariable: 'CLIENT_ID',
+            passwordVariable: 'CLIENT_SECRET'),
         string(
-            credentialsId: 'AUTH0_CLIENT_ID',
-            variable: 'CLIENT_ID'),
-        string(
-            credentialsId: 'AUTH0_CLIENT_SECRET',
-            variable: 'CLIENT_SECRET'),
-        string(
-            credentialsId: 'AUTHZ_API',
-            variable: 'AUTHZ_API_URL'),
-        string(
-            credentialsId: 'AUTHZ_API_ID',
-            variable: 'AUTHZ_API_ID'),
-        string(
-            credentialsId: 'AUTH0_DOMAIN',
-            variable: 'AUTH0_DOMAIN')
+            credentialsId: 'auth0-authz-api-url',
+            variable: 'AUTHZ_API_URL')
       ]) {
         sh "/usr/local/bin/grant_access ${env.APP_NAME} '${env.EMAILS}'"
       }
