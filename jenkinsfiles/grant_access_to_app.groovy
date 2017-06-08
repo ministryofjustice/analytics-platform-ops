@@ -25,8 +25,8 @@ node {
       withCredentials([
         usernamePassword(
             credentialsId: 'auth0-api-client',
-            usernameVariable: 'CLIENT_ID',
-            passwordVariable: 'CLIENT_SECRET'),
+            usernameVariable: 'AUTH0_CLIENT_ID',
+            passwordVariable: 'AUTH0_CLIENT_SECRET'),
         string(
             credentialsId: 'auth0-authz-api-url',
             variable: 'AUTHZ_API_URL')
