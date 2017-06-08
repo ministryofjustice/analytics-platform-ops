@@ -128,6 +128,7 @@ module "data_access" {
 
     saml_provider_arn = "${module.federated_identity.saml_provider_arn}"
 
+    membership_events_topic_arn = "${module.notifications.membership_events_topic_arn}"
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
     team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
 }
