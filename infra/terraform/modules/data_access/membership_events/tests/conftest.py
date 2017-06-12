@@ -6,23 +6,28 @@ import pytest
 
 
 TEST_ATTACH_BUCKET_POLICY_ARN = "arn:aws:iam::123456789012:lambda/attach_bucket_policy"
-TEST_DETACH_BUCKET_POLICY_ARN = "arn:aws:iam::123456789012:lambda/detach_bucket_policy"
+TEST_DETACH_BUCKET_POLICIES_ARN = "arn:aws:iam::123456789012:lambda/detach_bucket_policies"
 TEST_USERNAME = "alice"
 TEST_TEAM_SLUG = "justice-league"
 
-TEST_PAYLOAD = {
+TEST_ATTACH_PAYLOAD = {
     "user": {"username": TEST_USERNAME},
     "team": {"slug": TEST_TEAM_SLUG},
     "policy": {"type": "readwrite"},
 }
-TEST_PAYLOAD_BYTES = json.dumps(TEST_PAYLOAD).encode("utf8")
+TEST_ATTACH_PAYLOAD_BYTES = json.dumps(TEST_ATTACH_PAYLOAD).encode("utf8")
 
+TEST_DETACH_PAYLOAD = {
+    "user": {"username": TEST_USERNAME},
+    "team": {"slug": TEST_TEAM_SLUG},
+}
+TEST_DETACH_PAYLOAD_BYTES = json.dumps(TEST_DETACH_PAYLOAD).encode("utf8")
 
 @pytest.yield_fixture
 def given_the_env_is_set():
     with mock.patch.dict("os.environ", {
         "LAMBDA_ATTACH_BUCKET_POLICY_ARN": TEST_ATTACH_BUCKET_POLICY_ARN,
-        "LAMBDA_DETACH_BUCKET_POLICY_ARN": TEST_DETACH_BUCKET_POLICY_ARN,
+        "LAMBDA_DETACH_BUCKET_POLICIES_ARN": TEST_DETACH_BUCKET_POLICIES_ARN,
     }):
         yield
 
