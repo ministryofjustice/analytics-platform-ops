@@ -26,11 +26,6 @@ LOG.setLevel(LOG_LEVEL)
 
 # "membership" webhook event: https://developer.github.com/v3/activity/events/types/#membershipevent
 def event_received(sns_event, context):
-    EVENT_HANDLERS = {
-        "added": os.environ["LAMBDA_ATTACH_BUCKET_POLICY_ARN"],
-        "removed": os.environ["LAMBDA_DETACH_BUCKET_POLICY_ARN"],
-    }
-
     LOG.debug("SNS event received = {}".format(json.dumps(sns_event)))
     for record in sns_event["Records"]:
         event = json.loads(record["Sns"]["Message"])
@@ -39,10 +34,15 @@ def event_received(sns_event, context):
         if event["scope"] != "team":
             continue
 
-        if action in EVENT_HANDLERS:
+        if action == "added":
             invoke_lambda(
-                function=EVENT_HANDLERS[action],
-                payload=payload(event),
+                function=os.environ["LAMBDA_ATTACH_BUCKET_POLICY_ARN"],
+                payload=attach_payload(event),
+            )
+        elif action == "removed":
+            invoke_lambda(
+                function=os.environ["LAMBDA_DETACH_BUCKET_POLICIES_ARN"],
+                payload=detach_payload(event),
             )
 
 
@@ -55,9 +55,16 @@ def invoke_lambda(function, payload):
     )
 
 
-def payload(event):
+def attach_payload(event):
     return {
         "user": {"username": event["member"]["login"]},
         "team": {"slug": event["team"]["slug"]},
         "policy": {"type": POLICY_READ_WRITE},
+    }
+
+
+def detach_payload(event):
+    return {
+        "user": {"username": event["member"]["login"]},
+        "team": {"slug": event["team"]["slug"]},
     }
