@@ -65,3 +65,64 @@ resource "aws_iam_role_policy" "attach_bucket_policy" {
 }
 EOF
 }
+
+# Lambda function to detach bucket IAM policy from an IAM role
+resource "aws_lambda_function" "detach_bucket_policies" {
+    description = "Detaches bucket IAM policy from an IAM role"
+    filename = "/tmp/memberships.zip"
+    source_code_hash = "${data.archive_file.memberships_zip.output_base64sha256}"
+    function_name = "${var.env}_detach_bucket_policies"
+    role = "${aws_iam_role.detach_bucket_policies.arn}"
+    handler = "memberships.detach_bucket_policies"
+    runtime = "python3.6"
+    timeout = 10
+    depends_on = ["data.archive_file.memberships_zip"]
+    environment {
+        variables = {
+            STAGE = "${var.env}",
+            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}"
+        }
+    }
+}
+
+# Role assumed by the 'detach_bucket_policies' lambda function
+resource "aws_iam_role" "detach_bucket_policies" {
+    name = "${var.env}_detach_bucket_policies"
+    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
+}
+
+# Policies for the 'detach_bucket_policies' role
+resource "aws_iam_role_policy" "detach_bucket_policies" {
+    name = "${var.env}_detach_bucket_policies"
+    role = "${aws_iam_role.detach_bucket_policies.id}"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CanDetachPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:role/users/${var.env}_*"
+      ]
+    },
+    {
+      "Sid": "CanLog",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:*"
+      ]
+    }
+  ]
+}
+EOF
+}

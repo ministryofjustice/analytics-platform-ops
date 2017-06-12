@@ -1,7 +1,6 @@
 from mock import call
 
 import boto3
-from botocore.exceptions import ClientError
 import pytest
 
 import team_events
