@@ -19,9 +19,7 @@ resource "aws_lambda_function" "membership_events" {
     environment {
         variables = {
             LAMBDA_ATTACH_BUCKET_POLICY_ARN = "${aws_lambda_function.attach_bucket_policy.arn}",
-            # TODO: Replace with actual lambda function ARN
-            LAMBDA_DETACH_BUCKET_POLICY_ARN = "TODO: detach_bucket_policy.arn",
-            # LAMBDA_DETACH_BUCKET_POLICY_ARN = "${aws_lambda_function.detach_bucket_policy.arn}",
+            LAMBDA_DETACH_BUCKET_POLICIES_ARN = "${aws_lambda_function.detach_bucket_policies.arn}",
         }
     }
 }
@@ -52,7 +50,6 @@ resource "aws_iam_role" "membership_events_role" {
 resource "aws_iam_role_policy" "membership_events_role_policy" {
     name = "${var.env}_membership_events_role_policy"
     role = "${aws_iam_role.membership_events_role.id}"
-# TODO: Add 'aws_lambda_function.detach_bucket_policy.arn'
     policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -64,7 +61,8 @@ resource "aws_iam_role_policy" "membership_events_role_policy" {
         "lambda:InvokeFunction"
       ],
       "Resource": [
-        "${aws_lambda_function.attach_bucket_policy.arn}"
+        "${aws_lambda_function.attach_bucket_policy.arn}",
+        "${aws_lambda_function.detach_bucket_policies.arn}"
       ]
     },
     {

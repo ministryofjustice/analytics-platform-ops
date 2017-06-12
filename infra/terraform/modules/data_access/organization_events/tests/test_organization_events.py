@@ -1,5 +1,4 @@
 import boto3
-from botocore.exceptions import ClientError
 import pytest
 
 import organization_events
