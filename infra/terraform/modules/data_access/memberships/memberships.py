@@ -10,7 +10,7 @@ import json
 import os
 
 import boto3
-
+import botocore.exceptions
 
 POLICY_READ_ONLY = "readonly"
 POLICY_READ_WRITE = "readwrite"
@@ -31,9 +31,7 @@ def attach_bucket_policy(event, context):
     }
     """
     policy_type = event["policy"]["type"]
-    if not policy_type in [POLICY_READ_ONLY, POLICY_READ_WRITE]:
-        raise InvalidPolicyType("type can only be '{}' or '{}'".format(
-            POLICY_READ_ONLY, POLICY_READ_WRITE))
+    validate_policy_type(policy_type)
 
     username = event["user"]["username"]
     team_slug = event["team"]["slug"]
@@ -43,6 +41,37 @@ def attach_bucket_policy(event, context):
         RoleName=role_name(username),
         PolicyArn=policy_arn(team_slug, policy_type),
     )
+
+
+def detach_bucket_policies(event, context):
+    """
+    Detaches the team bucket IAM policies from the user's IAM role
+
+    event = {
+        "user": {"username": "alice"},
+        "team": {"slug": "justice-league"}
+    }
+    """
+    username = event["user"]["username"]
+    team_slug = event["team"]["slug"]
+    name = role_name(username)
+
+    client = boto3.client("iam")
+    for policy_type in [POLICY_READ_WRITE, POLICY_READ_ONLY]:
+        # Be sure we detach all policies without stopping early
+        try:
+            client.detach_role_policy(
+                RoleName=name,
+                PolicyArn=policy_arn(team_slug, policy_type),
+            )
+        except botocore.exceptions.ClientError:
+            pass
+
+
+def validate_policy_type(policy_type):
+    if not policy_type in [POLICY_READ_ONLY, POLICY_READ_WRITE]:
+        raise InvalidPolicyType("type can only be '{}' or '{}'".format(
+            POLICY_READ_ONLY, POLICY_READ_WRITE))
 
 
 def role_name(username):
