@@ -119,3 +119,8 @@ module "notifications" {
 
     gh_hook_secret = "${var.gh_hook_secret}"
 }
+
+module "federated_identity" {
+    source ="../../modules/federated_identity"
+    env = "${var.env}"
+}
