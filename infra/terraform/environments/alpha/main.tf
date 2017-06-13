@@ -120,6 +120,20 @@ module "notifications" {
     gh_hook_secret = "${var.gh_hook_secret}"
 }
 
+module "data_access" {
+    source = "../../modules/data_access"
+
+    region = "${var.region}"
+    env = "${var.env}"
+    account_id = "${data.aws_caller_identity.current.account_id}"
+
+    saml_provider_arn = "${module.federated_identity.saml_provider_arn}"
+
+    membership_events_topic_arn = "${module.notifications.membership_events_topic_arn}"
+    organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
+    team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
+}
+
 module "federated_identity" {
     source ="../../modules/federated_identity"
     env = "${var.env}"
