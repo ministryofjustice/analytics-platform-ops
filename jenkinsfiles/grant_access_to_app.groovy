@@ -20,7 +20,7 @@ node {
     // Creates passwordless user in Auth0 and adds to app group
     // NOTE: Groups provided by Auth0 Authorization Extension
     env.AUTHZ_API_ID = "urn:auth0-authz-api"
-    env.AUTH0_DOMAIN = "${env.ENV}-analytics-moj.eu.auth0.com"
+    env.AUTH0_DOMAIN = "${env.PLATFORM_ENV}-analytics-moj.eu.auth0.com"
     stage ("Create Auth0 passwordless user and add to app group") {
       withCredentials([
         usernamePassword(
