@@ -6,7 +6,8 @@ Environment variables:
    IAM policy for the bucket to the IAM role
  - LOG_LEVEL, change the logging level (default is "DEBUG"). Must be one of
    the python logging supported levels: "CRITICAL", "ERROR", "WARNING",
-   "INFO" or "DEBUG" (See: https://docs.python.org/2/library/logging.html#logging-levels)
+   "INFO" or "DEBUG"
+   (See: https://docs.python.org/2/library/logging.html#logging-levels)
 '''
 
 import json
@@ -26,6 +27,11 @@ LOG.setLevel(LOG_LEVEL)
 
 # "membership" webhook event: https://developer.github.com/v3/activity/events/types/#membershipevent
 def event_received(sns_event, context):
+    EVENT_HANDLERS = {
+        "added": os.environ["LAMBDA_ATTACH_BUCKET_POLICY_ARN"],
+        "removed": os.environ["LAMBDA_DETACH_BUCKET_POLICIES_ARN"],
+    }
+
     LOG.debug("SNS event received = {}".format(json.dumps(sns_event)))
     for record in sns_event["Records"]:
         event = json.loads(record["Sns"]["Message"])
@@ -34,15 +40,10 @@ def event_received(sns_event, context):
         if event["scope"] != "team":
             continue
 
-        if action == "added":
+        if action in EVENT_HANDLERS:
             invoke_lambda(
-                function=os.environ["LAMBDA_ATTACH_BUCKET_POLICY_ARN"],
-                payload=attach_payload(event),
-            )
-        elif action == "removed":
-            invoke_lambda(
-                function=os.environ["LAMBDA_DETACH_BUCKET_POLICIES_ARN"],
-                payload=detach_payload(event),
+                function=EVENT_HANDLERS[action],
+                payload=payload(event),
             )
 
 
@@ -55,16 +56,12 @@ def invoke_lambda(function, payload):
     )
 
 
-def attach_payload(event):
-    return {
-        "user": {"username": event["member"]["login"]},
-        "team": {"slug": event["team"]["slug"]},
-        "policy": {"type": POLICY_READ_WRITE},
-    }
-
-
-def detach_payload(event):
-    return {
+def payload(event):
+    result = {
         "user": {"username": event["member"]["login"]},
         "team": {"slug": event["team"]["slug"]},
     }
+    if event["action"] == "added":
+        result["policy"] = {"type": POLICY_READ_WRITE}
+
+    return result

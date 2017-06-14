@@ -32,10 +32,13 @@ def raise_detach_role_policy_exception(**kwarg):
     "given_iam_is_available",
 )
 def test_when_invoked_detaches_all_bucket_policies_from_the_role(iam_client_mock):
-    # This is to test the scenario when 1+ of the policies tried to be
-    # detached is not actually attached: In this case we still boto/AWS will
-    # raise an exception but we still want to carry on and detach the rest
-    # of the policies.
+    '''
+    This is to test the scenario when 1+ of the policies tried to be
+    detached is not actually attached: In this case boto/AWS will still
+    raise an exception but we still want to carry on and detach the rest of
+    the policies.
+    '''
+
     iam_client_mock.detach_role_policy.side_effect = raise_detach_role_policy_exception
 
     event = {
