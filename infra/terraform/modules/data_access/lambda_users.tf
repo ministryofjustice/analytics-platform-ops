@@ -20,6 +20,7 @@ resource "aws_lambda_function" "create_user_role" {
         variables = {
             STAGE = "${var.env}",
             SAML_PROVIDER_ARN = "${var.saml_provider_arn}",
+            K8S_WORKER_ROLE_ARN = "${var.k8s_worker_role_arn}",
         }
     }
 }
