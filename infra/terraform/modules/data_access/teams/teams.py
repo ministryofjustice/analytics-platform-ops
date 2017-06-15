@@ -214,4 +214,4 @@ def detach_policy_from_user(policy_arn, user_name):
 
 
 def bucket_name(slug):
-    return "{}-{}".format(os.environ["STAGE"], slug)
+    return "{}-{}".format(os.environ["STAGE"], slug.lower())
