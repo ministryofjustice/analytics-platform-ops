@@ -127,6 +127,7 @@ module "data_access" {
     account_id = "${data.aws_caller_identity.current.account_id}"
 
     saml_provider_arn = "${module.federated_identity.saml_provider_arn}"
+    k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
 
     membership_events_topic_arn = "${module.notifications.membership_events_topic_arn}"
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
