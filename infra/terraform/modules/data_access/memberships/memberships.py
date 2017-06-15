@@ -97,7 +97,7 @@ def validate_policy_type(policy_type):
 def role_name(username):
     return "{env}_{username}".format(
         env=os.environ["STAGE"],
-        username=username,
+        username=username.lower(),
     )
 
 
@@ -116,5 +116,5 @@ def policy_arn(team_slug, policy_type):
 def bucket_name(team_slug):
     return "{env}-{team_slug}".format(
         env=os.environ["STAGE"],
-        team_slug=team_slug
+        team_slug=team_slug.lower()
     )
