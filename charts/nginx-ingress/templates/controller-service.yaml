@@ -29,16 +29,11 @@ spec:
 {{ toYaml .Values.controller.service.loadBalancerSourceRanges | indent 4 }}
 {{- end }}
   ports:
-    # HTTP directed to nginx server{} block that redirects everything to HTTPS
     - name: http
       port: 80
-      protocol: TCP
-      targetPort: 8000
-
-    # HTTPS directed to nginx port 80, as ELB terminates TLS and proxies as HTTP
+      targetPort: 80
     - name: https
       port: 443
-      protocol: TCP
       targetPort: 80
   {{- range $key, $value := .Values.tcp }}
     - name: "{{ $key }}-tcp"

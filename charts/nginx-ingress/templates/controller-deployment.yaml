@@ -29,7 +29,7 @@ spec:
           args:
             - /nginx-ingress-controller
             - --default-backend-service={{ if .Values.defaultBackend.enabled }}{{ .Release.Namespace }}/{{ template "defaultBackend.fullname" . }}{{ else }}{{ .Values.controller.defaultBackendService }}{{ end }}
-            - --nginx-configmap={{ .Release.Namespace }}/{{ template "controller.fullname" . }}
+            - --configmap={{ .Release.Namespace }}/{{ template "controller.fullname" . }}
             {{- if .Values.tcp }}
             - --tcp-services-configmap={{ .Release.Namespace }}/{{ template "fullname" . }}-tcp
             {{ end -}}
@@ -48,23 +48,13 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            initialDelaySeconds: 10
-            timeoutSeconds: 1
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
-            - name: httpredirect
-              containerPort: 8000
-              protocol: TCP
-            - name: https
-              containerPort: 443
-              protocol: TCP
+            # - name: https
+            #   containerPort: 443
+            #   protocol: TCP
           {{- if .Values.controller.stats.enabled }}
             - name: stats
               containerPort: 18080
@@ -85,9 +75,13 @@ spec:
               path: /healthz
               port: 10254
               scheme: HTTP
-          volumeMounts:
-          - name: nginxtmpl
-            mountPath: /etc/nginx/template
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
           resources:
 {{ toYaml .Values.controller.resources | indent 12 }}
 
@@ -117,11 +111,4 @@ spec:
     {{- end }}
       terminationGracePeriodSeconds: 60
 
-      volumes:
-        - name: nginxtmpl
-          configMap:
-            name: {{ template "fullname" . }}-nginxconf
-            items:
-            - key: nginx.tmpl
-              path: nginx.tmpl
 {{- end }}
