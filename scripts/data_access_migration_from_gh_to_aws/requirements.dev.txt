@@ -1,0 +1,2 @@
+boto3
+pygithub==1.34
