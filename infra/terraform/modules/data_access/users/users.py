@@ -55,7 +55,6 @@ def create_user_role(event, context):
     client = boto3.client("iam")
     client.create_role(
         RoleName=role_name(event["username"]),
-        Path="/users/",
         AssumeRolePolicyDocument=json.dumps(trust_relationship),
     )
 
@@ -86,7 +85,7 @@ def detach_role_policies(role_name):
 
 
 def role_name(username):
-    return "{env}_{username}".format(
+    return "{env}_user_{username}".format(
         env=os.environ["STAGE"],
         username=username.lower(),
     )
