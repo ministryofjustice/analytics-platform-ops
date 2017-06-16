@@ -6,7 +6,8 @@ Environment variables:
    IAM policy for the bucket to the IAM role
  - LOG_LEVEL, change the logging level (default is "DEBUG"). Must be one of
    the python logging supported levels: "CRITICAL", "ERROR", "WARNING",
-   "INFO" or "DEBUG" (See: https://docs.python.org/2/library/logging.html#logging-levels)
+   "INFO" or "DEBUG"
+   (See: https://docs.python.org/2/library/logging.html#logging-levels)
 '''
 
 import json
@@ -28,7 +29,7 @@ LOG.setLevel(LOG_LEVEL)
 def event_received(sns_event, context):
     EVENT_HANDLERS = {
         "added": os.environ["LAMBDA_ATTACH_BUCKET_POLICY_ARN"],
-        "removed": os.environ["LAMBDA_DETACH_BUCKET_POLICY_ARN"],
+        "removed": os.environ["LAMBDA_DETACH_BUCKET_POLICIES_ARN"],
     }
 
     LOG.debug("SNS event received = {}".format(json.dumps(sns_event)))
@@ -56,8 +57,11 @@ def invoke_lambda(function, payload):
 
 
 def payload(event):
-    return {
+    result = {
         "user": {"username": event["member"]["login"]},
         "team": {"slug": event["team"]["slug"]},
-        "policy": {"type": POLICY_READ_WRITE},
     }
+    if event["action"] == "added":
+        result["policy"] = {"type": POLICY_READ_WRITE}
+
+    return result
