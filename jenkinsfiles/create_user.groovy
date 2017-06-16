@@ -13,6 +13,13 @@ node {
     }
 
     stage ("Create platform user") {
-        sh "/usr/local/bin/create_user ${env.USERNAME} ${env.EMAIL} --env ${env.PLATFORM_ENV} --fullname \"${env.FULLNAME}\""
+        withCredentials([
+            string(
+                credentialsId: 'GITHUB_TOKEN',
+                variable: 'GITHUB_TOKEN'
+            )
+        ]) {
+            sh "/usr/local/bin/create_user ${env.USERNAME} ${env.EMAIL} --env ${env.PLATFORM_ENV} --fullname \"${env.FULLNAME}\""
+        }
     }
 }
