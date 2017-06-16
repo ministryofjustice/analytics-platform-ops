@@ -6,8 +6,7 @@ OAuth:
   ClientId: ""
   Domain: "AUTH0_USER.eu.auth0.com"
 AWS:
-  AccessKeyId: ""
-  SecretAccessKey: ""
+  IAMRole: ""
   DefaultRegion: "eu-west-1"
 Elasticsearch:
   Host: "elasticsearch-server"
