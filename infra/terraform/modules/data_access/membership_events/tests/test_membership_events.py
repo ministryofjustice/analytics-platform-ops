@@ -1,5 +1,4 @@
 import boto3
-from botocore.exceptions import ClientError
 import pytest
 
 import membership_events
@@ -8,26 +7,40 @@ import membership_events
 from tests.conftest import (
     sns_event,
     TEST_ATTACH_BUCKET_POLICY_ARN,
-    TEST_DETACH_BUCKET_POLICY_ARN,
-    TEST_PAYLOAD_BYTES
+    TEST_DETACH_BUCKET_POLICIES_ARN,
+    TEST_ATTACH_PAYLOAD_BYTES,
+    TEST_DETACH_PAYLOAD_BYTES,
 )
 
 
-@pytest.mark.parametrize("event,lambda_arn", [
-    (sns_event("added"), TEST_ATTACH_BUCKET_POLICY_ARN),
-    (sns_event("removed"), TEST_DETACH_BUCKET_POLICY_ARN)
-])
 @pytest.mark.usefixtures(
     "given_the_env_is_set",
     "given_lambda_is_available",
 )
-def test_when_event_received_is_handled(lambda_client_mock, event, lambda_arn):
+def test_when_event_added_invokes_attach_lambda(lambda_client_mock):
+    event = sns_event("added")
     membership_events.event_received(event, None)
 
     # Test right lambda function is invoked asyncronously
     lambda_client_mock.invoke.assert_called_with(
-        FunctionName=lambda_arn,
-        Payload=TEST_PAYLOAD_BYTES,
+        FunctionName=TEST_ATTACH_BUCKET_POLICY_ARN,
+        Payload=TEST_ATTACH_PAYLOAD_BYTES,
+        InvocationType="Event",
+    )
+
+
+@pytest.mark.usefixtures(
+    "given_the_env_is_set",
+    "given_lambda_is_available",
+)
+def test_when_event_removed_invokes_detach_lambda(lambda_client_mock):
+    event = sns_event("removed")
+    membership_events.event_received(event, None)
+
+    # Test right lambda function is invoked asyncronously
+    lambda_client_mock.invoke.assert_called_with(
+        FunctionName=TEST_DETACH_BUCKET_POLICIES_ARN,
+        Payload=TEST_DETACH_PAYLOAD_BYTES,
         InvocationType="Event",
     )
 
