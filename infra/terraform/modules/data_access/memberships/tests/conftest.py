@@ -11,8 +11,8 @@ TEST_TEAM_SLUG = "Justice-League"
 TEST_USERNAME = "Alice"
 
 TEST_BUCKET_NAME = "{}-{}".format(TEST_STAGE, TEST_TEAM_SLUG.lower())
-TEST_ROLE_NAME = "{}_{}".format(TEST_STAGE, TEST_USERNAME.lower())
-TEST_POLICY_ARN_PREFIX = "{iam_arn_base}:policy/teams/{bucket_name}".format(
+TEST_ROLE_NAME = "{}_user_{}".format(TEST_STAGE, TEST_USERNAME.lower())
+TEST_POLICY_ARN_PREFIX = "{iam_arn_base}:policy/{bucket_name}".format(
     iam_arn_base=TEST_IAM_ARN_BASE,
     bucket_name=TEST_BUCKET_NAME,
 )
