@@ -17,6 +17,9 @@ def create_user_role(event, context):
 
     event = {"username": "alice"}
     """
+
+    # See: `sts:AssumeRole` required by kube2iam
+    # https://github.com/jtblin/kube2iam#iam-roles
     trust_relationship = {
         "Version": "2012-10-17",
         "Statement": [
@@ -31,6 +34,20 @@ def create_user_role(event, context):
                         "SAML:aud": "https://signin.aws.amazon.com/saml"
                     }
                 }
+            },
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ec2.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            },
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": os.environ["K8S_WORKER_ROLE_ARN"]
+                },
+                "Action": "sts:AssumeRole"
             }
         ]
     }
