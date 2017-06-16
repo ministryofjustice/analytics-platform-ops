@@ -15,9 +15,9 @@ TEST_BUCKET_ARN = "arn:aws:s3:::{}".format(TEST_BUCKET_NAME)
 TEST_ROLE_NAME = "test-role"
 TEST_GROUP_NAME = "test-group"
 TEST_USER_NAME = "test-user"
-TEST_READONLY_POLICY_ARN = "{}:policy/teams/{}-readonly".format(
+TEST_READONLY_POLICY_ARN = "{}:policy/{}-readonly".format(
     TEST_IAM_ARN_BASE, TEST_BUCKET_NAME)
-TEST_READWRITE_POLICY_ARN = "{}:policy/teams/{}-readwrite".format(
+TEST_READWRITE_POLICY_ARN = "{}:policy/{}-readwrite".format(
     TEST_IAM_ARN_BASE, TEST_BUCKET_NAME)
 TEST_READONLY_POLICY_DOCUMENT = {
     "Version": "2012-10-17",

@@ -23,12 +23,10 @@ def test_when_the_team_is_created_the_bucket_policies_are_created(iam_client_moc
     calls = [
         call(
             PolicyName="{}-readonly".format(TEST_BUCKET_NAME),
-            Path="/teams/",
             PolicyDocument=json.dumps(TEST_READONLY_POLICY_DOCUMENT),
         ),
         call(
             PolicyName="{}-readwrite".format(TEST_BUCKET_NAME),
-            Path="/teams/",
             PolicyDocument=json.dumps(TEST_READWRITE_POLICY_DOCUMENT),
         )
     ]
