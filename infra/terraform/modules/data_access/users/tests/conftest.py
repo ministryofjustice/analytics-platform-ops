@@ -6,6 +6,7 @@ import pytest
 
 
 TEST_SAML_PROVIDER_ARN = "arn:aws:iam::123456789012:saml-provider/auth0"
+TEST_K8S_WORKER_ROLE_ARN = "arn:aws:iam::123456789012:role/nodes.test.example.com"
 TEST_STAGE = "test"
 TEST_USERNAME = "alice"
 TEST_ROLE_NAME = "{}_{}".format(TEST_STAGE, TEST_USERNAME)
@@ -18,6 +19,7 @@ def given_the_env_is_set():
     with mock.patch.dict("os.environ", {
         "STAGE": TEST_STAGE,
         "SAML_PROVIDER_ARN": TEST_SAML_PROVIDER_ARN,
+        "K8S_WORKER_ROLE_ARN": TEST_K8S_WORKER_ROLE_ARN,
     }):
         yield
 
@@ -38,6 +40,20 @@ def trust_relationship():
                         "SAML:aud": "https://signin.aws.amazon.com/saml"
                     }
                 }
+            },
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ec2.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            },
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": TEST_K8S_WORKER_ROLE_ARN
+                },
+                "Action": "sts:AssumeRole"
             }
         ]
     }
