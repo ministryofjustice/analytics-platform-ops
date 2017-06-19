@@ -8,6 +8,7 @@ Environment variables:
 import json
 import logging
 import os
+import re
 
 import boto3
 
@@ -213,4 +214,20 @@ def detach_policy_from_user(policy_arn, user_name):
 
 
 def bucket_name(slug):
-    return "{}-{}".format(os.environ["STAGE"], slug.lower())
+    '''
+    Generate the S3 bucket name by prefixing the environment name and
+    replacing invalid characters with an hyphen ('-').
+
+    NOTE: This is a very simple implementation which doesn't cover all the
+          S3 limitations (e.g. max length or labels limitations, etc...)
+
+    See: http://docs.aws.amazon.com/en_gb/AmazonS3/latest/dev/BucketRestrictions.html
+    '''
+
+    INVALID_BUCKET_CHARS = r"[^a-z0-9.-]+"
+
+    name = slug.lower()
+    name = re.sub(INVALID_BUCKET_CHARS, "-", name)
+    name = name.strip("-")
+
+    return "{}-{}".format(os.environ["STAGE"], name)

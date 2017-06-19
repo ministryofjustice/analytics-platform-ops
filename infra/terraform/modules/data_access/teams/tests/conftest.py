@@ -8,8 +8,8 @@ import pytest
 
 TEST_BUCKET_REGION = "eu-west-1"
 TEST_STAGE = "test"
-TEST_TEAM_SLUG = "Justice-League"
-TEST_BUCKET_NAME = "{}-{}".format(TEST_STAGE, TEST_TEAM_SLUG.lower())
+TEST_TEAM_SLUG = "__Justice____League--"
+TEST_BUCKET_NAME = "{}-justice-league".format(TEST_STAGE)
 TEST_IAM_ARN_BASE = "arn:aws:iam::1234"
 TEST_BUCKET_ARN = "arn:aws:s3:::{}".format(TEST_BUCKET_NAME)
 TEST_ROLE_NAME = "test-role"
