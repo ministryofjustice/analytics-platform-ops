@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -ex
 
+if [ $# -lt 1 ]; then
+  echo 1>&2 "$0: Arguments: DOCKER_TAG"
+  exit 2
+fi
+
+DOCKER_TAG=$1
+
 env=$(kubectl config current-context | cut -f 1 -d .)
 
 for user in $(kubectl get ns | grep user- | cut -f 1 -d ' ' | cut -f 2 -d -); do
@@ -15,6 +22,7 @@ for user in $(kubectl get ns | grep user- | cut -f 1 -d ' ' | cut -f 2 -d -); do
         --set Username=$user \
         --set AWS.AccessKeyId=$access_key \
         --set AWS.SecretAccessKey=$secret_key \
+        --set RStudio.Image.Tag=$DOCKER_TAG \
         --namespace $namespace \
         --install
 done
