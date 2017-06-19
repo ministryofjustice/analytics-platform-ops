@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "create_user_role_policy" {
         "iam:CreateRole"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/users/${var.env}_*"
+        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*"
       ]
     },
     {
@@ -108,7 +108,7 @@ resource "aws_iam_role_policy" "delete_user_role_policy" {
         "iam:DetachRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/users/${var.env}_*"
+        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*"
       ]
     },
     {
