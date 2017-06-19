@@ -105,7 +105,7 @@ resource "aws_iam_role_policy" "create_team_bucket_policies" {
         "iam:CreatePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:policy/teams/${var.env}-*"
+        "arn:aws:iam::${var.account_id}:policy/${var.env}-*"
       ]
     },
     {
@@ -166,7 +166,7 @@ resource "aws_iam_role_policy" "delete_team_bucket_policies" {
         "iam:DeletePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:policy/teams/${var.env}-*"
+        "arn:aws:iam::${var.account_id}:policy/${var.env}-*"
       ]
     },
     {

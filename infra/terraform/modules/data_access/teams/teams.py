@@ -67,7 +67,6 @@ def create_policy(readwrite, bucket_name):
     client = boto3.client("iam")
     client.create_policy(
         PolicyName=policy_name,
-        Path="/teams/",
         PolicyDocument=json.dumps(get_policy_document(bucket_name, readwrite)),
     )
 
@@ -150,7 +149,7 @@ def delete_policy(name):
 
     LOG.debug("Deleting '{}' policy".format(name))
 
-    policy_arn = "{iam_arn_base}:policy/teams/{policy_name}".format(
+    policy_arn = "{iam_arn_base}:policy/{policy_name}".format(
         iam_arn_base=os.environ["IAM_ARN_BASE"],
         policy_name=name,
     )

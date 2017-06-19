@@ -17,6 +17,5 @@ def test_create_user_role_success(iam_client_mock, trust_relationship):
     # Test role is created
     iam_client_mock.create_role.assert_called_with(
         RoleName=TEST_ROLE_NAME,
-        Path="/users/",
         AssumeRolePolicyDocument=json.dumps(trust_relationship),
     )
