@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "attach_bucket_policy" {
         "iam:AttachRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/users/${var.env}_*"
+        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*"
       ]
     },
     {
@@ -106,7 +106,7 @@ resource "aws_iam_role_policy" "detach_bucket_policies" {
         "iam:DetachRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/users/${var.env}_*"
+        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*"
       ]
     },
     {

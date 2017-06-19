@@ -95,7 +95,7 @@ def validate_policy_type(policy_type):
 
 
 def role_name(username):
-    return "{env}_{username}".format(
+    return "{env}_user_{username}".format(
         env=os.environ["STAGE"],
         username=username.lower(),
     )
@@ -107,7 +107,7 @@ def policy_arn(team_slug, policy_type):
         policy_type=policy_type,
     )
 
-    return "{iam_arn_base}:policy/teams/{policy_name}".format(
+    return "{iam_arn_base}:policy/{policy_name}".format(
         iam_arn_base=os.environ["IAM_ARN_BASE"],
         policy_name=policy_name,
     )
