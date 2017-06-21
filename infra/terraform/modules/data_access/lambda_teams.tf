@@ -94,6 +94,7 @@ resource "aws_lambda_function" "create_team_bucket_policies" {
     environment {
         variables = {
             STAGE = "${var.env}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }
@@ -154,7 +155,8 @@ resource "aws_lambda_function" "delete_team_bucket_policies" {
     environment {
         variables = {
             STAGE = "${var.env}",
-            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}"
+            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }
