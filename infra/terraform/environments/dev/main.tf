@@ -122,6 +122,7 @@ module "data_access" {
     membership_events_topic_arn = "${module.notifications.membership_events_topic_arn}"
     organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
     team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
+    logs_bucket_name = "${module.data_buckets.logs_bucket_name}"
 }
 
 module "federated_identity" {
