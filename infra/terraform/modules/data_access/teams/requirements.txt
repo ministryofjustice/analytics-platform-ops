@@ -1,0 +1,9 @@
+# If you're having problems running pip install on MacOS+homebrew add the
+# following to ~/.pydistutils.cfg:
+#
+# [install]
+# prefix=
+#
+# See: https://stackoverflow.com/a/24357384/455642
+
+raven
