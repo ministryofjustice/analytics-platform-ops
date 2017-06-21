@@ -34,6 +34,7 @@ resource "aws_lambda_function" "create_team_bucket" {
             BUCKET_REGION = "${var.region}",
             STAGE = "${var.env}",
             SENTRY_DSN = "${var.sentry_dsn}",
+            LOGS_BUCKET_NAME = "${var.logs_bucket_name}",
         }
     }
 }
