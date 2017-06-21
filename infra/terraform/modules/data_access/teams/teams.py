@@ -265,8 +265,3 @@ def bucket_name(slug):
     name = name.strip("-")
 
     return "{}-{}".format(os.environ["STAGE"], name)
-
-
-# def logs_bucket_name():
-#     return "{}-{}".format(os.environ['STAGE'],
-#                           os.environ['LOGS_BUCKET_NAME_SUFFIX'])
