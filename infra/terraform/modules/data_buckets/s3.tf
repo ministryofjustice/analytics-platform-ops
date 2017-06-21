@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "scratch" {
 
 resource "aws_s3_bucket" "logs" {
     bucket = "${var.env}-moj-analytics-logs"
-    acl = "private"
+    acl = "log-delivery-write"
 
     tags {
         Name = "${var.env}-moj-analytics-logs"
