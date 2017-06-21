@@ -3,6 +3,9 @@ import os
 
 import boto3
 
+import naming
+import sentry
+
 
 '''
 Environment variables:
@@ -11,6 +14,7 @@ Environment variables:
 '''
 
 
+@sentry.catch_exceptions
 def create_user_role(event, context):
     """
     Creates the role for the given user
@@ -54,23 +58,24 @@ def create_user_role(event, context):
 
     client = boto3.client("iam")
     client.create_role(
-        RoleName=role_name(event["username"]),
+        RoleName=naming.role_name(event["username"]),
         AssumeRolePolicyDocument=json.dumps(trust_relationship),
     )
 
 
+@sentry.catch_exceptions
 def delete_user_role(event, context):
     """
     Deletes the role for the given user
 
     event = {"username": "alice"}
     """
-    name = role_name(event["username"])
+    role_name = naming.role_name(event["username"])
 
-    detach_role_policies(name)
+    detach_role_policies(role_name)
 
     client = boto3.client("iam")
-    client.delete_role(RoleName=name)
+    client.delete_role(RoleName=role_name)
 
 
 def detach_role_policies(role_name):
@@ -82,10 +87,3 @@ def detach_role_policies(role_name):
             RoleName=role_name,
             PolicyArn=policy["PolicyArn"],
         )
-
-
-def role_name(username):
-    return "{env}_user_{username}".format(
-        env=os.environ["STAGE"],
-        username=username.lower(),
-    )

@@ -1,3 +1,15 @@
+# Install dependencies
+resource "null_resource" "memberships_install_deps" {
+    provisioner "local-exec" {
+        command = "${path.module}/memberships/build.sh"
+    }
+
+    triggers {
+        build_sh_sha = "${sha256(file("${path.module}/memberships/build.sh"))}"
+        requirements_sha = "${sha256(file("${path.module}/memberships/requirements.txt"))}"
+    }
+}
+
 # Zip the lambda function before the actual deploy
 data "archive_file" "memberships_zip" {
     type        = "zip"
@@ -19,7 +31,8 @@ resource "aws_lambda_function" "attach_bucket_policy" {
     environment {
         variables = {
             STAGE = "${var.env}",
-            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}"
+            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }
@@ -80,7 +93,8 @@ resource "aws_lambda_function" "detach_bucket_policies" {
     environment {
         variables = {
             STAGE = "${var.env}",
-            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}"
+            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }

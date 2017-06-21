@@ -16,6 +16,7 @@ from tests.conftest import (
 @pytest.mark.usefixtures(
     "given_the_env_is_set",
     "given_iam_is_available",
+    "given_sentry_is_mocked",
 )
 def test_when_policy_type_is_invalid_raise_exception():
     event = {
