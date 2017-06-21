@@ -1,3 +1,15 @@
+# Install dependencies
+resource "null_resource" "users_install_deps" {
+    provisioner "local-exec" {
+        command = "${path.module}/users/build.sh"
+    }
+
+    triggers {
+        build_sh_sha = "${sha256(file("${path.module}/users/build.sh"))}"
+        requirements_sha = "${sha256(file("${path.module}/users/requirements.txt"))}"
+    }
+}
+
 # Zip the lambda function before the actual deploy
 data "archive_file" "users_zip" {
     type        = "zip"
@@ -21,6 +33,7 @@ resource "aws_lambda_function" "create_user_role" {
             STAGE = "${var.env}",
             SAML_PROVIDER_ARN = "${var.saml_provider_arn}",
             K8S_WORKER_ROLE_ARN = "${var.k8s_worker_role_arn}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }
@@ -81,6 +94,7 @@ resource "aws_lambda_function" "delete_user_role" {
     environment {
         variables = {
             STAGE = "${var.env}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }

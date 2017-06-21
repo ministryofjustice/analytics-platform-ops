@@ -17,6 +17,10 @@ import re
 import boto3
 import botocore.exceptions
 
+import naming
+import sentry
+
+
 POLICY_READ_ONLY = "readonly"
 POLICY_READ_WRITE = "readwrite"
 
@@ -29,6 +33,7 @@ class InvalidPolicyType(Exception):
     pass
 
 
+@sentry.catch_exceptions
 def attach_bucket_policy(event, context):
     """
     Attaches the team bucket IAM policy to the user's IAM role
@@ -39,6 +44,7 @@ def attach_bucket_policy(event, context):
         "policy": {"type": "readwrite"},
     }
     """
+
     policy_type = event["policy"]["type"]
     validate_policy_type(policy_type)
 
@@ -47,11 +53,12 @@ def attach_bucket_policy(event, context):
 
     client = boto3.client("iam")
     client.attach_role_policy(
-        RoleName=role_name(username),
+        RoleName=naming.role_name(username),
         PolicyArn=policy_arn(team_slug, policy_type),
     )
 
 
+@sentry.catch_exceptions
 def detach_bucket_policies(event, context):
     """
     Detaches the team bucket IAM policies from the user's IAM role
@@ -61,9 +68,9 @@ def detach_bucket_policies(event, context):
         "team": {"slug": "justice-league"}
     }
     """
+
     username = event["user"]["username"]
     team_slug = event["team"]["slug"]
-    name = role_name(username)
 
     client = boto3.client("iam")
     errors = []
@@ -71,7 +78,7 @@ def detach_bucket_policies(event, context):
         # Be sure we detach all policies without stopping early
         try:
             client.detach_role_policy(
-                RoleName=name,
+                RoleName=naming.role_name(username),
                 PolicyArn=policy_arn(team_slug, policy_type),
             )
         except botocore.exceptions.ClientError as error:
@@ -95,40 +102,9 @@ def validate_policy_type(policy_type):
             POLICY_READ_ONLY, POLICY_READ_WRITE))
 
 
-def role_name(username):
-    return "{env}_user_{username}".format(
-        env=os.environ["STAGE"],
-        username=username.lower(),
-    )
-
-
 def policy_arn(team_slug, policy_type):
-    policy_name = "{bucket_name}-{policy_type}".format(
-        bucket_name=bucket_name(team_slug),
+    return naming.policy_arn(
+        iam_arn_base=os.environ["IAM_ARN_BASE"],
+        bucket_name=naming.bucket_name(team_slug),
         policy_type=policy_type,
     )
-
-    return "{iam_arn_base}:policy/{policy_name}".format(
-        iam_arn_base=os.environ["IAM_ARN_BASE"],
-        policy_name=policy_name,
-    )
-
-
-def bucket_name(slug):
-    '''
-    Generate the S3 bucket name by prefixing the environment name and
-    replacing invalid characters with an hyphen ('-').
-
-    NOTE: This is a very simple implementation which doesn't cover all the
-          S3 limitations (e.g. max length or labels limitations, etc...)
-
-    See: http://docs.aws.amazon.com/en_gb/AmazonS3/latest/dev/BucketRestrictions.html
-    '''
-
-    INVALID_BUCKET_CHARS = r"[^a-z0-9.-]+"
-
-    name = slug.lower()
-    name = re.sub(INVALID_BUCKET_CHARS, "-", name)
-    name = name.strip("-")
-
-    return "{}-{}".format(os.environ["STAGE"], name)
