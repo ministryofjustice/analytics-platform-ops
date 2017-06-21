@@ -13,6 +13,10 @@ output "logs_bucket_arn" {
     value = "${aws_s3_bucket.logs.arn}"
 }
 
+output "logs_bucket_name" {
+    value = "${aws_s3_bucket.logs.id}"
+}
+
 output "iam_managers_arn" {
     value = "${aws_iam_group.managers.arn}"
 }
