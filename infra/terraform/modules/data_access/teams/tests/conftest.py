@@ -66,6 +66,8 @@ TEST_READWRITE_POLICY_DOCUMENT["Statement"].append(
         "Resource": "{}/*".format(TEST_BUCKET_ARN)
     }
 )
+TEST_LOGS_PREFIX = "s3/{}/".format(TEST_BUCKET_NAME)
+TEST_LOGS_BUCKET_NAME = "test-logs"
 
 
 @pytest.yield_fixture
@@ -74,6 +76,7 @@ def given_the_env_is_set():
         "BUCKET_REGION": TEST_BUCKET_REGION,
         "IAM_ARN_BASE": TEST_IAM_ARN_BASE,
         "STAGE": TEST_STAGE,
+        "LOGS_BUCKET_NAME": TEST_LOGS_BUCKET_NAME,
     }):
         yield
 

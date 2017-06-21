@@ -43,7 +43,7 @@ def send_exceptions_to_sentry(fn):
 @send_exceptions_to_sentry
 def create_team_bucket(event, context):
     """
-    Creates the team's S3 bucket
+    Creates the team's S3 bucket, with logging enabled
 
     event = {"team": {"slug": "justice-league"}}
     """
@@ -61,6 +61,15 @@ def create_team_bucket(event, context):
         Bucket=name,
         ACL="private",
         CreateBucketConfiguration={"LocationConstraint": region},
+    )
+    client.put_bucket_logging(
+        Bucket=name,
+        BucketLoggingStatus={
+            'LoggingEnabled': {
+                'TargetBucket': os.environ.get('LOGS_BUCKET_NAME'),
+                'TargetPrefix': "s3/{}/".format(name)
+            }
+        },
     )
 
 
@@ -256,3 +265,8 @@ def bucket_name(slug):
     name = name.strip("-")
 
     return "{}-{}".format(os.environ["STAGE"], name)
+
+
+# def logs_bucket_name():
+#     return "{}-{}".format(os.environ['STAGE'],
+#                           os.environ['LOGS_BUCKET_NAME_SUFFIX'])
