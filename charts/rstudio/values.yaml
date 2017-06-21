@@ -38,8 +38,8 @@ AuthProxy:
 RStudio:
   Image:
     Repository: quay.io/mojanalytics/rstudio
-    Tag: "v1.2.1"
-    PullPolicy: "IfNotPresent"
+    Tag: "latest"
+    PullPolicy: "Always"
   resources:
     limits:
       cpu: 1.5
