@@ -7,10 +7,10 @@ import pytest
 
 TEST_IAM_ARN_BASE = "arn:aws:iam::1234"
 TEST_STAGE = "test"
-TEST_TEAM_SLUG = "Justice-League"
+TEST_TEAM_SLUG = "__Justice_____League?!"
 TEST_USERNAME = "Alice"
 
-TEST_BUCKET_NAME = "{}-{}".format(TEST_STAGE, TEST_TEAM_SLUG.lower())
+TEST_BUCKET_NAME = "{}-justice-league".format(TEST_STAGE)
 TEST_ROLE_NAME = "{}_user_{}".format(TEST_STAGE, TEST_USERNAME.lower())
 TEST_POLICY_ARN_PREFIX = "{iam_arn_base}:policy/{bucket_name}".format(
     iam_arn_base=TEST_IAM_ARN_BASE,

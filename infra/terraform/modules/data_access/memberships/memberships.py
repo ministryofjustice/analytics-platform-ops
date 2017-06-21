@@ -12,6 +12,7 @@ Environment variables:
 import json
 import logging
 import os
+import re
 
 import boto3
 import botocore.exceptions
@@ -113,8 +114,21 @@ def policy_arn(team_slug, policy_type):
     )
 
 
-def bucket_name(team_slug):
-    return "{env}-{team_slug}".format(
-        env=os.environ["STAGE"],
-        team_slug=team_slug.lower()
-    )
+def bucket_name(slug):
+    '''
+    Generate the S3 bucket name by prefixing the environment name and
+    replacing invalid characters with an hyphen ('-').
+
+    NOTE: This is a very simple implementation which doesn't cover all the
+          S3 limitations (e.g. max length or labels limitations, etc...)
+
+    See: http://docs.aws.amazon.com/en_gb/AmazonS3/latest/dev/BucketRestrictions.html
+    '''
+
+    INVALID_BUCKET_CHARS = r"[^a-z0-9.-]+"
+
+    name = slug.lower()
+    name = re.sub(INVALID_BUCKET_CHARS, "-", name)
+    name = name.strip("-")
+
+    return "{}-{}".format(os.environ["STAGE"], name)
