@@ -1,8 +1,11 @@
+import importlib
 import json
 import mock
 
 import boto3
 import pytest
+
+import memberships
 
 
 TEST_IAM_ARN_BASE = "arn:aws:iam::1234"
@@ -26,6 +29,19 @@ def given_the_env_is_set():
         "STAGE": TEST_STAGE,
         "IAM_ARN_BASE": TEST_IAM_ARN_BASE,
     }):
+        yield
+
+@pytest.yield_fixture
+def given_sentry_is_mocked():
+    def catch_exceptions(fn):
+        def wrapped(*args, **kwargs):
+            fn(*args, **kwargs)
+
+        return wrapped
+
+    with mock.patch("sentry.catch_exceptions", catch_exceptions):
+        # Reload membership to be sure it's using the mocked sentry
+        importlib.reload(memberships)
         yield
 
 

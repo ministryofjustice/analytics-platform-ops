@@ -5,6 +5,7 @@ resource "null_resource" "teams_install_deps" {
     }
 
     triggers {
+        build_sh_sha = "${sha256(file("${path.module}/teams/build.sh"))}"
         requirements_sha = "${sha256(file("${path.module}/teams/requirements.txt"))}"
     }
 }
