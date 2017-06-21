@@ -3,6 +3,7 @@ Environment variables:
  - BUCKET_REGION, region where bucket will be created, e.g. "eu-west-1"
  - IAM_ARN_BASE, e.g. "arn:aws:iam::1234"
  - STAGE, e.g. "dev", "alpha", etc...
+ - SENTRY_DSN, Sentry DSN
 '''
 
 import json
@@ -11,6 +12,8 @@ import os
 import re
 
 import boto3
+from raven import Client as Sentry
+from raven.transport.http import HTTPTransport as SentryHTTPTransport
 
 
 READ_ONLY = False
@@ -21,12 +24,30 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 LOG.setLevel(LOG_LEVEL)
 
 
+def send_exceptions_to_sentry(fn):
+    def wrapped(*args, **kwargs):
+        try:
+            fn(*args, **kwargs)
+        except Exception:
+            client = Sentry(
+                os.environ["SENTRY_DSN"],
+                transport=SentryHTTPTransport,
+                environment=os.environ["STAGE"],
+            )
+            client.captureException()
+            raise
+
+    return wrapped
+
+
+@send_exceptions_to_sentry
 def create_team_bucket(event, context):
     """
     Creates the team's S3 bucket
 
     event = {"team": {"slug": "justice-league"}}
     """
+
     name = bucket_name(event["team"]["slug"])
     region = os.environ["BUCKET_REGION"]
 
@@ -43,6 +64,7 @@ def create_team_bucket(event, context):
     )
 
 
+@send_exceptions_to_sentry
 def create_team_bucket_policies(event, context):
     """
     Creates the policies for the team S3 bucket:
@@ -51,6 +73,7 @@ def create_team_bucket_policies(event, context):
 
     event = {"team": {"slug": "justice-league"}}
     """
+
     bucket = bucket_name(event["team"]["slug"])
 
     create_policy(readwrite=READ_ONLY, bucket_name=bucket)
@@ -127,6 +150,7 @@ def get_policy_document(bucket_name, readwrite):
     }
 
 
+@send_exceptions_to_sentry
 def delete_team_bucket_policies(event, context):
     """
     Deletes the IAM policies for the team S3 bucket ("*-readonly" and
@@ -134,6 +158,7 @@ def delete_team_bucket_policies(event, context):
 
     event = {"team": {"slug": "justice-league"}}
     """
+
     bucket = bucket_name(event["team"]["slug"])
 
     delete_policy("{}-readonly".format(bucket))
