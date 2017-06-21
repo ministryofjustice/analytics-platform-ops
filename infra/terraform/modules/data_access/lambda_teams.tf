@@ -1,8 +1,21 @@
+# Install dependencies
+resource "null_resource" "teams_install_deps" {
+    provisioner "local-exec" {
+        command = "${path.module}/teams/build.sh"
+    }
+
+    triggers {
+        requirements_sha = "${sha256(file("${path.module}/teams/requirements.txt"))}"
+    }
+}
+
 # Zip the lambda function before the actual deploy
 data "archive_file" "teams_zip" {
     type        = "zip"
     source_dir  = "${path.module}/teams"
     output_path = "/tmp/teams.zip"
+
+    depends_on = ["null_resource.teams_install_deps"]
 }
 
 # Lambda function to create a team's S3 bucket
@@ -20,6 +33,7 @@ resource "aws_lambda_function" "create_team_bucket" {
         variables = {
             BUCKET_REGION = "${var.region}",
             STAGE = "${var.env}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }
@@ -80,6 +94,7 @@ resource "aws_lambda_function" "create_team_bucket_policies" {
     environment {
         variables = {
             STAGE = "${var.env}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }
@@ -140,7 +155,8 @@ resource "aws_lambda_function" "delete_team_bucket_policies" {
     environment {
         variables = {
             STAGE = "${var.env}",
-            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}"
+            IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
+            SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
 }

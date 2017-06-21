@@ -1,4 +1,5 @@
 boto3
+raven
 
 pytest
 pytest-spec
