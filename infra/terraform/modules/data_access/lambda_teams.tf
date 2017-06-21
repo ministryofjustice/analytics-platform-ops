@@ -56,7 +56,8 @@ resource "aws_iam_role_policy" "create_team_bucket" {
       "Sid": "CanCreateBuckets",
       "Effect": "Allow",
       "Action": [
-        "s3:CreateBucket"
+        "s3:CreateBucket",
+        "s3:PutBucketLogging"
       ],
       "Resource": [
         "arn:aws:s3:::${var.env}-*"
