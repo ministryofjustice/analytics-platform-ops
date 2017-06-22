@@ -34,6 +34,7 @@ resource "aws_lambda_function" "create_team_bucket" {
             BUCKET_REGION = "${var.region}",
             STAGE = "${var.env}",
             SENTRY_DSN = "${var.sentry_dsn}",
+            LOGS_BUCKET_NAME = "${var.logs_bucket_name}",
         }
     }
 }
@@ -56,7 +57,8 @@ resource "aws_iam_role_policy" "create_team_bucket" {
       "Sid": "CanCreateBuckets",
       "Effect": "Allow",
       "Action": [
-        "s3:CreateBucket"
+        "s3:CreateBucket",
+        "s3:PutBucketLogging"
       ],
       "Resource": [
         "arn:aws:s3:::${var.env}-*"
