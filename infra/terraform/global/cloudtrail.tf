@@ -114,7 +114,7 @@ resource "aws_cloudtrail" "global" {
 
 resource "aws_s3_bucket" "global_cloudtrail" {
   bucket = "moj-analytics-global-cloudtrail"
-  force_destroy = true
+  force_destroy = false
 
   policy = <<POLICY
 {
