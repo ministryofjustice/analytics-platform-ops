@@ -1,7 +1,7 @@
 
 '''
 Environment variables:
- - STAGE, e.g. "dev", "alpha", etc...
+ - ENV, e.g. "dev", "alpha", etc...
  - IAM_ARN_BASE, e.g. "arn:aws:iam::1234"
  - LOG_LEVEL, change the logging level (default is "DEBUG"). Must be one of
    the python logging supported levels: "CRITICAL", "ERROR", "WARNING",
