@@ -2,9 +2,12 @@ import pytest
 
 import teams
 
-from tests.conftest import (TEST_TEAM_SLUG, TEST_BUCKET_NAME,
-                            TEST_BUCKET_REGION, TEST_LOGS_BUCKET_NAME,
-                            TEST_LOGS_PREFIX)
+from tests.conftest import (
+    TEST_TEAM_SLUG,
+    TEST_BUCKET_NAME,
+    TEST_BUCKET_REGION,
+    TEST_LOGS_BUCKET_NAME,
+    TEST_LOGS_PREFIX)
 
 
 @pytest.mark.usefixtures(
