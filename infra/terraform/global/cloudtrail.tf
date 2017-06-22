@@ -116,6 +116,26 @@ resource "aws_s3_bucket" "global_cloudtrail" {
   bucket = "moj-analytics-global-cloudtrail"
   force_destroy = false
 
+  lifecycle_rule {
+    id = "logs-transition"
+    prefix = ""
+    enabled = true
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+
   policy = <<POLICY
 {
     "Version": "2012-10-17",
