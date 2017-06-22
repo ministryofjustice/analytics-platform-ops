@@ -33,13 +33,13 @@ def given_the_env_is_set():
 
 @pytest.yield_fixture
 def given_sentry_is_mocked():
-    def catch_exceptions(fn):
+    def report_exceptions(fn):
         def wrapped(*args, **kwargs):
             fn(*args, **kwargs)
 
         return wrapped
 
-    with mock.patch("sentry.catch_exceptions", catch_exceptions):
+    with mock.patch("sentry.report_exceptions", report_exceptions):
         # Reload membership to be sure it's using the mocked sentry
         importlib.reload(memberships)
         yield

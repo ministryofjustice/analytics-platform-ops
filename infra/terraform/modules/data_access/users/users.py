@@ -14,7 +14,7 @@ Environment variables:
 '''
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def create_user_role(event, context):
     """
     Creates the role for the given user
@@ -63,7 +63,7 @@ def create_user_role(event, context):
     )
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def delete_user_role(event, context):
     """
     Deletes the role for the given user

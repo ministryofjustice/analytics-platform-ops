@@ -33,7 +33,7 @@ class InvalidPolicyType(Exception):
     pass
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def attach_bucket_policy(event, context):
     """
     Attaches the team bucket IAM policy to the user's IAM role
@@ -58,7 +58,7 @@ def attach_bucket_policy(event, context):
     )
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def detach_bucket_policies(event, context):
     """
     Detaches the team bucket IAM policies from the user's IAM role
