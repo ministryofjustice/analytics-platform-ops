@@ -119,6 +119,7 @@ resource "aws_s3_bucket" "global_cloudtrail" {
   lifecycle_rule {
     id = "logs-transition"
     prefix = ""
+    abort_incomplete_multipart_upload_days = 7
     enabled = true
 
     transition {
