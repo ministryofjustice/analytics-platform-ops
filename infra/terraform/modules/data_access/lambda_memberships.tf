@@ -30,7 +30,7 @@ resource "aws_lambda_function" "attach_bucket_policy" {
     depends_on = ["data.archive_file.memberships_zip"]
     environment {
         variables = {
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
             SENTRY_DSN = "${var.sentry_dsn}",
         }
@@ -92,7 +92,7 @@ resource "aws_lambda_function" "detach_bucket_policies" {
     depends_on = ["data.archive_file.memberships_zip"]
     environment {
         variables = {
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
             SENTRY_DSN = "${var.sentry_dsn}",
         }

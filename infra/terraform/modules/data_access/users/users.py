@@ -9,7 +9,7 @@ import sentry
 
 '''
 Environment variables:
- - STAGE, e.g. "dev", "alpha", etc...
+ - ENV, e.g. "dev", "alpha", etc...
  - SAML_PROVIDER_ARN, SAML provider used to login
 '''
 

@@ -2,7 +2,7 @@
 Environment variables:
  - BUCKET_REGION, region where bucket will be created, e.g. "eu-west-1"
  - IAM_ARN_BASE, e.g. "arn:aws:iam::1234"
- - STAGE, e.g. "dev", "alpha", etc...
+ - ENV, e.g. "dev", "alpha", etc...
  - SENTRY_DSN, Sentry DSN
 '''
 
