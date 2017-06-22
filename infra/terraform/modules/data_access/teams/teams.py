@@ -25,7 +25,7 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 LOG.setLevel(LOG_LEVEL)
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def create_team_bucket(event, context):
     """
     Creates the team's S3 bucket, with logging enabled
@@ -58,7 +58,7 @@ def create_team_bucket(event, context):
     )
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def create_team_bucket_policies(event, context):
     """
     Creates the policies for the team S3 bucket:
@@ -144,7 +144,7 @@ def get_policy_document(bucket_name, readwrite):
     }
 
 
-@sentry.catch_exceptions
+@sentry.report_exceptions
 def delete_team_bucket_policies(event, context):
     """
     Deletes the IAM policies for the team S3 bucket ("*-readonly" and
