@@ -7,9 +7,9 @@ import pytest
 
 TEST_SAML_PROVIDER_ARN = "arn:aws:iam::123456789012:saml-provider/auth0"
 TEST_K8S_WORKER_ROLE_ARN = "arn:aws:iam::123456789012:role/nodes.test.example.com"
-TEST_STAGE = "test"
+TEST_ENV = "test"
 TEST_USERNAME = "Alice"
-TEST_ROLE_NAME = "{}_user_{}".format(TEST_STAGE, TEST_USERNAME.lower())
+TEST_ROLE_NAME = "{}_user_{}".format(TEST_ENV, TEST_USERNAME.lower())
 
 TEST_ROLE_POLICY_ARN = "test_policy_arn"
 
@@ -17,7 +17,7 @@ TEST_ROLE_POLICY_ARN = "test_policy_arn"
 @pytest.yield_fixture
 def given_the_env_is_set():
     with mock.patch.dict("os.environ", {
-        "STAGE": TEST_STAGE,
+        "ENV": TEST_ENV,
         "SAML_PROVIDER_ARN": TEST_SAML_PROVIDER_ARN,
         "K8S_WORKER_ROLE_ARN": TEST_K8S_WORKER_ROLE_ARN,
     }):

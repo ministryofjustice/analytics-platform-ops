@@ -30,7 +30,7 @@ resource "aws_lambda_function" "create_user_role" {
     depends_on = ["data.archive_file.users_zip"]
     environment {
         variables = {
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             SAML_PROVIDER_ARN = "${var.saml_provider_arn}",
             K8S_WORKER_ROLE_ARN = "${var.k8s_worker_role_arn}",
             SENTRY_DSN = "${var.sentry_dsn}",
@@ -93,7 +93,7 @@ resource "aws_lambda_function" "delete_user_role" {
     depends_on = ["data.archive_file.users_zip"]
     environment {
         variables = {
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             SENTRY_DSN = "${var.sentry_dsn}",
         }
     }

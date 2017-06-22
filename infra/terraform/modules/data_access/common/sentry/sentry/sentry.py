@@ -1,6 +1,6 @@
 '''
 Environment variables:
- - STAGE, e.g. "dev", "alpha", etc...
+ - ENV, e.g. "dev", "alpha", etc...
  - SENTRY_DSN, Sentry DSN
 '''
 
@@ -18,7 +18,7 @@ def catch_exceptions(fn):
             client = Sentry(
                 os.environ["SENTRY_DSN"],
                 transport=SentryHTTPTransport,
-                environment=os.environ["STAGE"],
+                environment=os.environ["ENV"],
             )
             client.captureException()
             raise

@@ -1,6 +1,6 @@
 '''
 Environment variables:
- - STAGE, e.g. "dev", "alpha", etc...
+ - ENV, e.g. "dev", "alpha", etc...
 '''
 
 import os
@@ -9,7 +9,7 @@ import re
 
 def role_name(username):
     return "{env}_user_{username}".format(
-        env=os.environ["STAGE"],
+        env=os.environ["ENV"],
         username=username.lower(),
     )
 
@@ -31,7 +31,7 @@ def bucket_name(slug):
     name = re.sub(INVALID_BUCKET_CHARS, "-", name)
     name = name.strip("-")
 
-    return "{}-{}".format(os.environ["STAGE"], name)
+    return "{}-{}".format(os.environ["ENV"], name)
 
 
 def policy_name(bucket_name, policy_type):
