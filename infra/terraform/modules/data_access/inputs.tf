@@ -10,3 +10,4 @@ variable "k8s_worker_role_arn" {}
 variable "membership_events_topic_arn" {}
 variable "organization_events_topic_arn" {}
 variable "team_events_topic_arn" {}
+variable "logs_bucket_name" {}
