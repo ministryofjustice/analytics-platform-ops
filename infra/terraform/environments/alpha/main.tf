@@ -116,6 +116,8 @@ module "data_access" {
     env = "${var.env}"
     account_id = "${data.aws_caller_identity.current.account_id}"
 
+    sentry_dsn = "${var.sentry_dsn}"
+
     saml_provider_arn = "${module.federated_identity.saml_provider_arn}"
     k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
 
