@@ -5,6 +5,7 @@ resource "null_resource" "teams_install_deps" {
     }
 
     triggers {
+        build_sh_sha = "${sha256(file("${path.module}/teams/build.sh"))}"
         requirements_sha = "${sha256(file("${path.module}/teams/requirements.txt"))}"
     }
 }
@@ -32,7 +33,7 @@ resource "aws_lambda_function" "create_team_bucket" {
     environment {
         variables = {
             BUCKET_REGION = "${var.region}",
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             SENTRY_DSN = "${var.sentry_dsn}",
             LOGS_BUCKET_NAME = "${var.logs_bucket_name}",
         }
@@ -95,7 +96,7 @@ resource "aws_lambda_function" "create_team_bucket_policies" {
     depends_on = ["data.archive_file.teams_zip"]
     environment {
         variables = {
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             SENTRY_DSN = "${var.sentry_dsn}",
         }
     }
@@ -156,7 +157,7 @@ resource "aws_lambda_function" "delete_team_bucket_policies" {
     depends_on = ["data.archive_file.teams_zip"]
     environment {
         variables = {
-            STAGE = "${var.env}",
+            ENV = "${var.env}",
             IAM_ARN_BASE = "arn:aws:iam::${var.account_id}",
             SENTRY_DSN = "${var.sentry_dsn}",
         }

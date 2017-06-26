@@ -1,6 +1,9 @@
 boto3
 raven
 
+file:../data_access/common/naming
+file:../data_access/common/sentry
+
 pytest
 pytest-spec
 pytest-watch
