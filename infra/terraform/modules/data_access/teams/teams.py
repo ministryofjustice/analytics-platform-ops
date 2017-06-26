@@ -2,7 +2,7 @@
 Environment variables:
  - BUCKET_REGION, region where bucket will be created, e.g. "eu-west-1"
  - IAM_ARN_BASE, e.g. "arn:aws:iam::1234"
- - STAGE, e.g. "dev", "alpha", etc...
+ - ENV, e.g. "dev", "alpha", etc...
  - SENTRY_DSN, Sentry DSN
 '''
 
@@ -12,8 +12,9 @@ import os
 import re
 
 import boto3
-from raven import Client as Sentry
-from raven.transport.http import HTTPTransport as SentryHTTPTransport
+
+import naming
+import sentry
 
 
 READ_ONLY = False
@@ -24,23 +25,7 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 LOG.setLevel(LOG_LEVEL)
 
 
-def send_exceptions_to_sentry(fn):
-    def wrapped(*args, **kwargs):
-        try:
-            fn(*args, **kwargs)
-        except Exception:
-            client = Sentry(
-                os.environ["SENTRY_DSN"],
-                transport=SentryHTTPTransport,
-                environment=os.environ["STAGE"],
-            )
-            client.captureException()
-            raise
-
-    return wrapped
-
-
-@send_exceptions_to_sentry
+@sentry.report_exceptions
 def create_team_bucket(event, context):
     """
     Creates the team's S3 bucket, with logging enabled
@@ -48,7 +33,7 @@ def create_team_bucket(event, context):
     event = {"team": {"slug": "justice-league"}}
     """
 
-    name = bucket_name(event["team"]["slug"])
+    name = naming.bucket_name(event["team"]["slug"])
     region = os.environ["BUCKET_REGION"]
 
     LOG.debug("Creating S3 bucket '{name}' (private) in region '{region}'".format(
@@ -73,7 +58,7 @@ def create_team_bucket(event, context):
     )
 
 
-@send_exceptions_to_sentry
+@sentry.report_exceptions
 def create_team_bucket_policies(event, context):
     """
     Creates the policies for the team S3 bucket:
@@ -83,16 +68,16 @@ def create_team_bucket_policies(event, context):
     event = {"team": {"slug": "justice-league"}}
     """
 
-    bucket = bucket_name(event["team"]["slug"])
+    bucket = naming.bucket_name(event["team"]["slug"])
 
     create_policy(readwrite=READ_ONLY, bucket_name=bucket)
     create_policy(readwrite=READ_WRITE, bucket_name=bucket)
 
 
 def create_policy(readwrite, bucket_name):
-    policy_name = "{bucket_name}-{suffix}".format(
+    policy_name = naming.policy_name(
         bucket_name=bucket_name,
-        suffix="readwrite" if readwrite else "readonly"
+        policy_type="readwrite" if readwrite else "readonly"
     )
 
     LOG.debug("Creating '{}' policy".format(policy_name))
@@ -159,7 +144,7 @@ def get_policy_document(bucket_name, readwrite):
     }
 
 
-@send_exceptions_to_sentry
+@sentry.report_exceptions
 def delete_team_bucket_policies(event, context):
     """
     Deletes the IAM policies for the team S3 bucket ("*-readonly" and
@@ -168,13 +153,13 @@ def delete_team_bucket_policies(event, context):
     event = {"team": {"slug": "justice-league"}}
     """
 
-    bucket = bucket_name(event["team"]["slug"])
+    bucket = naming.bucket_name(event["team"]["slug"])
 
-    delete_policy("{}-readonly".format(bucket))
-    delete_policy("{}-readwrite".format(bucket))
+    delete_policy(bucket_name=bucket, policy_type="readonly")
+    delete_policy(bucket_name=bucket, policy_type="readwrite")
 
 
-def delete_policy(name):
+def delete_policy(bucket_name, policy_type):
     '''
     Delete an IAM policy
 
@@ -182,12 +167,13 @@ def delete_policy(name):
     SEE: https://docs.aws.amazon.com/de_de/IAM/latest/APIReference/API_DeletePolicy.html
     '''
 
-    LOG.debug("Deleting '{}' policy".format(name))
-
-    policy_arn = "{iam_arn_base}:policy/{policy_name}".format(
+    policy_arn = naming.policy_arn(
         iam_arn_base=os.environ["IAM_ARN_BASE"],
-        policy_name=name,
+        bucket_name=bucket_name,
+        policy_type=policy_type,
     )
+
+    LOG.debug("Deleting '{}' policy".format(policy_arn))
 
     detach_policy_from_entities(policy_arn)
 
@@ -245,23 +231,3 @@ def detach_policy_from_user(policy_arn, user_name):
         UserName=user_name,
         PolicyArn=policy_arn,
     )
-
-
-def bucket_name(slug):
-    '''
-    Generate the S3 bucket name by prefixing the environment name and
-    replacing invalid characters with an hyphen ('-').
-
-    NOTE: This is a very simple implementation which doesn't cover all the
-          S3 limitations (e.g. max length or labels limitations, etc...)
-
-    See: http://docs.aws.amazon.com/en_gb/AmazonS3/latest/dev/BucketRestrictions.html
-    '''
-
-    INVALID_BUCKET_CHARS = r"[^a-z0-9.-]+"
-
-    name = slug.lower()
-    name = re.sub(INVALID_BUCKET_CHARS, "-", name)
-    name = name.strip("-")
-
-    return "{}-{}".format(os.environ["STAGE"], name)

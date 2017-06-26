@@ -7,9 +7,9 @@ import pytest
 
 
 TEST_BUCKET_REGION = "eu-west-1"
-TEST_STAGE = "test"
+TEST_ENV = "test"
 TEST_TEAM_SLUG = "__Justice____League--"
-TEST_BUCKET_NAME = "{}-justice-league".format(TEST_STAGE)
+TEST_BUCKET_NAME = "{}-justice-league".format(TEST_ENV)
 TEST_IAM_ARN_BASE = "arn:aws:iam::1234"
 TEST_BUCKET_ARN = "arn:aws:s3:::{}".format(TEST_BUCKET_NAME)
 TEST_ROLE_NAME = "test-role"
@@ -75,7 +75,7 @@ def given_the_env_is_set():
     with mock.patch.dict("os.environ", {
         "BUCKET_REGION": TEST_BUCKET_REGION,
         "IAM_ARN_BASE": TEST_IAM_ARN_BASE,
-        "STAGE": TEST_STAGE,
+        "ENV": TEST_ENV,
         "LOGS_BUCKET_NAME": TEST_LOGS_BUCKET_NAME,
     }):
         yield
