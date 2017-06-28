@@ -8,7 +8,7 @@ app:
   port: 80
   repo: ""
 AuthProxy:
-  AuthenticationRequired: true
+  AuthenticationRequired: "true"
   IPRanges: ""
   Image:
     Repository: quay.io/mojanalytics/auth-proxy
