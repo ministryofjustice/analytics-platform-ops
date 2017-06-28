@@ -53,9 +53,9 @@ spec:
             - name: TARGET_URL
               value: "http://localhost:{{ .Values.shinyApp.port }}/"
             - name: AUTHENTICATION_REQUIRED
-              value: {{ .Values.AuthProxy.AuthenticationRequired }}
+              value: "{{ .Values.AuthProxy.AuthenticationRequired }}"
             - name: IP_RANGES
-              value: {{ .Values.AuthProxy.IPRanges }}
+              value: "{{ .Values.AuthProxy.IPRanges }}"
             - name: AUTH0_PASSWORDLESS
               value: "true"
             - name: PORT
