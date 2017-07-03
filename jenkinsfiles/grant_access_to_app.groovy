@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     parameters{
-        string(name: 'APP_NAME', description: 'Shiny App name')
+        string(name: 'APP_NAME', description: 'Shiny App name: e.g. rshiny-test')
         string(name: 'EMAILS', description: 'List of email addresses')
     }
 
