@@ -1,37 +1,23 @@
-node {
+pipeline {
 
-    properties([
-        parameters([
-            string(
-                name: 'APP_NAME',
-                description: 'Shiny App name',
-                defaultValue: ''),
-            string(
-                name: 'EMAILS',
-                description: 'List of email addresses',
-                defaultValue: ''),
-        ])
-    ])
+    agent any
 
-    stage ("Git checkout") {
-        checkout scm
+    parameters{
+        string(name: 'APP_NAME', description: 'Shiny App name')
+        string(name: 'EMAILS', description: 'List of email addresses')
     }
 
-    // Creates passwordless user in Auth0 and adds to app group
-    // NOTE: Groups provided by Auth0 Authorization Extension
-    env.AUTHZ_API_ID = "urn:auth0-authz-api"
-    env.AUTH0_DOMAIN = "${env.PLATFORM_ENV}-analytics-moj.eu.auth0.com"
-    stage ("Create Auth0 passwordless user and add to app group") {
-      withCredentials([
-        usernamePassword(
-            credentialsId: 'auth0-api-client',
-            usernameVariable: 'AUTH0_CLIENT_ID',
-            passwordVariable: 'AUTH0_CLIENT_SECRET'),
-        string(
-            credentialsId: 'auth0-authz-api-url',
-            variable: 'AUTHZ_API_URL')
-      ]) {
-        sh "/usr/local/bin/grant_access ${env.APP_NAME} '${env.EMAILS}'"
-      }
+    stages {
+        stage ("Create Auth0 passwordless user and add to app group") {
+            environment {
+                AUTHZ_API_ID = 'urn:auth0-authz-api'
+                AUTHZ_API_URL = credentials('auth0-authz-api-url')
+                AUTH0_CLIENT = credentials('auth0-api-client')
+                AUTH0_DOMAIN = "${PLATFORM_ENV}-analytics-moj.eu.auth0.com"
+            }
+            steps {
+                sh "grant_access ${params.APP_NAME} '${params.EMAILS}'"
+            }
+        }
     }
 }
