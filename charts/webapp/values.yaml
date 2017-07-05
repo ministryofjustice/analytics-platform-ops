@@ -22,8 +22,8 @@ OAuth:
   ClientSecret: ""
   ClientId: ""
   Domain: "AUTH0_USER.eu.auth0.com"
-shinyApp:
-  port: 3838
+webapp:
+  port: 80
   docker:
     repository: ""
     tag: latest

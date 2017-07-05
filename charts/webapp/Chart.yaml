@@ -1,0 +1,4 @@
+apiVersion: v1
+description: webapp Helm chart for Kubernetes
+name: webapp
+version: 1.0.0
