@@ -51,7 +51,7 @@ spec:
                   name: {{ template "fullname" . }}
                   key: cookie_secret
             - name: TARGET_URL
-              value: "http://localhost:{{ .Values.shinyApp.port }}/"
+              value: "http://localhost:{{ .Values.webapp.port }}/"
             - name: AUTHENTICATION_REQUIRED
               value: "{{ .Values.AuthProxy.AuthenticationRequired }}"
             - name: IP_RANGES
@@ -67,15 +67,15 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
 
-        - name: shiny-app
-          image: "{{ .Values.shinyApp.docker.repository }}:{{ .Values.shinyApp.docker.tag }}"
-          imagePullPolicy: {{ .Values.shinyApp.docker.pullPolicy }}
+        - name: webapp
+          image: "{{ .Values.webapp.docker.repository }}:{{ .Values.webapp.docker.tag }}"
+          imagePullPolicy: {{ .Values.webapp.docker.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.shinyApp.port }}
+            - containerPort: {{ .Values.webapp.port }}
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.shinyApp.port }}
+              port: {{ .Values.webapp.port }}
             initialDelaySeconds: 15
             periodSeconds: 5
             timeoutSeconds: 5
