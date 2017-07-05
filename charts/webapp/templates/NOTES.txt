@@ -1,0 +1,1 @@
+Your webapp will be available shortly at {{ .Values.app.name }}.{{ .Values.app.baseHost }}
