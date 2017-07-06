@@ -83,6 +83,8 @@ spec:
             requests:
               cpu: 10m
           volumeMounts:
+            - name: varlognginx
+              mountPath: /var/log/nginx
             - name: varlogshinyserver
               mountPath: /var/log/shiny-server
 
@@ -108,10 +110,14 @@ spec:
           volumeMounts:
             - name: fluentd-config
               mountPath: /fluentd/etc
+            - name: varlognginx
+              mountPath: /var/log/nginx
             - name: varlogshinyserver
               mountPath: /var/log/shiny-server
 
       volumes:
+        - name: varlognginx
+          emptyDir: {}
         - name: varlogshinyserver
           emptyDir: {}
         - name: fluentd-config
