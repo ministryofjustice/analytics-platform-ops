@@ -17,8 +17,6 @@ data:
       type tail
       format none
       path /var/log/shiny-server/*
-      pos_file /var/log/shiny-server/fluentd.pos
-      read_from_head true
       tag "#{ENV['FLUENT_SOURCE_TAG']}"
     </source>
 
