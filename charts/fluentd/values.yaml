@@ -1,7 +1,7 @@
 image:
-  repository: quay.io/fluent/fluentd-kubernetes-daemonset
-  tag: latest
-  pullPolicy: IfNotPresent
+  repository: fluent/fluentd-kubernetes-daemonset
+  tag: elasticsearch
+  pullPolicy: Always
 elasticsearch:
   host: elasticsearch-logging
   port: "9200"
