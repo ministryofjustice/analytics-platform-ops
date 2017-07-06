@@ -5,6 +5,9 @@ image:
 elasticsearch:
   host: elasticsearch-logging
   port: "9200"
+  scheme: "http"
+  username: ""
+  password: ""
 resources:
   limits:
     cpu: 100m
