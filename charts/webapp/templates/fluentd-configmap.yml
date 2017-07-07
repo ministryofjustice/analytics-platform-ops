@@ -28,6 +28,12 @@ data:
         path /var/log/nginx/access.log
     </source>
 
+    <filter nginx.access>
+      type grep
+      input_key code
+      exclude ^200$
+    </filter>
+
     # NGINX's error logs
     <source>
         @type tail
