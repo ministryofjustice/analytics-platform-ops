@@ -29,10 +29,10 @@ data:
         path /var/log/nginx/access.log
     </source>
 
+    # Ignore k8s healthcheck requests
     <filter nginx.access>
-      type grep
-      input_key code
-      exclude ^200$
+      @type grep
+      exclude1 agent ^Go-http-client\/.*$
     </filter>
 
     # NGINX's error logs
