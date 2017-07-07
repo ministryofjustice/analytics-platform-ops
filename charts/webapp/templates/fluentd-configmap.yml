@@ -14,7 +14,7 @@ data:
   fluent.conf: |
     # shiny-server logs
     <source>
-      type tail
+      @type tail
       format none
       path /var/log/shiny-server/*
       tag "#{ENV['FLUENT_SOURCE_TAG']}"
@@ -22,7 +22,7 @@ data:
 
     # NGINX's access logs
     <source>
-        type tail
+        @type tail
         format nginx
         tag nginx.access
         path /var/log/nginx/access.log
@@ -30,7 +30,7 @@ data:
 
     # NGINX's error logs
     <source>
-        type tail
+        @type tail
         tag nginx.error
         path /var/log/nginx/error.log
 
@@ -41,7 +41,7 @@ data:
     </source>
 
     <match **>
-       type elasticsearch
+       @type elasticsearch
        log_level info
        include_tag_key true
        host "#{ENV['FLUENT_ELASTICSEARCH_HOST']}"
