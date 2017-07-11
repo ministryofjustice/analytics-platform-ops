@@ -8,8 +8,6 @@ metadata:
     release: "{{ .Release.Name }}"
   name: "{{ template "fullname" . }}-fluentd"
 data:
-  elasticsearch_host: "{{ .Values.Elasticsearch.Host }}"
-  elasticsearch_port: "{{ .Values.Elasticsearch.Port }}"
   source_tag: "{{ template "fullname" . }}"
   fluent.conf: |
     # shiny-server logs
@@ -51,8 +49,11 @@ data:
        @type elasticsearch
        log_level info
        include_tag_key true
+       scheme "#{ENV['FLUENT_ELASTICSEARCH_SCHEME']}"
        host "#{ENV['FLUENT_ELASTICSEARCH_HOST']}"
        port "#{ENV['FLUENT_ELASTICSEARCH_PORT']}"
+       user "#{ENV['FLUENT_ELASTICSEARCH_USERNAME']}"
+       password "#{ENV['FLUENT_ELASTICSEARCH_PASSWORD']}"
        logstash_format true
        buffer_chunk_limit 2M
        buffer_queue_limit 32
