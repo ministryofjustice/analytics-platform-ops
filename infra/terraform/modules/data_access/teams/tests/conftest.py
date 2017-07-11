@@ -66,7 +66,7 @@ TEST_READWRITE_POLICY_DOCUMENT["Statement"].append(
         "Resource": "{}/*".format(TEST_BUCKET_ARN)
     }
 )
-TEST_LOGS_PREFIX = "s3/{}/".format(TEST_BUCKET_NAME)
+TEST_LOGS_PREFIX = "{}/".format(TEST_BUCKET_NAME)
 TEST_LOGS_BUCKET_NAME = "test-logs"
 
 
