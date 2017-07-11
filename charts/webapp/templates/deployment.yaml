@@ -92,16 +92,31 @@ spec:
           image: "{{ .Values.Fluentd.Image.Repository }}:{{ .Values.Fluentd.Image.Tag }}"
           imagePullPolicy: {{ .Values.Fluentd.Image.PullPolicy }}
           env:
+            - name:  FLUENT_ELASTICSEARCH_SCHEME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_scheme
             - name:  FLUENT_ELASTICSEARCH_HOST
               valueFrom:
-                configMapKeyRef:
-                  name: {{ template "fullname" . }}-fluentd
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
                   key: elasticsearch_host
             - name:  FLUENT_ELASTICSEARCH_PORT
               valueFrom:
-                configMapKeyRef:
-                  name: {{ template "fullname" . }}-fluentd
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
                   key: elasticsearch_port
+            - name:  FLUENT_ELASTICSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_username
+            - name:  FLUENT_ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_password
             - name:  FLUENT_SOURCE_TAG
               valueFrom:
                 configMapKeyRef:
