@@ -30,8 +30,8 @@ webapp:
     pullPolicy: Always
 Fluentd:
   Image:
-    Repository: quay.io/fluent/fluentd-kubernetes-daemonset
-    Tag: latest
+    Repository: fluent/fluentd-kubernetes-daemonset
+    Tag: stable-elasticsearch
     PullPolicy: "IfNotPresent"
 Elasticsearch:
   Host: ""
