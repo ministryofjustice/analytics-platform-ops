@@ -34,5 +34,8 @@ Fluentd:
     Tag: stable-elasticsearch
     PullPolicy: "IfNotPresent"
 Elasticsearch:
+  Scheme: "http"
   Host: ""
   Port: "9200"
+  Username: ""
+  Password: ""
