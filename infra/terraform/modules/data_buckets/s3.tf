@@ -16,36 +16,6 @@ resource "aws_s3_bucket" "scratch" {
     }
 }
 
-resource "aws_s3_bucket" "logs" {
-    bucket = "${var.env}-moj-analytics-logs"
-    acl = "log-delivery-write"
-
-    lifecycle_rule {
-      id = "logs-transition"
-      prefix = ""
-      abort_incomplete_multipart_upload_days = 7
-      enabled = true
-
-      transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-
-      transition {
-        days          = 60
-        storage_class = "GLACIER"
-      }
-
-      expiration {
-        days = 365
-      }
-    }
-
-    tags {
-        Name = "${var.env}-moj-analytics-logs"
-    }
-}
-
 # Data in the 'source' bucket must be encrypted
 resource "aws_s3_bucket_policy" "source" {
     bucket = "${aws_s3_bucket.source.id}"
