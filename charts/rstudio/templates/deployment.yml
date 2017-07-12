@@ -70,16 +70,38 @@ spec:
           image: "{{ .Values.Fluentd.Image.Repository }}:{{ .Values.Fluentd.Image.Tag }}"
           imagePullPolicy: {{ .Values.Fluentd.Image.PullPolicy }}
           env:
+            - name: USER
+              value: {{ .Values.Username }}
             - name:  FLUENT_ELASTICSEARCH_HOST
               valueFrom:
-                configMapKeyRef:
-                  name: {{ template "fullname" . }}-fluentd
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
                   key: elasticsearch_host
             - name:  FLUENT_ELASTICSEARCH_PORT
               valueFrom:
-                configMapKeyRef:
-                  name: {{ template "fullname" . }}-fluentd
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
                   key: elasticsearch_port
+            - name:  FLUENT_ELASTICSEARCH_SCHEME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_scheme
+            {{ if .Values.Elasticsearch.Username }}
+            - name: FLUENT_ELASTICSEARCH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_username
+            {{ end }}
+            {{ if .Values.Elasticsearch.Password }}
+            - name: FLUENT_ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_password
+            {{ end }}
+
           volumeMounts:
             - name: fluentd-config
               mountPath: /fluentd/etc
