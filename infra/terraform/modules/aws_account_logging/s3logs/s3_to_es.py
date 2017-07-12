@@ -49,11 +49,7 @@ def log_lines(log_file):
     log_data = log_file['Body']._raw_stream
     reader = codecs.getreader('utf-8')(log_data)
 
-    while True:
-        line = reader.readline()
-
-        if not line:
-            break
+    for line in reader:
 
         line = line.strip()
 
