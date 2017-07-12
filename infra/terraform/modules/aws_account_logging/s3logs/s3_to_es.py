@@ -112,7 +112,7 @@ def parse_log_entry(entry):
 
     log['time_received'] = log['time_received_utc_isoformat']
 
-    for key, value in log.items():
+    for key, value in dict(log).items():
 
         if key.startswith('time_received_'):
             del log[key]
