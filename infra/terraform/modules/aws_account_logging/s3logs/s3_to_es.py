@@ -1,3 +1,4 @@
+import codecs
 import os
 import datetime
 import logging
@@ -44,11 +45,17 @@ def add_elasticsearch_index(log_file):
 
 
 def log_lines(log_file):
-    # TODO update this to stream the body in case of large log files?
 
-    log_data = log_file['Body'].read().decode('utf-8')
+    log_data = log_file['Body']._raw_stream
+    reader = codecs.getreader('utf-8')(log_data)
 
-    for line in log_data.split('\n'):
+    while True:
+        line = reader.readline()
+
+        if not line:
+            break
+
+        line = line.strip()
 
         if line:
             yield line
