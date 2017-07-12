@@ -22,17 +22,20 @@ OAuth:
   ClientSecret: ""
   ClientId: ""
   Domain: "AUTH0_USER.eu.auth0.com"
-shinyApp:
-  port: 3838
+webapp:
+  port: 80
   docker:
     repository: ""
     tag: latest
     pullPolicy: Always
 Fluentd:
   Image:
-    Repository: quay.io/fluent/fluentd-kubernetes-daemonset
-    Tag: latest
+    Repository: fluent/fluentd-kubernetes-daemonset
+    Tag: stable-elasticsearch
     PullPolicy: "IfNotPresent"
 Elasticsearch:
+  Scheme: "http"
   Host: ""
   Port: "9200"
+  Username: ""
+  Password: ""

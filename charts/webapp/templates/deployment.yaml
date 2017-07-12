@@ -51,7 +51,7 @@ spec:
                   name: {{ template "fullname" . }}
                   key: cookie_secret
             - name: TARGET_URL
-              value: "http://localhost:{{ .Values.shinyApp.port }}/"
+              value: "http://localhost:{{ .Values.webapp.port }}/"
             - name: AUTHENTICATION_REQUIRED
               value: "{{ .Values.AuthProxy.AuthenticationRequired }}"
             - name: IP_RANGES
@@ -67,15 +67,15 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
 
-        - name: shiny-app
-          image: "{{ .Values.shinyApp.docker.repository }}:{{ .Values.shinyApp.docker.tag }}"
-          imagePullPolicy: {{ .Values.shinyApp.docker.pullPolicy }}
+        - name: webapp
+          image: "{{ .Values.webapp.docker.repository }}:{{ .Values.webapp.docker.tag }}"
+          imagePullPolicy: {{ .Values.webapp.docker.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.shinyApp.port }}
+            - containerPort: {{ .Values.webapp.port }}
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.shinyApp.port }}
+              port: {{ .Values.webapp.port }}
             initialDelaySeconds: 15
             periodSeconds: 5
             timeoutSeconds: 5
@@ -83,6 +83,8 @@ spec:
             requests:
               cpu: 10m
           volumeMounts:
+            - name: varlognginx
+              mountPath: /var/log/nginx
             - name: varlogshinyserver
               mountPath: /var/log/shiny-server
 
@@ -90,16 +92,31 @@ spec:
           image: "{{ .Values.Fluentd.Image.Repository }}:{{ .Values.Fluentd.Image.Tag }}"
           imagePullPolicy: {{ .Values.Fluentd.Image.PullPolicy }}
           env:
+            - name:  FLUENT_ELASTICSEARCH_SCHEME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_scheme
             - name:  FLUENT_ELASTICSEARCH_HOST
               valueFrom:
-                configMapKeyRef:
-                  name: {{ template "fullname" . }}-fluentd
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
                   key: elasticsearch_host
             - name:  FLUENT_ELASTICSEARCH_PORT
               valueFrom:
-                configMapKeyRef:
-                  name: {{ template "fullname" . }}-fluentd
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
                   key: elasticsearch_port
+            - name:  FLUENT_ELASTICSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_username
+            - name:  FLUENT_ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: elasticsearch_password
             - name:  FLUENT_SOURCE_TAG
               valueFrom:
                 configMapKeyRef:
@@ -108,10 +125,14 @@ spec:
           volumeMounts:
             - name: fluentd-config
               mountPath: /fluentd/etc
+            - name: varlognginx
+              mountPath: /var/log/nginx
             - name: varlogshinyserver
               mountPath: /var/log/shiny-server
 
       volumes:
+        - name: varlognginx
+          emptyDir: {}
         - name: varlogshinyserver
           emptyDir: {}
         - name: fluentd-config
