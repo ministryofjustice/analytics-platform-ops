@@ -10,21 +10,17 @@ metadata:
 data:
   fluent.conf: |
     <source>
-      type tail
+      @type tail
       format none
       path /var/log/rstudio-server/rserver-http-access.log
-      pos_file /var/log/rstudio-server/rserver-http-access.pos
-      read_from_head true
-      tag rstudio-access
+      tag "#{ENV['USER']}.rstudio.access"
     </source>
 
     <source>
-      type tail
-      format none
+      @type tail
       path /var/log/rstudio-server/rserver-http-error.log
-      pos_file /var/log/rstudio-server/rserver-http-error.pos
-      read_from_head true
-      tag rstudio-error
+      format none
+      tag "#{ENV['USER']}.rstudio.error"
     </source>
 
     <match **>
