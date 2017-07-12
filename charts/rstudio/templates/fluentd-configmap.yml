@@ -25,7 +25,7 @@ data:
     </source>
 
     # Ignore k8s healthcheck requests
-    <filter *.nginx.access>
+    <filter *.rstudio.access>
       @type grep
       exclude1 path ^\/health-check$
     </filter>
