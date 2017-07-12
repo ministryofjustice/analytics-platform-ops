@@ -27,7 +27,7 @@ data:
     # Ignore k8s healthcheck requests
     <filter *.nginx.access>
       @type grep
-      exclude1 agent ^Go-http-client\/.*$
+      exclude1 path ^\/health-check$
     </filter>
 
     <match **>
