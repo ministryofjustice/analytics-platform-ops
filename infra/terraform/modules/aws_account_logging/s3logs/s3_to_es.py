@@ -25,8 +25,9 @@ def lambda_handler(event, context):
     for record in event['Records']:
         log_file = log_file_s3_object(record)
 
-        LOG.debug('Indexing log file: bucket={Bucket}, key={Key}'.format(
-            **log_file))
+        LOG.debug('Indexing log file: bucket={bucket}, key={key}'.format(
+            bucket=record['s3']['bucket']['name'],
+            key=record['s3']['object']['key']))
 
         add_elasticsearch_index(log_file)
 
