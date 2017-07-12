@@ -14,12 +14,14 @@ data:
       format /^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")? "(?<x_forwarded_for>[^ ]+)?"/
       time_format %d/%b/%Y:%H:%M:%S %z
       path /var/log/rstudio-server/rserver-http-access.log
+      pos_file /var/log/rstudio-server/rserver-http-access.pos
       tag "#{ENV['USER']}.rstudio.access"
     </source>
 
     <source>
       @type tail
       path /var/log/rstudio-server/rserver-http-error.log
+      pos_file /var/log/rstudio-server/rserver-http-error.pos
       format none
       tag "#{ENV['USER']}.rstudio.error"
     </source>
