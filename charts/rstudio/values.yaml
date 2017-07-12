@@ -13,9 +13,9 @@ Elasticsearch:
   Port: 9200
 Fluentd:
   Image:
-    Repository: quay.io/fluent/fluentd-kubernetes-daemonset
-    Tag: latest
-    PullPolicy: "IfNotPresent"
+    Repository: fluent/fluentd-kubernetes-daemonset
+    Tag: elasticsearch
+    PullPolicy: Always
   resources:
     limits:
       cpu: 100m
