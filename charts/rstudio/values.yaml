@@ -17,7 +17,7 @@ Elasticsearch:
 Fluentd:
   Image:
     Repository: fluent/fluentd-kubernetes-daemonset
-    Tag: elasticsearch
+    Tag: stable-elasticsearch
     PullPolicy: Always
   resources:
     limits:
