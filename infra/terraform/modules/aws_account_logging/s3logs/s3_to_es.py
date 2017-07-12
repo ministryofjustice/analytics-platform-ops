@@ -8,73 +8,115 @@ import s3_log_parser
 import requests
 from requests.auth import HTTPBasicAuth
 
-LOG = logging.getLogger(__name__)
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
-LOG.setLevel(LOG_LEVEL)
 
-ES_URL = '{scheme}://{domain}:{port}/{index}/{doctype}'.format(**{
-    'domain': os.environ.get('ES_DOMAIN', 'localhost'),
-    'port': os.environ.get('ES_PORT', '9200'),
-    'scheme': os.environ.get('ES_SCHEME', 'http'),
-    'doctype': os.environ.get('ES_DOCTYPE', 's3-access-log'),
-    'index': "-".join([
-        os.environ.get('ES_INDEX_PREFIX', 's3logs'),
-        datetime.datetime.utcnow().strftime('%Y.%m.%d')])
-})
-ES_USERNAME = os.environ.get('ES_USERNAME', None)
-ES_PASSWORD = os.environ.get('ES_PASSWORD', None)
+LOG = logging.getLogger(__name__)
+LOG.setLevel(os.environ.get('LOG_LEVEL', 'DEBUG'))
 
 s3 = boto3.client('s3', config=Config(signature_version='s3v4'))
+
 s3_parser = s3_log_parser.make_parser(
-    "%BO %B %t %a %r %si %o %k \"%R\" %s %e %b %y %m %n "
-    "\"%{Referer}i\" \"%{User-Agent}i\" %v")
+    '%BO %B %t %a %r %si %o %k "%R" %s %e %b %y %m %n '
+    '"%{Referer}i" "%{User-Agent}i" %v')
 
 
 def lambda_handler(event, context):
     LOG.debug('Event received: {}'.format(event))
 
     for record in event['Records']:
-        process_log_file(
-            record['s3']['bucket']['name'],
-            record['s3']['object']['key'])
+        log_file = log_file_s3_object(record)
+
+        LOG.debug('Indexing log file: bucket={Bucket}, key={Key}'.format(
+            **log_file))
+
+        add_elasticsearch_index(log_file)
 
 
-def process_log_file(bucket, key):
-    LOG.debug('Processing log file: bucket={}, key={}'.format(bucket, key))
+def log_file_s3_object(record):
+    return s3.get_object(
+        Bucket=record['s3']['bucket']['name'],
+        Key=record['s3']['object']['key'])
 
-    obj = s3.get_object(Bucket=bucket, Key=key)
-    log_file = obj['Body'].read().decode('utf-8')
 
-    for line in log_file.split('\n'):
+def add_elasticsearch_index(log_file):
+    for line in log_lines(log_file):
+        post_to_elasticsearch(parse_log_entry(line))
+
+
+def log_lines(log_file):
+    # TODO update this to stream the body in case of large log files?
+
+    log_data = log_file['Body'].read().decode('utf-8')
+
+    for line in log_data.split('\n'):
+
         if line:
-            post_to_es(parse_log_entry(line))
+            yield line
+
+
+def post_to_elasticsearch(doc):
+    LOG.debug('Posting to elasticsearch: {}'.format(doc))
+
+    # TODO handle errors
+    response = requests.post(
+        elasticsearch_url(os.environ),
+        auth=elasticsearch_auth_header(os.environ),
+        json=doc)
+
+    LOG.debug('Elasticsearch response: {status} - {text}'.format(
+        status=response.status_code,
+        text=response.text))
+
+
+def elasticsearch_url(env):
+
+    values = {
+        'scheme': 'http',
+        'domain': 'localhost',
+        'port': '9200',
+        'index_prefix': 's3logs',
+        'doctype': 's3-access-log',
+        'params': 'pipeline=s3logs-geoip'
+    }
+
+    for key, value in env.items():
+        if key.startswith('ES_'):
+            values[key[3:].lower()] = value
+
+    return '{scheme}://{domain}:{port}/{index}/{doctype}?{params}'.format(
+        index=elasticsearch_url_index(values['index_prefix']),
+        **values)
+
+
+def elasticsearch_url_index(prefix, today=None):
+
+    if today is None:
+        today = datetime.datetime.utcnow()
+
+    return '{prefix}-{date:%Y.%m.%d}'.format(
+        prefix=prefix,
+        date=today)
+
+
+def elasticsearch_auth_header(env):
+    return HTTPBasicAuth(
+        env.get('ES_USERNAME'),
+        env.get('ES_PASSWORD'))
 
 
 def parse_log_entry(entry):
+
     LOG.debug('Parsing log entry: {}'.format(entry))
 
     log = s3_parser(entry)
 
-    # Use ISO-formatted UTC datetime for time_received field
     log['time_received'] = log['time_received_utc_isoformat']
 
-    # Strip out all other time_received variant fields
-    log = {k: v for k, v in log.items() if not k.startswith('time_received_')}
+    for key, value in log.items():
 
-    # Convert '-' null values to None
-    log = {k: v if v != '-' else None for k, v in log.items()}
+        if key.startswith('time_received_'):
+            del log[key]
 
-    LOG.debug('Parsed log entry: {}'.format(log))
+        elif value == '-':
+            log[key] = None
 
     return log
-
-
-def post_to_es(doc):
-    LOG.debug('Posting to elasticsearch: {}'.format(doc))
-
-    url = '{}?pipeline=s3logs-geoip'.format(ES_URL)
-    r = requests.post(
-        url, auth=HTTPBasicAuth(ES_USERNAME, ES_PASSWORD), json=doc)
-
-    LOG.debug('ES status code: {}'.format(r.status_code))
-    LOG.debug('ES response msg: {}'.format(r.text))
