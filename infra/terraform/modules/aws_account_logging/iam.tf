@@ -24,37 +24,35 @@ resource "aws_iam_role_policy" "s3_logs_to_elasticsearch" {
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
-          "Effect": "Allow",
-          "Action": "logs:CreateLogGroup",
-          "Resource": "arn:aws:logs:::*"
-      },
-      {
-          "Effect": "Allow",
-          "Action": [
-              "logs:CreateLogStream",
-              "logs:PutLogEvents"
-          ],
-          "Resource": [
-              "arn:aws:logs:::log-group:/aws/lambda/s3_logs_to_elasticsearch:*"
-          ]
-      },
-  {
-    "Sid": "Stmt1499439833532",
-    "Action": [
-      "s3:ListBucket"
-    ],
-    "Effect": "Allow",
-    "Resource": "${aws_s3_bucket.s3_logs.arn}"
-  },
-  {
-    "Sid": "Stmt1499439848123",
-    "Action": [
-      "s3:GetObject"
-    ],
-    "Effect": "Allow",
-    "Resource": "${aws_s3_bucket.s3_logs.arn}"
-  }
+    {
+      "Sid": "CanLog",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:*"
+      ]
+    },
+    {
+      "Sid": "Stmt1499439833532",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.s3_logs.arn}"
+    },
+    {
+      "Sid": "Stmt1499439848123",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.s3_logs.arn}/*"
+    }
   ]
 }
 EOF
