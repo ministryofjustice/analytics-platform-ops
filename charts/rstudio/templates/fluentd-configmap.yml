@@ -8,8 +8,6 @@ metadata:
     release: "{{ .Release.Name }}"
   name: "{{ template "fullname" . }}-fluentd"
 data:
-  elasticsearch_host: "{{ .Values.Elasticsearch.Host }}"
-  elasticsearch_port: "{{ .Values.Elasticsearch.Port }}"
   fluent.conf: |
     <source>
       type tail
