@@ -9,8 +9,11 @@ AWS:
   IAMRole: ""
   DefaultRegion: "eu-west-1"
 Elasticsearch:
-  Host: "elasticsearch-server"
+  Host: "elasticsearch"
   Port: 9200
+  Scheme: "http"
+  Username: ""
+  Password: ""
 Fluentd:
   Image:
     Repository: fluent/fluentd-kubernetes-daemonset
