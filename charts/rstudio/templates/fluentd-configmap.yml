@@ -8,26 +8,29 @@ metadata:
     release: "{{ .Release.Name }}"
   name: "{{ template "fullname" . }}-fluentd"
 data:
-  elasticsearch_host: "{{ .Values.Elasticsearch.Host }}"
-  elasticsearch_port: "{{ .Values.Elasticsearch.Port }}"
   fluent.conf: |
     <source>
-      type tail
-      format none
+      @type tail
+      format /^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")? "(?<x_forwarded_for>[^ ]+)?"/
+      time_format %d/%b/%Y:%H:%M:%S %z
       path /var/log/rstudio-server/rserver-http-access.log
       pos_file /var/log/rstudio-server/rserver-http-access.pos
-      read_from_head true
-      tag rstudio-access
+      tag "#{ENV['USER']}.rstudio.access"
     </source>
 
     <source>
-      type tail
-      format none
+      @type tail
       path /var/log/rstudio-server/rserver-http-error.log
       pos_file /var/log/rstudio-server/rserver-http-error.pos
-      read_from_head true
-      tag rstudio-error
+      format none
+      tag "#{ENV['USER']}.rstudio.error"
     </source>
+
+    # Ignore k8s healthcheck requests
+    <filter *.rstudio.access>
+      @type grep
+      exclude1 path ^\/health-check$
+    </filter>
 
     <match **>
        type elasticsearch
@@ -35,6 +38,11 @@ data:
        include_tag_key true
        host "#{ENV['FLUENT_ELASTICSEARCH_HOST']}"
        port "#{ENV['FLUENT_ELASTICSEARCH_PORT']}"
+       scheme "#{ENV['FLUENT_ELASTICSEARCH_SCHEME'] || 'http'}"
+       user "#{ENV['FLUENT_ELASTICSEARCH_USER']}"
+       password "#{ENV['FLUENT_ELASTICSEARCH_PASSWORD']}"
+       reload_connections "#{ENV['FLUENT_ELASTICSEARCH_RELOAD_CONNECTIONS'] || 'true'}"
+       logstash_prefix "#{ENV['FLUENT_ELASTICSEARCH_LOGSTASH_PREFIX'] || 'logstash'}"
        logstash_format true
        buffer_chunk_limit 2M
        buffer_queue_limit 32
