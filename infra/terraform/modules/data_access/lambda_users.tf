@@ -5,8 +5,7 @@ resource "null_resource" "users_install_deps" {
     }
 
     triggers {
-        build_sh_sha = "${sha256(file("${path.module}/users/build.sh"))}"
-        requirements_sha = "${sha256(file("${path.module}/users/requirements.txt"))}"
+        force_rebuild = "${timestamp()}"
     }
 }
 

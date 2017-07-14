@@ -5,8 +5,7 @@ resource "null_resource" "memberships_install_deps" {
     }
 
     triggers {
-        build_sh_sha = "${sha256(file("${path.module}/memberships/build.sh"))}"
-        requirements_sha = "${sha256(file("${path.module}/memberships/requirements.txt"))}"
+        force_rebuild = "${timestamp()}"
     }
 }
 
