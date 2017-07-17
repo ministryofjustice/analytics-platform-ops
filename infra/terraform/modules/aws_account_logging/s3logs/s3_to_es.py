@@ -82,13 +82,23 @@ def elasticsearch_url(env):
         'params': 'pipeline=s3logs-geoip'
     }
 
-    for key, value in env.items():
-        if key.startswith('ES_'):
-            values[key[3:].lower()] = value
+    values.update(elasticsearch_env_vars(env))
 
     return '{scheme}://{domain}:{port}/{index}/{doctype}?{params}'.format(
         index=elasticsearch_url_index(values['index_prefix']),
         **values)
+
+
+def elasticsearch_env_vars(env):
+    values = {}
+
+    for key, value in env.items():
+
+        if key.startswith('ES_'):
+            key = key[3:].lower()
+            values[key] = value
+
+    return values
 
 
 def elasticsearch_url_index(prefix, today=None):
