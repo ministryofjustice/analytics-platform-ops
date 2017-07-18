@@ -1,15 +1,15 @@
 apiVersion: kops/v1alpha2
 kind: Cluster
 metadata:
-  name: CLUSTER_NAME
+  name: {{ .cluster_name }}
 spec:
   api:
     loadBalancer:
       type: Public
   channel: alpha
   cloudProvider: aws
-  configBase: s3://STATE_BUCKET/CLUSTER_NAME
-  dnsZone: DNS_ZONE_ID
+  configBase: {{ .kops_state_store }}/{{ .cluster_name }}
+  dnsZone: {{ .dns_zone_id }}
   etcdClusters:
   - etcdMembers:
     - instanceGroup: master-eu-west-1a
@@ -30,48 +30,33 @@ spec:
   kubernetesApiAccess:
   - 0.0.0.0/0
   kubernetesVersion: 1.5.3
-  masterInternalName: api.internal.CLUSTER_NAME
-  masterPublicName: api.CLUSTER_NAME
+  masterInternalName: api.internal.{{ .cluster_name }}
+  masterPublicName: api.{{ .cluster_name }}
   networkCIDR: 192.168.0.0/16
-  networkID: VPC_ID
+  networkID: {{ .vpc_id }}
   networking:
     calico: {}
   nonMasqueradeCIDR: 100.64.0.0/10
   sshAccess:
   - 0.0.0.0/0
   subnets:
-  - id: PRIVATE_SUBNET_ID
-    name: eu-west-1a
+{{ range split .private_subnets "," }}
+  {{ $id_and_region := split . "=" }}
+  - id: {{ index $id_and_region 0 }}
+    name: {{ index $id_and_region 1 }}
     type: Private
-    zone: eu-west-1a
-
-  - id: PRIVATE_SUBNET_ID
-    name: eu-west-1b
-    type: Private
-    zone: eu-west-1b
-
-  - id: PRIVATE_SUBNET_ID
-    name: eu-west-1c
-    type: Private
-    zone: eu-west-1c
-
-  - id: DMZ_SUBNET_ID
-    name: dmz-eu-west-1a
+    zone: {{ index $id_and_region 1 }}
+{{ end }}
+{{ range split .dmz_subnets "," }}
+  {{ $id_and_region := split . "=" }}
+  - id: {{ index $id_and_region 0 }}
+    name: dmz-{{ index $id_and_region 1 }}
     type: Utility
-    zone: eu-west-1a
-
-  - id: DMZ_SUBNET_ID
-    name: dmz-eu-west-1b
-    type: Utility
-    zone: eu-west-1b
-
-  - id: DMZ_SUBNET_ID
-    name: dmz-eu-west-1c
-    type: Utility
-    zone: eu-west-1c
+    zone: {{ index $id_and_region 1 }}
+{{ end }}
   topology:
     bastion:
-      bastionPublicName: bastion.CLUSTER_NAME
+      bastionPublicName: bastion.{{ .cluster_name }}
     dns:
       type: Public
     masters: private
