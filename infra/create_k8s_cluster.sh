@@ -11,13 +11,13 @@ ENV_NAME=$1
 cd $(dirname $0)
 INFRA_DIR=`pwd`
 
+# cd into terraform env dir to use `terraform output ...`
+cd $INFRA_DIR/terraform/environments/$ENV_NAME
+
 KOPS_DIR=$INFRA_DIR/kops
 KOPS_CLUSTER_TEMPLATE_DIR=$KOPS_DIR/example-cluster
 KOPS_CLUSTER_DIR=$KOPS_DIR/clusters/$ENV_NAME
 KOPS_STATE_STORE=s3://`grep "terraform_bucket_name =" terraform.tfvars | cut -d\" -f 2 | sed -e 's/terraform/kops/'`
-
-# cd into terraform env dir to use `terraform output ...`
-cd $INFRA_DIR/terraform/environments/$ENV_NAME
 
 # Install command to render templates (Requires Go)
 go get github.com/noqcks/gucci
