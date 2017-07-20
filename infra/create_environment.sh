@@ -10,3 +10,4 @@ ENV_NAME=$1
 
 ./create_tf_resources.sh $ENV_NAME
 ./create_k8s_cluster.sh $ENV_NAME
+./install_helm_charts.sh $ENV_NAME
