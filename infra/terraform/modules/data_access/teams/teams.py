@@ -52,7 +52,7 @@ def create_team_bucket(event, context):
         BucketLoggingStatus={
             'LoggingEnabled': {
                 'TargetBucket': os.environ['LOGS_BUCKET_NAME'],
-                'TargetPrefix': "s3/{}/".format(name)
+                'TargetPrefix': "{}/".format(name)
             }
         },
     )
