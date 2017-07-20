@@ -15,6 +15,6 @@ ES_URL=$3
 for PIPELINE in pipelines/*; do
     NAME=$(basename $PIPELINE | cut -f 1 -d '.')
 
-    curl -XPUT -u $USERNAME:$PASSWORD "$ES_URL/ingest/pipeline/$NAME" \
+    curl -XPUT -u $USERNAME:$PASSWORD "$ES_URL/_ingest/pipeline/$NAME" \
         -H "Content-Type: application/json" -d @$PIPELINE
 done
