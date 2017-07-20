@@ -41,18 +41,18 @@ spec:
   - 0.0.0.0/0
   subnets:
 {{ range split .private_subnets "," }}
-  {{ $id_and_region := split . "=" }}
-  - id: {{ index $id_and_region 0 }}
-    name: {{ index $id_and_region 1 }}
+  {{ $id_and_zone := split . "=" }}
+  - id: {{ index $id_and_zone 0 }}
+    name: {{ index $id_and_zone 1 }}
     type: Private
-    zone: {{ index $id_and_region 1 }}
+    zone: {{ index $id_and_zone 1 }}
 {{ end }}
 {{ range split .dmz_subnets "," }}
-  {{ $id_and_region := split . "=" }}
-  - id: {{ index $id_and_region 0 }}
-    name: dmz-{{ index $id_and_region 1 }}
+  {{ $id_and_zone := split . "=" }}
+  - id: {{ index $id_and_zone 0 }}
+    name: dmz-{{ index $id_and_zone 1 }}
     type: Utility
-    zone: {{ index $id_and_region 1 }}
+    zone: {{ index $id_and_zone 1 }}
 {{ end }}
   topology:
     bastion:

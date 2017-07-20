@@ -40,10 +40,10 @@ DNS_ZONE_ID=`terraform output -module=cluster_dns dns_zone_id`
 # Get VPC_ID
 VPC_ID=`terraform output -module=aws_vpc vpc_id`
 
-# Get PRIVATE_SUBNETS
+# Get PRIVATE_SUBNETS, e.g. `subnet-1=eu-west-1a,subnet-2=eu-west-1b`
 PRIVATE_SUBNETS=`terraform output -json -module=aws_vpc private_subnets | jq --raw-output '.value | to_entries | map(.key + "=" + .value) | join(",")'`
 
-# Get DMZ_SUBNETS
+# Get DMZ_SUBNETS, e.g. `subnet-1=eu-west-1a,subnet-2=eu-west-1b`
 DMZ_SUBNETS=`terraform output --json -module=aws_vpc dmz_subnets | jq --raw-output '.value | to_entries | map(.key + "=" + .value) | join(",")'`
 
 # Render KOPS resource templates: bastions.yml
