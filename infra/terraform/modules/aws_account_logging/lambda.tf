@@ -5,8 +5,7 @@ resource "null_resource" "s3logs_install_deps" {
     }
 
     triggers {
-        build_sh_sha = "${sha256(file("${path.module}/s3logs/build.sh"))}"
-        requirements_sha = "${sha256(file("${path.module}/s3logs/requirements.txt"))}"
+        force_rebuild = "${timestamp()}"
     }
 }
 
