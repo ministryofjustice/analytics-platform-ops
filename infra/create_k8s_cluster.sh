@@ -15,7 +15,7 @@ INFRA_DIR=`pwd`
 cd $INFRA_DIR/terraform/environments/$ENV_NAME
 
 KOPS_DIR=$INFRA_DIR/kops
-KOPS_CLUSTER_TEMPLATE_DIR=$KOPS_DIR/example-cluster
+KOPS_CLUSTER_TEMPLATE_DIR=$KOPS_DIR/TEMPLATE_CLUSTER
 KOPS_CLUSTER_DIR=$KOPS_DIR/clusters/$ENV_NAME
 KOPS_STATE_STORE=s3://`grep "terraform_bucket_name =" terraform.tfvars | cut -d\" -f 2 | sed -e 's/terraform/kops/'`
 
