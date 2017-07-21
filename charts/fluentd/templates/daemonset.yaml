@@ -36,6 +36,11 @@ spec:
               secretKeyRef:
                 name: {{ template "fullname" . }}
                 key: elasticsearch_scheme
+          - name: FLUENT_ELASTICSEARCH_LOGSTASH_PREFIX
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: elasticsearch_logstash_prefix
           {{ if .Values.elasticsearch.username }}
           - name: FLUENT_ELASTICSEARCH_USER
             valueFrom:
