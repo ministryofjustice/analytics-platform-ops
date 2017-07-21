@@ -28,8 +28,11 @@ sed -i '.old'  "s/env = \"dev\"/env = \"$ENV_NAME\"/g" terraform.tfvars
 # Change env name in terraform backend
 sed -i '.old'  "s/dev\/terraform.tfstate/$ENV_NAME\/terraform.tfstate/g" main.tf
 
-# GENERATE new gh_hook_secret secret
-# TODO
+# Generate GitHub webhook secret
+GH_HOOK_SECRET=`openssl rand -hex 16`
+
+# Change gh_hook_secret in terraform.tvars
+sed -i '.old' "s/gh_hook_secret =.*/gh_hook_secret = \"$GH_HOOK_SECRET\"/" terraform.tfvars
 
 # Copy shared SAML certificate
 cp $TF_DIR/modules/federated_identity/saml/SHARED-auth0-metadata.xml $TF_DIR/modules/federated_identity/saml/$ENV_NAME-auth0-metadata.xml
