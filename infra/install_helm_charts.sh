@@ -55,9 +55,26 @@ helm install $HELM_CHARTS_DIR/nginx-ingress -f $HELM_CHARTS_CONFIG_ENV_DIR/nginx
 COOKIE_SECRET=`openssl rand -hex 16`
 
 # Render kube-dashboard chart values
-env_name=$ENV_NAME \
+domain=$DOMAIN_NAME \
 cookie_secret=$COOKIE_SECRET \
 gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/kube-dashboard.yml > $HELM_CHARTS_CONFIG_ENV_DIR/kube-dashboard.yml
 
 # Install kube-dashboard helm chart
 helm install $HELM_CHARTS_DIR/kube-dashboard -f $HELM_CHARTS_CONFIG_ENV_DIR/kube-dashboard.yml --namespace default --name cluster-dashboard
+
+# cp fluentd chart values
+cp $HELM_CHARTS_CONFIG_TEMPLATE_DIR/fluentd.yml $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml
+
+# Install fluentd helm chart
+helm install $HELM_CHARTS_DIR/fluentd -f $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml --namespace kube-system --name cluster-logging
+
+# TODO: Install kibana-auth-proxy helm chart
+#    Q: Do we still need this auth proxy????
+# NOTE: Current helm chart points to wrong ES
+
+# Render prometheus chart values
+domain=$DOMAIN_NAME \
+gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/prometheus.yml > $HELM_CHARTS_CONFIG_ENV_DIR/prometheus.yml
+
+# Install prometheus helm chart
+helm install stable/prometheus -f $HELM_CHARTS_CONFIG_ENV_DIR/prometheus.yml --namespace kube-system --name cluster-metrics
