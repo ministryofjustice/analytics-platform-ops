@@ -103,3 +103,9 @@ gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/jenkins.yml > $HELM_CHARTS_CONFIG_ENV_DIR
 
 # Install jenkins helm chart
 helm install stable/jenkins -f $HELM_CHARTS_CONFIG_ENV_DIR/jenkins.yml --namespace default --name control-panel
+
+# cp kube2iam chart values
+cp $HELM_CHARTS_CONFIG_TEMPLATE_DIR/kube2iam.yml $HELM_CHARTS_CONFIG_ENV_DIR/kube2iam.yml
+
+# Install kube2iam
+helm install $HELM_CHARTS_DIR/kube2iam -f $HELM_CHARTS_CONFIG_ENV_DIR/kube2iam.yml --namespace default --name kube2iam
