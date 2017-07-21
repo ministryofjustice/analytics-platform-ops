@@ -78,3 +78,28 @@ gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/prometheus.yml > $HELM_CHARTS_CONFIG_ENV_
 
 # Install prometheus helm chart
 helm install stable/prometheus -f $HELM_CHARTS_CONFIG_ENV_DIR/prometheus.yml --namespace kube-system --name cluster-metrics
+
+# Render grafana chart values
+domain=$DOMAIN_NAME \
+gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/grafana.yml > $HELM_CHARTS_CONFIG_ENV_DIR/grafana.yml
+
+# Install grafana helm chart
+helm install stable/grafana -f $HELM_CHARTS_CONFIG_ENV_DIR/grafana.yml --namespace kube-system --name cluster-monitoring
+
+# Render init-platform chart values
+domain=$DOMAIN_NAME \
+gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/init-platform.yml > $HELM_CHARTS_CONFIG_ENV_DIR/init-platform.yml
+
+# Install init-platform helm chart
+helm install $HELM_CHARTS_DIR/init-platform -f $HELM_CHARTS_CONFIG_ENV_DIR/init-platform.yml --namespace default --name init-platform
+
+# Render init-user chart values
+domain=$DOMAIN_NAME \
+gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/init-user.yml > $HELM_CHARTS_CONFIG_ENV_DIR/init-user.yml
+
+# Render jenkins chart values
+domain=$DOMAIN_NAME \
+gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/jenkins.yml > $HELM_CHARTS_CONFIG_ENV_DIR/jenkins.yml
+
+# Install jenkins helm chart
+helm install stable/jenkins -f $HELM_CHARTS_CONFIG_ENV_DIR/jenkins.yml --namespace default --name control-panel
