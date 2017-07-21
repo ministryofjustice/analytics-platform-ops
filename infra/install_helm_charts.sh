@@ -62,8 +62,9 @@ gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/kube-dashboard.yml > $HELM_CHARTS_CONFIG_
 # Install kube-dashboard helm chart
 helm install $HELM_CHARTS_DIR/kube-dashboard -f $HELM_CHARTS_CONFIG_ENV_DIR/kube-dashboard.yml --namespace default --name cluster-dashboard
 
-# cp fluentd chart values
-cp $HELM_CHARTS_CONFIG_TEMPLATE_DIR/fluentd.yml $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml
+# Render fluentd chart values
+env_name=$ENV_NAME \
+gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/fluentd.yml > $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml
 
 # Install fluentd helm chart
 helm install $HELM_CHARTS_DIR/fluentd -f $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml --namespace kube-system --name cluster-logging
