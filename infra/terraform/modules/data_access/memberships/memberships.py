@@ -13,6 +13,7 @@ import json
 import logging
 import os
 import re
+import time
 
 import boto3
 import botocore.exceptions
@@ -52,10 +53,35 @@ def attach_bucket_policy(event, context):
     team_slug = event["team"]["slug"]
 
     client = boto3.client("iam")
-    client.attach_role_policy(
-        RoleName=naming.role_name(username),
-        PolicyArn=policy_arn(team_slug, policy_type),
-    )
+
+    def fn():
+        client.attach_role_policy(
+            RoleName=naming.role_name(username),
+            PolicyArn=policy_arn(team_slug, policy_type),
+        )
+
+    retry(fn)
+
+
+def retry(fn, max_attempts=10, delay=0.200):
+    attempts = 0
+    while True:
+        try:
+            fn()
+            break
+        except botocore.exceptions.ClientError as error:
+            # Only retry on boto's ClientError/NoSuchEntity error
+            if error.response["Error"]["Code"] == "NoSuchEntity":
+                LOG.warning(
+                    "error while attaching role to policy: {}.".format(error))
+                attempts += 1
+                if attempts < max_attempts:
+                    LOG.warning("Retry in {}s...".format(delay))
+                    time.sleep(delay)
+                else:
+                    raise
+            else:
+                raise
 
 
 @sentry.report_exceptions
