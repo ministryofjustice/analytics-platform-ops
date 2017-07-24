@@ -63,7 +63,7 @@ def attach_bucket_policy(event, context):
     retry(fn)
 
 
-def retry(fn, max_attempts=5, delay=0.150):
+def retry(fn, max_attempts=10, delay=0.200):
     attempts = 0
     while True:
         try:
