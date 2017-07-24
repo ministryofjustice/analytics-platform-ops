@@ -54,15 +54,20 @@ def attach_bucket_policy(event, context):
 
     client = boto3.client("iam")
 
-    # If role or policy are not there yet, retry
-    RETRY_DELAY = 0.200
-    tries = 2
+    def fn():
+        client.attach_role_policy(
+            RoleName=naming.role_name(username),
+            PolicyArn=policy_arn(team_slug, policy_type),
+        )
+
+    retry(fn)
+
+
+def retry(fn, attempts=5, delay=0.150):
+    tries = attempts
     while tries > 0:
         try:
-            client.attach_role_policy(
-                RoleName=naming.role_name(username),
-                PolicyArn=policy_arn(team_slug, policy_type),
-            )
+            fn()
             break
         except botocore.exceptions.ClientError as error:
             if error.response["Error"]["Code"] != "NoSuchEntity":
@@ -73,8 +78,8 @@ def attach_bucket_policy(event, context):
             LOG.warning(
                 "error while attaching role to policy: {}.".format(error))
             if tries > 0:
-                LOG.warning("Retry in {}s...".format(RETRY_DELAY))
-                time.sleep(RETRY_DELAY)
+                LOG.warning("Retry in {}s...".format(delay))
+                time.sleep(delay)
             else:
                 raise
 
