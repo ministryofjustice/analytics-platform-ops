@@ -63,23 +63,23 @@ def attach_bucket_policy(event, context):
     retry(fn)
 
 
-def retry(fn, attempts=5, delay=0.150):
-    tries = attempts
-    while tries > 0:
+def retry(fn, max_attempts=5, delay=0.150):
+    attempts = 0
+    while True:
         try:
             fn()
             break
         except botocore.exceptions.ClientError as error:
-            if error.response["Error"]["Code"] != "NoSuchEntity":
-                # Only retry on boto's ClientError/NoSuchEntity error
-                raise
-
-            tries -= 1
-            LOG.warning(
-                "error while attaching role to policy: {}.".format(error))
-            if tries > 0:
-                LOG.warning("Retry in {}s...".format(delay))
-                time.sleep(delay)
+            # Only retry on boto's ClientError/NoSuchEntity error
+            if error.response["Error"]["Code"] == "NoSuchEntity":
+                LOG.warning(
+                    "error while attaching role to policy: {}.".format(error))
+                attempts += 1
+                if attempts < max_attempts:
+                    LOG.warning("Retry in {}s...".format(delay))
+                    time.sleep(delay)
+                else:
+                    raise
             else:
                 raise
 
