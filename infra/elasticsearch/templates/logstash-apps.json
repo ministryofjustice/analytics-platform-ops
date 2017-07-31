@@ -1,0 +1,14 @@
+{
+  "template": "logstash-apps-*",
+  "version": 50001,
+  "settings": {
+    "index.refresh_interval": "5s"
+  },
+  "mappings": {
+    "time" : {
+      "properties" : {
+        "time_nano" : { "type" : "long" }
+      }
+    }
+  }
+}
