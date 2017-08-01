@@ -1,0 +1,13 @@
+---
+# Define Elasticsearch Clusters and indices here, to have them periodically
+# pruned by Curator.
+
+- name: main
+  endpoint: https://curator:PASSWORD@METRIC-CLUSTER.us-west-1.aws.found.io:9243
+  indices:
+    - prefix: s3logs-
+      days: 30
+    - prefix: logstash-${ENV}-
+      days: 30
+    - prefix: logstash-apps-${ENV}-
+      days: 30

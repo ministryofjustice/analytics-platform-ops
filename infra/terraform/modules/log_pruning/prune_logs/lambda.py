@@ -1,8 +1,11 @@
+import os
+from string import Template
+
 import certifi
 import curator
-import yaml
 from curator.exceptions import NoIndices
 from elasticsearch import Elasticsearch
+import yaml
 
 
 ca_certs = certifi.where()
@@ -21,7 +24,11 @@ def handler(event, context):
 def load_config():
 
     with open('serverless-curator.yaml') as config_file:
-        return yaml.load(config_file)
+        return yaml.load(interpolate_vars(config_file.read()))
+
+
+def interpolate_vars(config):
+    return Template(config).substitute(ENV=os.environ.get('ENV'))
 
 
 def prune_cluster_indices(cluster):

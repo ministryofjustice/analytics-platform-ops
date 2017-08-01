@@ -16,6 +16,11 @@ resource "aws_lambda_function" "prune_logs" {
     runtime = "python3.6"
     timeout = 300
     depends_on = ["data.archive_file.prune_logs_zip"]
+    environment {
+        variables = {
+            ENV = "${var.env}"
+        }
+    }
 }
 
 # Role running the lambda function
