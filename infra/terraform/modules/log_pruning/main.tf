@@ -51,7 +51,7 @@ resource "aws_cloudwatch_event_rule" "nightly" {
 
 resource "aws_cloudwatch_event_target" "prune_logs" {
   rule      = "${aws_cloudwatch_event_rule.nightly.name}"
-  target_id = "Prune logs"
+  target_id = "prune-logs"
   arn       = "${aws_lambda_function.prune_logs.arn}"
 }
 
