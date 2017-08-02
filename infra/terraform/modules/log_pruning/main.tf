@@ -65,7 +65,3 @@ resource "aws_cloudwatch_event_target" "prune_logs" {
   target_id = "prune-logs"
   arn       = "${aws_lambda_function.prune_logs.arn}"
 }
-
-resource "aws_sns_topic" "aws_logins" {
-  name = "aws-console-logins"
-}
