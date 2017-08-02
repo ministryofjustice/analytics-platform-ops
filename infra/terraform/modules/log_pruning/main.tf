@@ -53,6 +53,31 @@ resource "aws_iam_role" "prune_logs_role" {
 EOF
 }
 
+resource "aws_iam_role_policy" "prune_logs" {
+    name = "prune_logs"
+    role = "${aws_iam_role.prune_logs_role.id}"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CanLog",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
 # Cloudwatch event rule for triggering the lambda function
 resource "aws_cloudwatch_event_rule" "nightly" {
   name        = "nightly"
