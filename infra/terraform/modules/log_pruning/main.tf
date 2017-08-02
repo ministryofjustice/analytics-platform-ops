@@ -1,8 +1,19 @@
+# Install dependencies
+resource "null_resource" "prune_logs_deps" {
+    provisioner "local-exec" {
+        command = "${path.module}/prune_logs/build.sh"
+    }
+    triggers {
+        force_rebuild = "${timestamp()}"
+    }
+}
+
 # Zip the lambda function before the actual deploy
 data "archive_file" "prune_logs_zip" {
     type        = "zip"
     source_dir  = "${path.module}/prune_logs"
     output_path = "/tmp/prune_logs.zip"
+    depends_on = ["null_resource.prune_logs_deps"]
 }
 
 # Lambda function which invokes curator to prune logs

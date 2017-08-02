@@ -1,0 +1,8 @@
+*.dist-info
+*.so
+certifi
+click
+curator
+elasticsearch
+urllib3
+yaml
