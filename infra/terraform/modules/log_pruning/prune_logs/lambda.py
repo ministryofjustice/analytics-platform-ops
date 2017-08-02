@@ -22,9 +22,7 @@ def handler(event, context):
 
 
 def load_config():
-
-    with open('serverless-curator.yaml') as config_file:
-        return yaml.load(interpolate_vars(config_file.read()))
+    return yaml.load(os.environ['CURATOR_CONF'])
 
 
 def interpolate_vars(config):

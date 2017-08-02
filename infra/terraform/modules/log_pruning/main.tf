@@ -10,7 +10,7 @@ resource "aws_lambda_function" "prune_logs" {
     description = "Prune elasticsearch log indexes"
     filename = "/tmp/prune_logs.zip"
     source_code_hash = "${data.archive_file.prune_logs_zip.output_base64sha256}"
-    function_name = "${var.env}_prune_logs"
+    function_name = "prune_logs"
     role = "${aws_iam_role.prune_logs_role.arn}"
     handler = "lambda.handler"
     runtime = "python3.6"
@@ -18,14 +18,14 @@ resource "aws_lambda_function" "prune_logs" {
     depends_on = ["data.archive_file.prune_logs_zip"]
     environment {
         variables = {
-            ENV = "${var.env}"
+            CURATOR_CONF = "${var.curator_conf}"
         }
     }
 }
 
 # Role running the lambda function
 resource "aws_iam_role" "prune_logs_role" {
-    name = "${var.env}_prune_logs_role"
+    name = "prune_logs_role"
     assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
