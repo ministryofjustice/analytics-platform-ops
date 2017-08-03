@@ -36,6 +36,8 @@ def prune_cluster_indices(cluster):
     for index in cluster['indices']:
         deleted_indices.extend(prune_indices(es, index))
 
+    return deleted_indices
+
 
 def elasticsearch_connection(endpoint):
 
