@@ -1,1 +1,1 @@
-variable "env" {}
+variable "curator_conf" {}
