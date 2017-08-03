@@ -43,6 +43,7 @@ def elasticsearch_connection(endpoint):
 
     return Elasticsearch(
         endpoint,
+        timeout=300,
         use_ssl=True,
         verify_certs=True,
         ca_certs=ca_certs)
