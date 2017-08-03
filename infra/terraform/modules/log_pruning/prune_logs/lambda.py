@@ -52,11 +52,10 @@ def prune_indices(es, index):
     try:
         index_list = obsolete_indices(es, index)
         delete_indices(index_list)
+        return index_list.working_list()
 
     except NoIndices:
-        pass
-
-    return index_list.working_list()
+        return []
 
 
 def obsolete_indices(es, index):
