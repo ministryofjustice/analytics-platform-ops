@@ -48,9 +48,13 @@ def elasticsearch_connection(endpoint):
 
 
 def prune_indices(es, index):
-    index_list = obsolete_indices(es, index)
 
-    delete_indices(index_list)
+    try:
+        index_list = obsolete_indices(es, index)
+        delete_indices(index_list)
+
+    except NoIndices:
+        pass
 
     return index_list.working_list()
 
@@ -69,9 +73,4 @@ def obsolete_indices(es, index):
 
 
 def delete_indices(index_list):
-
-    try:
-        curator.DeleteIndices(index_list).do_action()
-
-    except NoIndices:
-        pass
+    curator.DeleteIndices(index_list).do_action()
