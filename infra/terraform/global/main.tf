@@ -21,3 +21,23 @@ module "aws_account_logging" {
     es_username = "${var.es_username}"
     es_password = "${var.es_password}"
 }
+
+module "log_pruning" {
+    source = "../modules/log_pruning"
+
+    curator_conf = <<EOF
+- name: main
+  endpoint: ${var.es_scheme}://${var.es_username}:${var.es_password}@${var.es_domain}:${var.es_port}
+  indices:
+    - prefix: s3logs-
+      days: 30
+    - prefix: logstash-dev-
+      days: 2
+    - prefix: logstash-apps-dev-
+      days: 2
+    - prefix: logstash-alpha-
+      days: 30
+    - prefix: logstash-apps-alpha-
+      days: 30
+EOF
+}
