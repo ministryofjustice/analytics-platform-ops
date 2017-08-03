@@ -131,8 +131,3 @@ module "federated_identity" {
     source ="../../modules/federated_identity"
     env = "${var.env}"
 }
-
-module "log_pruning" {
-    source = "../../modules/log_pruning"
-    env = "${var.env}"
-}
