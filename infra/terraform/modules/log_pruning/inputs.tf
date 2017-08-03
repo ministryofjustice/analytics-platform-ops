@@ -1,0 +1,1 @@
+variable "curator_conf" {}
