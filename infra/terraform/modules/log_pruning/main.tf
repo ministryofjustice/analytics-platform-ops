@@ -85,6 +85,14 @@ resource "aws_cloudwatch_event_rule" "nightly" {
   schedule_expression = "cron(0 2 * * ? *)"
 }
 
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_prune_logs" {
+    statement_id = "AllowPruneLogExecutionFromCloudWatch"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.prune_logs.function_name}"
+    principal = "events.amazonaws.com"
+    source_arn = "${aws_cloudwatch_event_rule.nightly.arn}"
+}
+
 resource "aws_cloudwatch_event_target" "prune_logs" {
   rule      = "${aws_cloudwatch_event_rule.nightly.name}"
   target_id = "prune-logs"
