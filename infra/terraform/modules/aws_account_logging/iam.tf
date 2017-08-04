@@ -91,7 +91,7 @@ resource "aws_iam_role_policy" "cloudtrail_to_elasticsearch" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.cloudtrail.arn}"
+      "Resource": "${var.cloudtrail_s3_bucket_arn}"
     },
     {
       "Sid": "Stmt1499439848123",
@@ -99,7 +99,7 @@ resource "aws_iam_role_policy" "cloudtrail_to_elasticsearch" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.cloudtrail.arn}/*"
+      "Resource": "${var.cloudtrail_s3_bucket_arn}/*"
     }
   ]
 }
