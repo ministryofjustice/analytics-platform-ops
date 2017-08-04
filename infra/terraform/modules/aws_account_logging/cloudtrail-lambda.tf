@@ -1,33 +1,3 @@
-resource "aws_s3_bucket" "cloudtrail" {
-    bucket = "moj-analytics-global-cloudtrail"
-    acl = "log-delivery-write"
-
-    lifecycle_rule {
-      id = "logs-transition"
-      prefix = ""
-      abort_incomplete_multipart_upload_days = 7
-      enabled = true
-
-      transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-
-      transition {
-        days          = 60
-        storage_class = "GLACIER"
-      }
-
-      expiration {
-        days = 365
-      }
-    }
-
-    tags {
-        Name = "moj-analytics-global-cloudtrail"
-    }
-}
-
 # Install dependencies
 resource "null_resource" "cloudtrail_install_deps" {
     provisioner "local-exec" {
@@ -76,12 +46,12 @@ resource "aws_lambda_permission" "allow_cloudtrail_bucket" {
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.cloudtrail_to_elasticsearch.arn}"
   principal     = "s3.amazonaws.com"
-  source_arn    = "${aws_s3_bucket.cloudtrail.arn}"
+  source_arn    = "${var.cloudtrail_s3_bucket_arn}"
 }
 
 # Trigger Lambda function from S3 object created event
 resource "aws_s3_bucket_notification" "cloudtrail_object_created" {
-  bucket = "${aws_s3_bucket.cloudtrail.id}"
+  bucket = "${var.cloudtrail_s3_bucket_id}"
 
   lambda_function {
     lambda_function_arn = "${aws_lambda_function.cloudtrail_to_elasticsearch.arn}"
