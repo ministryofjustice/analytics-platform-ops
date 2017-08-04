@@ -26,7 +26,7 @@ def lambda_handler(event, context):
 def log_file_s3_object(record):
     return gzip.decompress(s3.get_object(
         Bucket=record['s3']['bucket']['name'],
-        Key=record['s3']['object']['key']))
+        Key=record['s3']['object']['key'])['Body'].read())
 
 
 def add_elasticsearch_index(log_file):
