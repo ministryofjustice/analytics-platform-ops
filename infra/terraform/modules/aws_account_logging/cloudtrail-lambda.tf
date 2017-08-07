@@ -27,7 +27,7 @@ resource "aws_lambda_function" "cloudtrail_to_elasticsearch" {
     role = "${aws_iam_role.cloudtrail_to_elasticsearch.arn}"
     handler = "cloudtrail_to_es.lambda_handler"
     runtime = "python3.6"
-    timeout = 10
+    timeout = 30
     depends_on = ["data.archive_file.cloudtrail_zip"]
     environment {
         variables = {
