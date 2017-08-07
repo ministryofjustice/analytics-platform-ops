@@ -64,11 +64,12 @@ def elasticsearch_url(env):
         'port': '9200',
         'index_prefix': 'logstash-cloudtrail',
         'doctype': 'cloudtrail-log',
+        'params': 'pipeline=logstash-cloudtrail'
     }
 
     values.update(elasticsearch_env_vars(env))
 
-    return '{scheme}://{domain}:{port}/{index}/{doctype}'.format(
+    return '{scheme}://{domain}:{port}/{index}/{doctype}?{params}'.format(
         index=elasticsearch_url_index(values['index_prefix']),
         **values)
 
