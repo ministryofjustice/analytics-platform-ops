@@ -36,8 +36,8 @@
           "type": "date",
           "doc_values": true
         },
-        apiVersion: {
-          type: text
+        "apiVersion": {
+          "type": "text"
         },
         "geoip": {
           "type": "object",
