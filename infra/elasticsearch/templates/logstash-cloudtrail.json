@@ -1,0 +1,67 @@
+{
+  "template": "logstash-cloudtrail-*",
+  "settings": {
+    "index.refresh_interval": "5s"
+  },
+  "mappings": {
+    "_default_": {
+      "_all": {
+        "enabled": true,
+        "omit_norms": true
+      },
+      "dynamic_templates": [
+        {
+          "date_fields": {
+            "match": "*",
+            "match_mapping_type": "date",
+            "mapping": {
+              "type": "date",
+              "doc_values": true
+            }
+          }
+        },
+        {
+          "geo_point_fields": {
+            "match": "*",
+            "match_mapping_type": "geo_point",
+            "mapping": {
+              "type": "geo_point",
+              "doc_values": true
+            }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date",
+          "doc_values": true
+        },
+        apiVersion: {
+          type: text
+        },
+        "geoip": {
+          "type": "object",
+          "dynamic": true,
+          "properties": {
+            "ip": {
+              "type": "ip",
+              "doc_values": true
+            },
+            "location": {
+              "type": "geo_point",
+              "doc_values": true
+            },
+            "latitude": {
+              "type": "float",
+              "doc_values": true
+            },
+            "longitude": {
+              "type": "float",
+              "doc_values": true
+            }
+          }
+        }
+      }
+    }
+  }
+}
