@@ -3,7 +3,7 @@
   "processors": [
     {
       "geoip": {
-        "field": sourceIpAddress
+        "field": "sourceIpAddress"
       }
     }
    ]
