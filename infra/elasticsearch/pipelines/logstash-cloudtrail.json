@@ -1,0 +1,10 @@
+{
+  "description": "Add geoip info",
+  "processors": [
+    {
+      "geoip": {
+        "field": sourceIpAddress
+      }
+    }
+   ]
+}
