@@ -34,6 +34,8 @@ module "log_pruning" {
   indices:
     - prefix: s3logs-
       days: 30
+    - prefix: cloudtrail-
+      days: 30
     - prefix: logstash-dev-
       days: 2
     - prefix: logstash-apps-dev-
