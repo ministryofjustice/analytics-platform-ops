@@ -1,5 +1,5 @@
 {
-  "template": "logstash-cloudtrail-*",
+  "template": "cloudtrail-*",
   "settings": {
     "index.refresh_interval": "5s"
   },
