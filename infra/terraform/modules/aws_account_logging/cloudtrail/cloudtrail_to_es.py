@@ -62,9 +62,9 @@ def elasticsearch_url(env):
         'scheme': 'http',
         'domain': 'localhost',
         'port': '9200',
-        'index_prefix': 'logstash-cloudtrail',
+        'index_prefix': 'cloudtrail',
         'doctype': 'cloudtrail-log',
-        'params': 'pipeline=logstash-cloudtrail'
+        'params': 'pipeline=cloudtrail-geoip'
     }
 
     values.update(elasticsearch_env_vars(env))
