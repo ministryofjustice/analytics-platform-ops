@@ -3,7 +3,8 @@
   "processors": [
     {
       "geoip": {
-        "field": "sourceIpAddress"
+        "field": "sourceIPAddress",
+        "ignore_missing": true
       }
     }
    ]
