@@ -5,3 +5,5 @@ variable "es_password" {}
 variable "es_scheme" {
   default = "https"
 }
+variable "cloudtrail_s3_bucket_id" {}
+variable "cloudtrail_s3_bucket_arn" {}
