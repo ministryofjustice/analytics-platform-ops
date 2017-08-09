@@ -23,6 +23,8 @@ module "aws_account_logging" {
 
     cloudtrail_s3_bucket_arn = "${aws_s3_bucket.global_cloudtrail.arn}"
     cloudtrail_s3_bucket_id = "${aws_s3_bucket.global_cloudtrail.id}"
+
+    account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "log_pruning" {
