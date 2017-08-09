@@ -47,9 +47,15 @@ def log_entries(log_file):
 def post_to_elasticsearch(doc):
     LOG.debug('Posting to elasticsearch: {}'.format(doc))
 
+    params = {}
+
+    if is_ipaddress(doc.get('sourceIPAddress')):
+        params['pipeline'] = 'cloudtrail-geoip'
+
     # TODO handle errors
     response = requests.post(
-        elasticsearch_url(os.environ, get_pipeline(doc)),
+        elasticsearch_url(os.environ),
+        params=params,
         auth=elasticsearch_auth_header(os.environ),
         json=doc)
 
@@ -57,34 +63,30 @@ def post_to_elasticsearch(doc):
         status=response.status_code,
         text=response.text))
 
-def get_pipeline(doc):
-    # sourceIPAddress may not be present, or may contain a hostname,
-    # which causes an ElasticSearch error - so only specify the geoip
-    # pipeline if an actual IP address is present
+
+def is_ipaddress(value):
     try:
-        ipaddress.ip_address(doc['sourceIPAddress'])
-        return 'cloudtrail-geoip'
-    except (KeyError, ValueError):
-        return None
+        ipaddress.ip_address(value)
+
+    except ValueError:
+        return False
+
+    return True
 
 
-def elasticsearch_url(env, pipeline):
+def elasticsearch_url(env):
 
     values = {
         'scheme': 'http',
         'domain': 'localhost',
         'port': '9200',
         'index_prefix': 'cloudtrail',
-        'doctype': 'cloudtrail-log',
-        'params': ''
+        'doctype': 'cloudtrail-log'
     }
 
     values.update(elasticsearch_env_vars(env))
 
-    if pipeline:
-        values['params'] = 'pipeline={}'.format(pipeline)
-
-    return '{scheme}://{domain}:{port}/{index}/{doctype}?{params}'.format(
+    return '{scheme}://{domain}:{port}/{index}/{doctype}'.format(
         index=elasticsearch_url_index(values['index_prefix']),
         **values)
 
