@@ -20,6 +20,9 @@ module "aws_account_logging" {
     es_scheme = "${var.es_scheme}"
     es_username = "${var.es_username}"
     es_password = "${var.es_password}"
+
+    cloudtrail_s3_bucket_arn = "${aws_s3_bucket.global_cloudtrail.arn}"
+    cloudtrail_s3_bucket_id = "${aws_s3_bucket.global_cloudtrail.id}"
 }
 
 module "log_pruning" {
@@ -30,6 +33,8 @@ module "log_pruning" {
   endpoint: ${var.es_scheme}://${var.es_username}:${var.es_password}@${var.es_domain}:${var.es_port}
   indices:
     - prefix: s3logs-
+      days: 30
+    - prefix: cloudtrail-
       days: 30
     - prefix: logstash-dev-
       days: 2
