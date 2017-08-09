@@ -56,6 +56,7 @@ resource "aws_s3_bucket_notification" "cloudtrail_object_created" {
   lambda_function {
     lambda_function_arn = "${aws_lambda_function.cloudtrail_to_elasticsearch.arn}"
     events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "AWSLogs/${var.account_id}/CloudTrail/"
   }
 
 }
