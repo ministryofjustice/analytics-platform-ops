@@ -8,8 +8,8 @@ import ipaddress
 import boto3
 from botocore.client import Config
 import certifi
-import elasticsearch
 from elasticsearch import Elasticsearch
+import elasticsearch.helpers
 
 
 LOG = logging.getLogger(__name__)
