@@ -1,1 +1,2 @@
-requests==2.13.0
+certifi==2016.8.8
+elasticsearch>=5.0.0,<6.0.0
