@@ -3,6 +3,7 @@ import json
 import os
 import datetime
 import logging
+import ipaddress
 
 import boto3
 from botocore.client import Config
@@ -17,6 +18,7 @@ s3 = boto3.client('s3', config=Config(signature_version='s3v4'))
 
 
 def lambda_handler(event, context):
+    LOG.debug('Received S3 event: {}'.format(event))
 
     for record in event['Records']:
         log_file = log_file_s3_object(record)
@@ -47,7 +49,7 @@ def post_to_elasticsearch(doc):
 
     # TODO handle errors
     response = requests.post(
-        elasticsearch_url(os.environ),
+        elasticsearch_url(os.environ, get_pipeline(doc)),
         auth=elasticsearch_auth_header(os.environ),
         json=doc)
 
@@ -55,8 +57,18 @@ def post_to_elasticsearch(doc):
         status=response.status_code,
         text=response.text))
 
+def get_pipeline(doc):
+    # sourceIPAddress may not be present, or may contain a hostname,
+    # which causes an ElasticSearch error - so only specify the geoip
+    # pipeline if an actual IP address is present
+    try:
+        ipaddress.ip_address(doc['sourceIPAddress'])
+        return 'cloudtrail-geoip'
+    except (KeyError, ValueError):
+        return None
 
-def elasticsearch_url(env):
+
+def elasticsearch_url(env, pipeline):
 
     values = {
         'scheme': 'http',
@@ -64,10 +76,13 @@ def elasticsearch_url(env):
         'port': '9200',
         'index_prefix': 'cloudtrail',
         'doctype': 'cloudtrail-log',
-        'params': 'pipeline=cloudtrail-geoip'
+        'params': ''
     }
 
     values.update(elasticsearch_env_vars(env))
+
+    if pipeline:
+        values['params'] = 'pipeline={}'.format(pipeline)
 
     return '{scheme}://{domain}:{port}/{index}/{doctype}?{params}'.format(
         index=elasticsearch_url_index(values['index_prefix']),
