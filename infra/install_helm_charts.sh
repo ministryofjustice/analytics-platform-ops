@@ -12,7 +12,6 @@ cd $(dirname $0)
 INFRA_DIR=`pwd`
 
 # Set helm charts envs paths
-HELM_CHARTS_DIR="$INFRA_DIR/../charts"
 HELM_CHARTS_CONFIG_DIR="$INFRA_DIR/../chart-env-config"
 HELM_CHARTS_CONFIG_ENV_DIR="$HELM_CHARTS_CONFIG_DIR/$ENV_NAME"
 HELM_CHARTS_CONFIG_TEMPLATE_DIR="$HELM_CHARTS_CONFIG_DIR/TEMPLATE"
@@ -29,15 +28,17 @@ kubectl config use-context $DOMAIN_NAME
 
 # Initialise helm (install "tiller", helm server on k8s cluster)
 helm init
+helm repo add mojanalytics https://ministryofjustice.github.io/analytics-platform-helm-charts/charts/
+helm repo update
 
 # Create directory for environent helm charts' values
 mkdir $HELM_CHARTS_CONFIG_ENV_DIR
 
 # Install node-exporter helm chart
-helm install $HELM_CHARTS_DIR/node-exporter --namespace kube-system --name node-metrics
+helm install mojanalytics/node-exporter --namespace kube-system --name node-metrics
 
 # Install heapster helm chart
-helm install $HELM_CHARTS_DIR/heapster --namespace kube-system --name heapster
+helm install mojanalytics/heapster --namespace kube-system --name heapster
 
 # Request SSL certificate
 #
@@ -49,7 +50,7 @@ ssl_arn=$SSL_ARN \
 gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/nginx-ingress.yml > $HELM_CHARTS_CONFIG_ENV_DIR/nginx-ingress.yml
 
 # Install nginx-ingress helm chart
-helm install $HELM_CHARTS_DIR/nginx-ingress -f $HELM_CHARTS_CONFIG_ENV_DIR/nginx-ingress.yml --namespace kube-system --name cluster-ingress
+helm install mojanalytics/nginx-ingress -f $HELM_CHARTS_CONFIG_ENV_DIR/nginx-ingress.yml --namespace kube-system --name cluster-ingress
 
 # Generate kube-dashboard's cookie secret
 COOKIE_SECRET=`openssl rand -hex 16`
@@ -60,14 +61,14 @@ cookie_secret=$COOKIE_SECRET \
 gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/kube-dashboard.yml > $HELM_CHARTS_CONFIG_ENV_DIR/kube-dashboard.yml
 
 # Install kube-dashboard helm chart
-helm install $HELM_CHARTS_DIR/kube-dashboard -f $HELM_CHARTS_CONFIG_ENV_DIR/kube-dashboard.yml --namespace default --name cluster-dashboard
+helm install mojanalytics/kube-dashboard -f $HELM_CHARTS_CONFIG_ENV_DIR/kube-dashboard.yml --namespace default --name cluster-dashboard
 
 # Render fluentd chart values
 env_name=$ENV_NAME \
 gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/fluentd.yml > $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml
 
 # Install fluentd helm chart
-helm install $HELM_CHARTS_DIR/fluentd -f $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml --namespace kube-system --name cluster-logging
+helm install mojanalytics/fluentd -f $HELM_CHARTS_CONFIG_ENV_DIR/fluentd.yml --namespace kube-system --name cluster-logging
 
 # TODO: Install kibana-auth-proxy helm chart
 #    Q: Do we still need this auth proxy????
@@ -92,7 +93,7 @@ domain=$DOMAIN_NAME \
 gucci $HELM_CHARTS_CONFIG_TEMPLATE_DIR/init-platform.yml > $HELM_CHARTS_CONFIG_ENV_DIR/init-platform.yml
 
 # Install init-platform helm chart
-helm install $HELM_CHARTS_DIR/init-platform -f $HELM_CHARTS_CONFIG_ENV_DIR/init-platform.yml --namespace default --name init-platform
+helm install mojanalytics/init-platform -f $HELM_CHARTS_CONFIG_ENV_DIR/init-platform.yml --namespace default --name init-platform
 
 # Render init-user chart values
 domain=$DOMAIN_NAME \
@@ -109,4 +110,4 @@ helm install stable/jenkins -f $HELM_CHARTS_CONFIG_ENV_DIR/jenkins.yml --namespa
 cp $HELM_CHARTS_CONFIG_TEMPLATE_DIR/kube2iam.yml $HELM_CHARTS_CONFIG_ENV_DIR/kube2iam.yml
 
 # Install kube2iam
-helm install $HELM_CHARTS_DIR/kube2iam -f $HELM_CHARTS_CONFIG_ENV_DIR/kube2iam.yml --namespace default --name kube2iam
+helm install mojanalytics/kube2iam -f $HELM_CHARTS_CONFIG_ENV_DIR/kube2iam.yml --namespace default --name kube2iam
