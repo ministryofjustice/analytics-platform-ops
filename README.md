@@ -8,12 +8,6 @@ Contact robin.linacre@digital.justice.gov.uk if you're in government and interes
 
 * `infra`
 [Terraform][terraform] resources for AWS infrastructure and [Kops][kops] resources for Kubernetes clusters
-* `jenkinsfiles`
-[Jenkins][jenkins] scripts for deployment and management tasks
-* `charts`
-[Helm][helm] charts for platform software and platform/user setup
-* `chart-env-config`
-Per-environment values and configuration for [Helm][helm] charts
 
 ## Prerequisites
 Install:
@@ -42,11 +36,11 @@ Because both Terraform and Kops create AWS resources in two different phases, th
 
 ## Secrets and git-crypt
 
-Terraform `terraform.tfvars` files and env-specific [Helm][helm] values files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
+Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
 
 ## Kubernetes resource management
 
-All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are currently stored in the `charts/` directory, and chart values for each environment are stored in the `chart-env-config/` directory.
+All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are served via our [Helm repository](https://ministryofjustice.github.io/analytics-platform-helm-charts/charts/) - source code is in the [ministryofjustice/analytics-platform-helm-charts](https://github.com/ministryofjustice/analytics-platform-helm-charts) repository, and chart values for each environment are stored in the [ministryofjustice/analytics-platform-config](https://github.com/ministryofjustice/analytics-platform-config) repository.
 
 ## Creating global AWS resources, and preparing Terraform remote state
 
@@ -157,7 +151,6 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
 [kops]: https://github.com/kubernetes/kops
 [helm]: https://github.com/kubernetes/helm/
 [kubernetes]: https://kubernetes.io
-[jenkins]: https://jenkins.io
 [gitcrypt]: https://www.agwa.name/projects/git-crypt/
 
 ### NFS server administration
