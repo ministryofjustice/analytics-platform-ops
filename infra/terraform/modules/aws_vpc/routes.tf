@@ -1,10 +1,10 @@
 resource "aws_route_table" "dmz" {
   vpc_id = "${aws_vpc.main.id}"
 
-  tags = {
-    Name = "${var.name}"
-    Cluster = "${var.name}"
-  }
+  # Terraform does not support variable interpolation in key names,
+  # so map() is used as a workaround.
+  # See: https://github.com/hashicorp/terraform/issues/14516
+  tags = "${map("Name", "dmz.${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_route" "dmz" {
@@ -18,10 +18,7 @@ resource "aws_route_table" "private" {
   vpc_id = "${aws_vpc.main.id}"
   count = "${length(var.availability_zones)}"
 
-  tags = {
-    Name = "private-${element(var.availability_zones, count.index)}.${var.name}"
-    Cluster = "${var.name}"
-  }
+  tags = "${map("Name", "private-${element(var.availability_zones, count.index)}.${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_route" "private" {
