@@ -44,7 +44,7 @@ output "cidr" {
 }
 
 output "availability_zones" {
-    value = "${join(",", var.availability_zones)}"
+  value = ["${var.availability_zones}"]
 }
 
 output "dmz_subnet_ids" {
@@ -81,4 +81,8 @@ output "extra_bastion_sg_id" {
 
 output "nat_gateway_public_ips" {
   value = ["${aws_nat_gateway.private_gw.*.public_ip}"]
+}
+
+output "nat_gateway_subnets" {
+  value = "${zipmap(aws_nat_gateway.private_gw.*.subnet_id, aws_nat_gateway.private_gw.*.id)}"
 }
