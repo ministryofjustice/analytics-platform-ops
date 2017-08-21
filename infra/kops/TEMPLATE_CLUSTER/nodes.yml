@@ -8,13 +8,14 @@ spec:
   additionalSecurityGroups:
   - {{ .extra_node_security_group_id }}
   associatePublicIp: false
-  image: kope.io/k8s-1.5-debian-jessie-amd64-hvm-ebs-2017-01-09
-  machineType: {{ .nodes_instance_size }}
-  maxSize: 3
-  minSize: 3
+  image: kope.io/k8s-1.6-debian-jessie-amd64-hvm-ebs-2017-07-28
+  machineType: {{ .node_instance_type }}
+  maxSize: {{ .num_nodes }}
+  minSize: {{ .num_nodes }}
   role: Node
   rootVolumeSize: 100
   subnets:
-  - eu-west-1a
-  - eu-west-1b
-  - eu-west-1c
+{{- range split .private_subnets "," -}}
+  {{- $id_and_zone := split . "=" }}
+  - {{ index $id_and_zone 1 }}
+{{- end -}}

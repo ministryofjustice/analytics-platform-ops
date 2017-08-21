@@ -5,12 +5,13 @@ metadata:
     kops.k8s.io/cluster: {{ .cluster_name }}
   name: bastions
 spec:
-  image: kope.io/k8s-1.5-debian-jessie-amd64-hvm-ebs-2017-01-09
+  image: kope.io/k8s-1.6-debian-jessie-amd64-hvm-ebs-2017-07-28
   machineType: t2.micro
-  maxSize: 1
-  minSize: 1
+  maxSize: {{ .num_bastions }}
+  minSize: {{ .num_bastions }}
   role: Bastion
   subnets:
-  - dmz-eu-west-1a
-  - dmz-eu-west-1b
-  - dmz-eu-west-1c
+{{- range split .dmz_subnets "," -}}
+  {{- $id_and_zone := split . "=" }}
+  - dmz-{{ index $id_and_zone 1 }}
+{{- end }}
