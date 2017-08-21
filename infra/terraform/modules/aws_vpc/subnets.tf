@@ -4,12 +4,10 @@ resource "aws_subnet" "dmz" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   count = "${length(var.availability_zones)}"
 
-  tags = {
-    Name = "dmz-${element(var.availability_zones, count.index)}.${var.name}"
-    Cluster = "${var.name}"
-    KubernetesCluster = "${var.name}"
-    "kubernetes.io/role/elb" = ""
-  }
+  # Terraform does not support variable interpolation in key names,
+  # so map() is used as a workaround.
+  # See: https://github.com/hashicorp/terraform/issues/14516
+  tags = "${map("Name", "dmz-${element(var.availability_zones, count.index)}.${var.name}", "KubernetesCluster", "${var.name}", "kubernetes.io/role/elb", "", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_route_table_association" "dmz" {
@@ -25,11 +23,7 @@ resource "aws_subnet" "private" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   count = "${length(var.availability_zones)}"
 
-  tags = {
-    Name = "private-${element(var.availability_zones, count.index)}.${var.name}"
-    Cluster = "${var.name}"
-    KubernetesCluster = "${var.name}"
-  }
+  tags = "${map("Name", "${element(var.availability_zones, count.index)}.${var.name}", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_route_table_association" "private" {
@@ -45,10 +39,7 @@ resource "aws_subnet" "storage" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   count = "${length(var.availability_zones)}"
 
-  tags = {
-    Name = "storage-${element(var.availability_zones, count.index)}.${var.name}"
-    Cluster = "${var.name}"
-  }
+  tags = "${map("Name", "storage-${element(var.availability_zones, count.index)}.${var.name}", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_route_table_association" "storage" {
