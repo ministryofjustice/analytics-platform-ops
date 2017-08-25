@@ -129,3 +129,8 @@ module "federated_identity" {
     source ="../../modules/federated_identity"
     env = "${var.env}"
 }
+
+module "control_panel_db" {
+    source = "../../modules/control_panel_db"
+    env = "${var.env}"
+}
