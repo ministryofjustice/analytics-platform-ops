@@ -1,4 +1,5 @@
 variable "env" {}
+variable "vpc_id" {}
 
 variable "storage_type" {
     default = "gp2"
@@ -18,4 +19,12 @@ variable "engine_version" {
 
 variable "instance_class" {
     default = "db.m1.small"
+}
+
+variable "db_subnet_ids" {
+    type = "list"
+}
+
+variable "ingress_security_group_ids" {
+    type = "list"
 }

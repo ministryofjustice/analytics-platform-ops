@@ -133,4 +133,7 @@ module "federated_identity" {
 module "control_panel_db" {
     source = "../../modules/control_panel_db"
     env = "${var.env}"
+    vpc_id = "${module.aws_vpc.vpc_id}"
+    db_subnet_ids = ["${module.aws_vpc.storage_subnet_ids}"]
+    ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
 }
