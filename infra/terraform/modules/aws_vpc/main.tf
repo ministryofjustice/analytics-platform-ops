@@ -86,3 +86,11 @@ output "nat_gateway_public_ips" {
 output "nat_gateway_subnets" {
   value = "${zipmap(aws_nat_gateway.private_gw.*.subnet_id, aws_nat_gateway.private_gw.*.id)}"
 }
+
+output "sg_inbound_ssh_id" {
+  value = "${aws_security_group.inbound_ssh.id}"
+}
+
+output "sg_inbound_http_id" {
+  value = "${aws_security_group.inbound_http.id}"
+}
