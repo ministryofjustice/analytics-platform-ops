@@ -46,3 +46,34 @@ resource "aws_security_group" "master_extra" {
         security_groups = ["${aws_security_group.node_extra.id}"]
     }
 }
+
+resource "aws_security_group" "inbound_ssh" {
+    name = "inbound_ssh"
+    vpc_id = "${aws_vpc.main.id}"
+
+    ingress {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+resource "aws_security_group" "inbound_http" {
+    name = "inbound_http"
+    vpc_id = "${aws_vpc.main.id}"
+
+    ingress {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+}
