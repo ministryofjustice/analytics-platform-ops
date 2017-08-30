@@ -5,16 +5,6 @@ resource "aws_autoscaling_group" "node" {
   max_size             = "${var.node_asg_max}"
   min_size             = "${var.node_asg_min}"
   desired_capacity     = "${var.node_asg_desired}"
-
-  # Ignore changes to autoscaling group min/max/desired as these attributes are
-  # managed by the Kubernetes cluster autoscaler
-  lifecycle {
-      ignore_changes = [
-        "max_size",
-        "min_size",
-        "desired_capacity"
-      ]
-  }
   vpc_zone_identifier  = ["${var.vpc_private_subnet_ids}"]
 
   tag = {
@@ -31,12 +21,6 @@ resource "aws_autoscaling_group" "node" {
 
   tag = {
     key                 = "k8s.io/role/node"
-    value               = "1"
-    propagate_at_launch = true
-  }
-
-  tag = {
-    key                 = "k8s.io/cluster-autoscaler/enabled"
     value               = "1"
     propagate_at_launch = true
   }
@@ -64,7 +48,6 @@ resource "aws_launch_configuration" "node" {
     "${var.sg_allow_ssh}"
   ]
 
-  associate_public_ip_address = true
   user_data                   = "${file("${path.module}/data/user_data.sh")}${data.template_file.node_user_data.rendered}"
 
   root_block_device = {
