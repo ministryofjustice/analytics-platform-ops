@@ -8,7 +8,7 @@ DOMAIN=$1
 # we get three positive hits before proceeding
 
 COUNTER=0
-while [[ $COUNTER -lt 3 ]]
+while [[ $COUNTER -lt 10 ]]
 do
     if [[ $(dig ns $DOMAIN +short | wc -l | awk '{print $1}') == "4" ]]
     then
