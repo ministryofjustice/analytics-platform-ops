@@ -16,7 +16,7 @@ resource "null_resource" "create_cluster" {
     "null_resource.wait_for_dns_resolution"
   ]
   provisioner "local-exec" {
-    command = "kops create cluster --dns ${var.dns} --networking flannel --zones=${join(",", data.aws_availability_zones.available.names)} --node-count=${var.node_asg_desired} --master-zones=${data.template_file.master_azs.rendered} --target=terraform --api-loadbalancer-type=public --vpc=${var.vpc_id} --state=s3://${var.kops_s3_bucket_id} --kubernetes-version ${var.kubernetes_version} ${var.cluster_fqdn}"
+    command = "kops create cluster --dns ${var.dns} --networking calico --zones=${join(",", data.aws_availability_zones.available.names)} --node-count=${var.node_asg_desired} --master-zones=${data.template_file.master_azs.rendered} --target=terraform --api-loadbalancer-type=public --vpc=${var.vpc_id} --state=s3://${var.kops_s3_bucket_id} --kubernetes-version ${var.kubernetes_version} ${var.cluster_fqdn}"
   }
   provisioner "local-exec" {
     when    = "destroy"
