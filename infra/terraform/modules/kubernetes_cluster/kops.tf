@@ -99,6 +99,8 @@ resource "null_resource" "update_cluster" {
     bastion_instance_type = "${var.bastion_instance_type}"
     bastion_count = "${var.bastion_asg_desired}"
     master_instance_type = "${var.master_instance_type}"
+    master_user_data = "${data.template_file.master_user_data.0.rendered}"
+    node_user_data = "${data.template_file.node_user_data.rendered}"
   }
 
   provisioner "local-exec" {
