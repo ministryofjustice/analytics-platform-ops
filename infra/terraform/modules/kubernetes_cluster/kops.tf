@@ -1,4 +1,25 @@
+resource "null_resource" "check_supported_k8s_version" {
+  triggers {
+    kubernetes_version = "${var.kubernetes_version}"
+    kubernetes_versions = "${join(",", sort(var.supported_k8s_versions))}"
+  }
+  provisioner "local-exec" {
+    command = <<EOF
+status=${contains(var.supported_k8s_versions, var.kubernetes_version) ? 0 : 1}
+if [[ $status == "1" ]]
+then
+  echo "Kubernetes version ${var.kubernetes_version} not supported"
+fi
+exit $status
+EOF
+  }
+}
+
 resource "null_resource" "check_kops_version" {
+  depends_on = [
+    "null_resource.check_supported_k8s_version"
+  ]
+
   provisioner "local-exec" {
     command = "${path.module}/bin/check_kops_version.sh ${path.module}/data/user_data.sh"
   }
@@ -12,20 +33,10 @@ resource "null_resource" "wait_for_dns_resolution" {
 
 resource "null_resource" "create_cluster" {
   depends_on = [
+    "null_resource.check_supported_k8s_version",
     "null_resource.check_kops_version",
     "null_resource.wait_for_dns_resolution"
   ]
-
-  # triggers {
-  #   kubernetes_version = "${var.kubernetes_version}"
-  #   node_instance_type = "${var.node_instance_type}"
-  #   node_count = "${var.node_asg_desired}"
-  #   node_volume_size = "${var.node_volume_size}"
-  #   ami_name = "${data.aws_ami.k8s_1_6_debian_jessie_ami.id}"
-  #   bastion_instance_type = "${var.bastion_instance_type}"
-  #   bastion_count = "${var.bastion_asg_desired}"
-  #   master_instance_type = "${var.master_instance_type}"
-  # }
 
   provisioner "local-exec" {
     # command = "kops create cluster --dns ${var.dns} --topology private --networking calico --zones=${join(",", data.aws_availability_zones.available.names)} --node-count=${var.node_asg_desired} --master-zones=${data.template_file.master_azs.rendered} --target=terraform --api-loadbalancer-type=public --vpc=${var.vpc_id} --state=s3://${var.kops_s3_bucket_id} --kubernetes-version ${var.kubernetes_version} ${var.cluster_fqdn}"
@@ -87,6 +98,8 @@ resource "null_resource" "wait_for_cluster_ready" {
 
 resource "null_resource" "update_cluster" {
   depends_on = [
+    "null_resource.check_supported_k8s_version",
+    "null_resource.check_kops_version",
     "null_resource.wait_for_cluster_ready"
   ]
 
