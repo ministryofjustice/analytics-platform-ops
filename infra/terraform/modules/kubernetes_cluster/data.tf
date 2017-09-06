@@ -13,7 +13,8 @@ data "aws_ami" "k8s_1_6_debian_jessie_ami" {
 
   filter {
     name   = "name"
-    values = ["k8s-1.6-debian-jessie-amd64-hvm-ebs-2017-05-02"]
+    # values = ["k8s-1.6-debian-jessie-amd64-hvm-ebs-2017-05-02"]
+    values = ["k8s-1.7-debian-jessie-amd64-hvm-ebs-2017-07-28"]
   }
 
   filter {

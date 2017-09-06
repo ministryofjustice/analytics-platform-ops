@@ -1,7 +1,7 @@
 resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
   count                = "${data.template_file.master_resource_count.rendered}"
-  name                 = "${var.cluster_name}_master_${element(split(",", data.template_file.az_letters.rendered), count.index)}"
+  name                 = "master-${data.aws_region.current.name}${element(split(",", data.template_file.az_letters.rendered), count.index)}.masters.${var.cluster_fqdn}"
   vpc_zone_identifier  = ["${element(var.vpc_private_subnet_ids, count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = [
@@ -20,7 +20,7 @@ resource "aws_autoscaling_group" "master" {
 
   tag = {
     key                 = "Name"
-    value               = "${var.cluster_name}_master_${element(split(",", data.template_file.az_letters.rendered), count.index)}"
+    value               = "master-${data.aws_region.current.name}${element(split(",", data.template_file.az_letters.rendered), count.index)}.masters.${var.cluster_fqdn}"
     propagate_at_launch = true
   }
 
