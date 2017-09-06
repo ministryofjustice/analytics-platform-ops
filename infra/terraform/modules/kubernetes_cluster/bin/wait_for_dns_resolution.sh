@@ -8,7 +8,7 @@ DOMAIN=$1
 # DNS resolves for a number of successive checks so we're really sure
 
 COUNTER=0
-while [[ $COUNTER -lt 10 ]]
+while [[ $COUNTER -lt 20 ]]
 do
     NUM_RECORDS=$(dig ns $DOMAIN +short | wc -l | awk '{print $1}')
 
@@ -20,5 +20,5 @@ do
         COUNTER=$((COUNTER+1))
     fi
 
-    sleep 5
+    sleep 3
 done
