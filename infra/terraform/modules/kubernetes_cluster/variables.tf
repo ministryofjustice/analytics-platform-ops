@@ -79,7 +79,14 @@ variable "bastion_asg_desired" {
   default = 3
 }
 
+variable "kops_ami_names" {
+  type = "map"
 
+  default = {
+    "1.6" = "k8s-1.6-debian-jessie-amd64-hvm-ebs-2017-05-02"
+    "1.7" = "k8s-1.7-debian-jessie-amd64-hvm-ebs-2017-07-28"
+  }
+}
 
 variable "public_subnet_zones" {
   type = "map"
