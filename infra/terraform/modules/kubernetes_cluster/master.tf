@@ -164,7 +164,7 @@ resource "aws_security_group" "master_internal_elb" {
 
 data "template_file" "master_user_data" {
   count    = "${data.template_file.master_resource_count.rendered}"
-  template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
+  template = "${file("${path.module}/data/nodeup/${var.kubernetes_version}.tpl")}"
   vars {
     cluster_fqdn           = "${var.cluster_fqdn}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"

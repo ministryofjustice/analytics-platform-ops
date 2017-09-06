@@ -27,7 +27,7 @@ resource "aws_autoscaling_group" "node" {
 }
 
 data "template_file" "node_user_data" {
-  template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
+  template = "${file("${path.module}/data/nodeup/${var.kubernetes_version}.tpl")}"
   vars {
     cluster_fqdn           = "${var.cluster_fqdn}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
