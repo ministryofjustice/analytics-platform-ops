@@ -64,3 +64,41 @@ variable "dns" {
 variable "force_single_master" {
   default = false
 }
+
+variable "vpc_cidr" {}
+
+variable "node_volume_size" {
+  default = 128
+}
+
+variable "bastion_instance_type" {
+  default = "t2.small"
+}
+
+variable "bastion_asg_desired" {
+  default = 3
+}
+
+
+
+variable "public_subnet_zones" {
+  type = "map"
+}
+
+variable "private_subnet_zones" {
+  type = "map"
+}
+
+variable "public_subnet_cidrs" {
+  type = "map"
+}
+
+variable "private_subnet_cidrs" {
+  type = "map"
+}
+
+variable "nat_gateway_subnets" {
+  type = "map"
+}
+
+variable "ssh_public_key" {}

@@ -67,6 +67,14 @@ output "private_subnets" {
     value = "${zipmap(aws_subnet.private.*.id, aws_subnet.private.*.availability_zone)}"
 }
 
+output "dmz_subnet_cidrs" {
+    value = "${zipmap(aws_subnet.dmz.*.id, aws_subnet.dmz.*.cidr_block)}"
+}
+
+output "private_subnet_cidrs" {
+    value = "${zipmap(aws_subnet.private.*.id, aws_subnet.private.*.cidr_block)}"
+}
+
 output "extra_node_sg_id" {
     value = "${aws_security_group.node_extra.id}"
 }

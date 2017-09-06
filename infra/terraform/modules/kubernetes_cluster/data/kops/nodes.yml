@@ -1,0 +1,21 @@
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  # creationTimestamp: 2017-03-13T16:27:19Z
+  # labels:
+  #   kops.k8s.io/cluster: dev.mojanalytics.xyz
+  name: nodes
+spec:
+  # additionalSecurityGroups:
+  # - sg-1a8a7963
+  associatePublicIp: false
+  # image: kope.io/k8s-1.5-debian-jessie-amd64-hvm-ebs-2017-01-09
+  # machineType: m4.large
+  # maxSize: 6
+  # minSize: 6
+  role: Node
+  # rootVolumeSize: 100
+  # subnets:
+  # - eu-west-1a
+  # - eu-west-1b
+  # - eu-west-1c
