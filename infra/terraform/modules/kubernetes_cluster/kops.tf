@@ -113,6 +113,10 @@ resource "null_resource" "update_cluster" {
     master_instance_type = "${var.master_instance_type}"
     master_user_data = "${data.template_file.master_user_data.0.rendered}"
     node_user_data = "${data.template_file.node_user_data.rendered}"
+    cluster_spec = "${data.template_file.cluster_spec.rendered}"
+    bastions_spec = "${data.template_file.bastions_spec.rendered}"
+    masters_spec = "${data.template_file.masters_spec.rendered}"
+    nodes_spec = "${data.template_file.nodes_spec.rendered}"
   }
 
   provisioner "local-exec" {
