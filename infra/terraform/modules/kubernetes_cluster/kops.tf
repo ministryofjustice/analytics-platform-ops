@@ -155,18 +155,6 @@ EOF
   }
 }
 
-# resource "null_resource" "upgrade_if_version_differs" {
-#   depends_on = ["null_resource.wait_for_cluster_ready"]
-
-#   triggers {
-#     kubernetes_version = "${var.kubernetes_version}"
-#   }
-
-#   provisioner "local-exec" {
-#     command = "${path.module}/bin/upgrade_if_version_differs.sh ${var.cluster_fqdn} ${var.kubernetes_version}"
-#   }
-# }
-
 resource "null_resource" "delete_tf_files" {
   depends_on = [ "null_resource.create_cluster" ]
   provisioner "local-exec" {
