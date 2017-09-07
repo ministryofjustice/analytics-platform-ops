@@ -8,7 +8,7 @@ data "aws_region" "current" {
   current = true
 }
 
-data "aws_ami" "k8s_1_6_debian_jessie_ami" {
+data "aws_ami" "kops_ami" {
   most_recent = true
 
   filter {

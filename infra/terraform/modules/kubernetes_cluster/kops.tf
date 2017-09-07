@@ -54,7 +54,7 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --node-instance-type ${var.node_instance_type} \
   --node-count ${var.node_asg_desired} \
   --node-volume-size ${var.node_volume_size} \
-  --ami-name ${data.aws_ami.k8s_1_6_debian_jessie_ami.id} \
+  --ami-name ${data.aws_ami.kops_ami.id} \
   --bastion-instance-type ${var.bastion_instance_type} \
   --bastion-count ${var.bastion_asg_desired} \
   --master-instance-type ${var.master_instance_type} \
@@ -108,7 +108,7 @@ resource "null_resource" "update_cluster" {
     node_instance_type = "${var.node_instance_type}"
     node_count = "${var.node_asg_desired}"
     node_volume_size = "${var.node_volume_size}"
-    ami_name = "${data.aws_ami.k8s_1_6_debian_jessie_ami.id}"
+    ami_name = "${data.aws_ami.kops_ami.id}"
     bastion_instance_type = "${var.bastion_instance_type}"
     bastion_count = "${var.bastion_asg_desired}"
     master_instance_type = "${var.master_instance_type}"
@@ -131,7 +131,7 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --node-instance-type ${var.node_instance_type} \
   --node-count ${var.node_asg_desired} \
   --node-volume-size ${var.node_volume_size} \
-  --ami-name ${data.aws_ami.k8s_1_6_debian_jessie_ami.id} \
+  --ami-name ${data.aws_ami.kops_ami.id} \
   --bastion-instance-type ${var.bastion_instance_type} \
   --bastion-count ${var.bastion_asg_desired} \
   --master-instance-type ${var.master_instance_type} \
