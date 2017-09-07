@@ -39,7 +39,6 @@ resource "null_resource" "create_cluster" {
   ]
 
   provisioner "local-exec" {
-    # command = "kops create cluster --dns ${var.dns} --topology private --networking calico --zones=${join(",", data.aws_availability_zones.available.names)} --node-count=${var.node_asg_desired} --master-zones=${data.template_file.master_azs.rendered} --target=terraform --api-loadbalancer-type=public --vpc=${var.vpc_id} --state=s3://${var.kops_s3_bucket_id} --kubernetes-version ${var.kubernetes_version} ${var.cluster_fqdn}"
     command = <<EOF
 ${path.module}/bin/kops-specs/generate_specs.py \
   --template-path ${path.module}/data/kops \
@@ -65,10 +64,10 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --nat-gateway-subnets '${jsonencode(var.nat_gateway_subnets)}'
 
 
-kops create -f ${path.module}/out/cluster_rendered.yml
-kops create -f ${path.module}/out/bastions_rendered.yml
-kops create -f ${path.module}/out/masters_rendered.yml
-kops create -f ${path.module}/out/nodes_rendered.yml
+kops create -f ${path.module}/out/cluster.yml
+kops create -f ${path.module}/out/bastions.yml
+kops create -f ${path.module}/out/masters.yml
+kops create -f ${path.module}/out/nodes.yml
 
 echo "${var.ssh_public_key}" > ${path.module}/out/id_rsa.pub
 kops create secret --name ${var.cluster_fqdn} sshpublickey admin \
@@ -141,10 +140,10 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --private-subnet-cidrs '${jsonencode(var.private_subnet_cidrs)}' \
   --nat-gateway-subnets '${jsonencode(var.nat_gateway_subnets)}'
 
-kops replace -f ${path.module}/out/cluster_rendered.yml
-kops replace -f ${path.module}/out/bastions_rendered.yml
-kops replace -f ${path.module}/out/masters_rendered.yml
-kops replace -f ${path.module}/out/nodes_rendered.yml
+kops replace -f ${path.module}/out/cluster.yml
+kops replace -f ${path.module}/out/bastions.yml
+kops replace -f ${path.module}/out/masters.yml
+kops replace -f ${path.module}/out/nodes.yml
 
 kops update cluster ${var.cluster_fqdn} --target terraform \
   --state=s3://${var.kops_s3_bucket_id}

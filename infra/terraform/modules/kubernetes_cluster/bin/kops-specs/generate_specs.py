@@ -90,7 +90,7 @@ for kind in ['private', 'public']:
 
 
 
-with open(template('cluster.yml'), 'r') as stream:
+with open(template('cluster.tpl.yml'), 'r') as stream:
     try:
         cluster = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -127,11 +127,11 @@ with open(template('cluster.yml'), 'r') as stream:
         }
     })
 
-    with open(outfile('cluster_rendered.yml'), 'w') as out:
+    with open(outfile('cluster.yml'), 'w') as out:
         yaml.dump(cluster, out, default_flow_style=False)
 
 
-with open(template('bastions.yml'), 'r') as stream:
+with open(template('bastions.tpl.yml'), 'r') as stream:
     try:
         bastions = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -151,11 +151,11 @@ with open(template('bastions.yml'), 'r') as stream:
         'subnets': [i['name'] for i in subnets['public']]
     })
 
-    with open(outfile('bastions_rendered.yml'), 'w') as out:
+    with open(outfile('bastions.yml'), 'w') as out:
         yaml.dump(bastions, out, default_flow_style=False)
 
 
-with open(template('nodes.yml'), 'r') as stream:
+with open(template('nodes.tpl.yml'), 'r') as stream:
     try:
         nodes = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -176,13 +176,13 @@ with open(template('nodes.yml'), 'r') as stream:
         'subnets': [i['name'] for i in subnets['private']]
     })
 
-    with open(outfile('nodes_rendered.yml'), 'w') as out:
+    with open(outfile('nodes.yml'), 'w') as out:
         yaml.dump(nodes, out, default_flow_style=False)
 
 
 masters = []
 for zone in zones:
-    with open(template('masters.yml'), 'r')  as stream:
+    with open(template('masters.tpl.yml'), 'r')  as stream:
         try:
             master = yaml.load(stream)
         except yaml.YAMLError as exc:
@@ -205,6 +205,6 @@ for zone in zones:
 
     masters.append(master)
 
-with open(outfile('masters_rendered.yml'), 'w') as out:
+with open(outfile('masters.yml'), 'w') as out:
     yaml.dump_all(masters, out, default_flow_style=False,
                   explicit_start=True)
