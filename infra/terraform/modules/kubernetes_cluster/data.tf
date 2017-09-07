@@ -54,3 +54,19 @@ data "template_file" "etcd_azs" {
      etcd_azs = "${var.force_single_master == 1 ? element(split(",", data.template_file.az_letters.rendered), 0) : data.template_file.az_letters.rendered}"
    }
 }
+
+data "template_file" "cluster_spec" {
+  template = "${file("${path.module}/data/kops/cluster.tpl.yml")}"
+}
+
+data "template_file" "bastions_spec" {
+  template = "${file("${path.module}/data/kops/bastions.tpl.yml")}"
+}
+
+data "template_file" "masters_spec" {
+  template = "${file("${path.module}/data/kops/masters.tpl.yml")}"
+}
+
+data "template_file" "nodes_spec" {
+  template = "${file("${path.module}/data/kops/nodes.tpl.yml")}"
+}
