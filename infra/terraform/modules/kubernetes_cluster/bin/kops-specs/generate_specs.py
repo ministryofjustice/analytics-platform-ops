@@ -208,5 +208,3 @@ for zone in zones:
 with open(outfile('masters_rendered.yml'), 'w') as out:
     yaml.dump_all(masters, out, default_flow_style=False,
                   explicit_start=True)
-
-# kops create cluster --dns ${var.dns} --topology private --networking calico --zones=${join(",", data.aws_availability_zones.available.names)} --node-count=${var.node_asg_desired} --master-zones=${data.template_file.master_azs.rendered} --target=terraform --api-loadbalancer-type=public --vpc=${var.vpc_id} --state=s3://${var.kops_s3_bucket_id} --kubernetes-version ${var.kubernetes_version} ${var.cluster_fqdn}
