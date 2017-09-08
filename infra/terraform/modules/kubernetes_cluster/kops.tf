@@ -57,11 +57,11 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --bastion-instance-type ${var.bastion_instance_type} \
   --bastion-count ${var.bastion_asg_desired} \
   --master-instance-type ${var.master_instance_type} \
-  --public-subnet-zones '${jsonencode(var.public_subnet_zones)}' \
-  --private-subnet-zones '${jsonencode(var.private_subnet_zones)}' \
-  --public-subnet-cidrs '${jsonencode(var.public_subnet_cidrs)}' \
-  --private-subnet-cidrs '${jsonencode(var.private_subnet_cidrs)}' \
-  --nat-gateway-subnets '${jsonencode(var.nat_gateway_subnets)}'
+  --public-subnet-zones '${jsonencode(var.vpc_public_subnet_zones)}' \
+  --private-subnet-zones '${jsonencode(var.vpc_private_subnet_zones)}' \
+  --public-subnet-cidrs '${jsonencode(var.vpc_public_subnet_cidrs)}' \
+  --private-subnet-cidrs '${jsonencode(var.vpc_private_subnet_cidrs)}' \
+  --nat-gateway-subnets '${jsonencode(var.vpc_nat_gateway_subnets)}'
 
 
 kops create -f ${path.module}/out/cluster.yml
@@ -138,11 +138,11 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --bastion-instance-type ${var.bastion_instance_type} \
   --bastion-count ${var.bastion_asg_desired} \
   --master-instance-type ${var.master_instance_type} \
-  --public-subnet-zones '${jsonencode(var.public_subnet_zones)}' \
-  --private-subnet-zones '${jsonencode(var.private_subnet_zones)}' \
-  --public-subnet-cidrs '${jsonencode(var.public_subnet_cidrs)}' \
-  --private-subnet-cidrs '${jsonencode(var.private_subnet_cidrs)}' \
-  --nat-gateway-subnets '${jsonencode(var.nat_gateway_subnets)}'
+  --public-subnet-zones '${jsonencode(var.vpc_public_subnet_zones)}' \
+  --private-subnet-zones '${jsonencode(var.vpc_private_subnet_zones)}' \
+  --public-subnet-cidrs '${jsonencode(var.vpc_public_subnet_cidrs)}' \
+  --private-subnet-cidrs '${jsonencode(var.vpc_private_subnet_cidrs)}' \
+  --nat-gateway-subnets '${jsonencode(var.vpc_nat_gateway_subnets)}'
 
 kops replace -f ${path.module}/out/cluster.yml
 kops replace -f ${path.module}/out/bastions.yml
