@@ -102,23 +102,23 @@ variable "kops_ami_names" {
   }
 }
 
-variable "public_subnet_zones" {
+variable "vpc_public_subnet_zones" {
   type = "map"
 }
 
-variable "private_subnet_zones" {
+variable "vpc_private_subnet_zones" {
   type = "map"
 }
 
-variable "public_subnet_cidrs" {
+variable "vpc_public_subnet_cidrs" {
   type = "map"
 }
 
-variable "private_subnet_cidrs" {
+variable "vpc_private_subnet_cidrs" {
   type = "map"
 }
 
-variable "nat_gateway_subnets" {
+variable "vpc_nat_gateway_subnets" {
   type = "map"
 }
 
