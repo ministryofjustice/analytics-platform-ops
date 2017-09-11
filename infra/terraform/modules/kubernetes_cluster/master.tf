@@ -168,14 +168,14 @@ data "template_file" "master_user_data" {
   vars {
     cluster_fqdn           = "${var.cluster_fqdn}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    autoscaling_group_name = "master-${element(sort(data.aws_availability_zones.available.names), count.index)}"
+    autoscaling_group_name = "master-${element(sort(var.availability_zones), count.index)}"
     kubernetes_master_tag  = "- _kubernetes_master"
   }
 }
 
 resource "aws_launch_configuration" "master" {
   count                = "${data.template_file.master_resource_count.rendered}"
-  name_prefix          = "${var.cluster_name}-master-${element(sort(data.aws_availability_zones.available.names), count.index)}-"
+  name_prefix          = "${var.cluster_name}-master-${element(sort(var.availability_zones), count.index)}-"
   image_id             = "${data.aws_ami.kops_ami.id}"
   instance_type        = "${var.master_instance_type}"
   key_name             = "${var.instance_key_name}"
@@ -205,7 +205,7 @@ resource "aws_launch_configuration" "master" {
 
 resource "aws_ebs_volume" "etcd-events" {
   count             = "${data.template_file.master_resource_count.rendered}"
-  availability_zone = "${element(sort(data.aws_availability_zones.available.names), count.index)}"
+  availability_zone = "${element(sort(var.availability_zones), count.index)}"
   size              = 20
   type              = "gp2"
   encrypted         = false
@@ -220,7 +220,7 @@ resource "aws_ebs_volume" "etcd-events" {
 
 resource "aws_ebs_volume" "etcd-main" {
   count             = "${data.template_file.master_resource_count.rendered}"
-  availability_zone = "${element(sort(data.aws_availability_zones.available.names), count.index)}"
+  availability_zone = "${element(sort(var.availability_zones), count.index)}"
   size              = 20
   type              = "gp2"
   encrypted         = false
