@@ -131,3 +131,10 @@ module "federated_identity" {
     source ="../../modules/federated_identity"
     env = "${var.env}"
 }
+
+module "control_panel_role" {
+    source = "../../modules/control_panel_role"
+
+    env = "${var.env}"
+    account_id = "${data.aws_caller_identity.current.account_id}"
+}
