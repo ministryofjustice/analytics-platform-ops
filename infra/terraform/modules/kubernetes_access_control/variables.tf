@@ -1,5 +1,7 @@
 variable "vpc_id" {}
 
+variable "cluster_name" {}
+
 variable "kops_bucket_arn" {}
 
 variable "inbound_ssh_source_sg_id" {}
