@@ -12,6 +12,10 @@ variable "supported_k8s_versions" {
   ]
 }
 
+variable "availability_zones" {
+  type = "list"
+}
+
 # Name for the cluster
 variable "cluster_name" {}
 # Fully qualified DNS name of cluster

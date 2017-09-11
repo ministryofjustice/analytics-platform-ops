@@ -48,7 +48,7 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --state-bucket ${var.kops_s3_bucket_id} \
   --kubernetes-version ${var.kubernetes_version} \
   --dns-zone ${var.route53_zone_id} \
-  --zones ${join(",", data.aws_availability_zones.available.names)} \
+  --zones ${join(",", var.availability_zones)} \
   --network-cidr ${var.vpc_cidr} \
   --node-instance-type ${var.node_instance_type} \
   --node-count ${var.node_asg_desired} \
@@ -129,7 +129,7 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --state-bucket ${var.kops_s3_bucket_id} \
   --kubernetes-version ${var.kubernetes_version} \
   --dns-zone ${var.route53_zone_id} \
-  --zones ${join(",", data.aws_availability_zones.available.names)} \
+  --zones ${join(",", var.availability_zones)} \
   --network-cidr ${var.vpc_cidr} \
   --node-instance-type ${var.node_instance_type} \
   --node-count ${var.node_asg_desired} \
