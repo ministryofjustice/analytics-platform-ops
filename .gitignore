@@ -11,3 +11,4 @@
 __pycache__
 .cache
 venv
+/infra/terraform/modules/kubernetes_cluster/out
