@@ -7,6 +7,7 @@ import os
 import yaml
 
 
+# Output multiline YAML strings as pipe-prepended scalars
 def str_presenter(dumper, data):
   if len(data.splitlines()) > 1:  # check for multiline string
     return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
@@ -86,10 +87,7 @@ for kind in ['private', 'public']:
 
         subnets[kind].append(subnet)
 
-
-
-
-
+# Cluster spec
 with open(template('cluster.tpl.yml'), 'r') as stream:
     try:
         cluster = yaml.load(stream)
@@ -131,6 +129,7 @@ with open(template('cluster.tpl.yml'), 'r') as stream:
         yaml.dump(cluster, out, default_flow_style=False)
 
 
+# Bastions spec
 with open(template('bastions.tpl.yml'), 'r') as stream:
     try:
         bastions = yaml.load(stream)
@@ -155,6 +154,7 @@ with open(template('bastions.tpl.yml'), 'r') as stream:
         yaml.dump(bastions, out, default_flow_style=False)
 
 
+# Nodes spec
 with open(template('nodes.tpl.yml'), 'r') as stream:
     try:
         nodes = yaml.load(stream)
@@ -180,6 +180,7 @@ with open(template('nodes.tpl.yml'), 'r') as stream:
         yaml.dump(nodes, out, default_flow_style=False)
 
 
+# Masters specs
 masters = []
 for zone in zones:
     with open(template('masters.tpl.yml'), 'r')  as stream:
