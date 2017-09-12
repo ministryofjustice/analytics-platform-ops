@@ -18,6 +18,14 @@ output "kops_bucket_name" {
     value = "${var.kops_bucket_name}"
 }
 
+output "kops_bucket_arn" {
+    value = "${aws_s3_bucket.kops_state.arn}"
+}
+
+output "kops_bucket_id" {
+    value = "${aws_s3_bucket.kops_state.id}"
+}
+
 output "auth0_ses_access_key_id" {
     value = "${aws_iam_access_key.auth0_ses.id}"
 }
