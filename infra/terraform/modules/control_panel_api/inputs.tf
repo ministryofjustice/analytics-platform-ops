@@ -1,5 +1,9 @@
 variable "env" {}
 variable "vpc_id" {}
+variable "account_id" {}
+
+variable "db_username" {}
+variable "db_password" {}
 
 variable "storage_type" {
     default = "gp2"
