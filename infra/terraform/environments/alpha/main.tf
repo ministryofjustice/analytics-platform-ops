@@ -132,9 +132,13 @@ module "federated_identity" {
     env = "${var.env}"
 }
 
-module "control_panel_role" {
-    source = "../../modules/control_panel_role"
-
-    env = "${var.env}"
-    account_id = "${data.aws_caller_identity.current.account_id}"
-}
+# module "control_panel_api" {
+#     source = "../../modules/control_panel_api"
+#     env = "${var.env}"
+#     db_username = "${var.control_panel_api_db_username}"
+#     db_password = "${var.control_panel_api_db_password}"
+#     account_id = "${data.aws_caller_identity.current.account_id}"
+#     vpc_id = "${module.aws_vpc.vpc_id}"
+#     db_subnet_ids = ["${module.aws_vpc.storage_subnet_ids}"]
+#     ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
+# }
