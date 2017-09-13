@@ -25,14 +25,14 @@ resource "aws_security_group_rule" "all_node_to_node" {
   protocol                 = "-1"
 }
 
-resource "aws_security_group_rule" "node_to_master_internal_elb" {
-  type                     = "ingress"
-  security_group_id        = "${aws_security_group.master_internal_elb.id}"
-  source_security_group_id = "${aws_security_group.node.id}"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-}
+# resource "aws_security_group_rule" "node_to_master_internal_elb" {
+#   type                     = "ingress"
+#   security_group_id        = "${aws_security_group.master_internal_elb.id}"
+#   source_security_group_id = "${aws_security_group.node.id}"
+#   from_port                = 443
+#   to_port                  = 443
+#   protocol                 = "tcp"
+# }
 
 resource "aws_security_group_rule" "node_to_master_tcp_1-65535" {
   type                     = "ingress"
