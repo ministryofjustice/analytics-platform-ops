@@ -9,7 +9,7 @@ Assets:
 - 5d95d64d7134f202ba60b1fa14adaff138905d15@https://kubeupv2.s3.amazonaws.com/kops/1.7.0/linux/amd64/utils.tar.gz
 ClusterName: ${cluster_fqdn}
 ConfigBase: s3://${kops_s3_bucket_id}/${cluster_fqdn}
-InstanceGroupName: ${autoscaling_group_name}
+InstanceGroupName: ${instance_group_name}
 Tags:
 - _automatic_upgrades
 - _aws
