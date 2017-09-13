@@ -5,8 +5,7 @@ resource "aws_autoscaling_group" "master" {
   vpc_zone_identifier  = ["${element(var.vpc_private_subnet_ids, count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = [
-    "${aws_elb.master.name}",
-    "${aws_elb.master_internal.name}"
+    "${aws_elb.master.name}"
   ]
   max_size         = 1
   min_size         = 1
@@ -57,33 +56,6 @@ resource "aws_elb" "master" {
   }
 }
 
-resource "aws_elb" "master_internal" {
-  name         = "${var.cluster_name}-master-internal"
-  subnets      = ["${var.vpc_private_subnet_ids}"]
-  internal     = true
-  idle_timeout = 300
-  listener = {
-    instance_port     = 443
-    instance_protocol = "TCP"
-    lb_port           = 443
-    lb_protocol       = "TCP"
-  }
-  security_groups = [
-    "${aws_security_group.master_internal_elb.id}",
-  ]
-  health_check = {
-    target              = "TCP:443"
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 10
-    timeout             = 5
-  }
-  tags = {
-    KubernetesCluster = "${var.cluster_fqdn}"
-    Name              = "${var.cluster_name}_master_internal"
-  }
-}
-
 resource "aws_route53_record" "master_elb" {
   name = "api.${var.cluster_fqdn}"
   type = "A"
@@ -123,15 +95,6 @@ resource "aws_security_group_rule" "master_elb_to_master" {
   protocol                 = "tcp"
 }
 
-resource "aws_security_group_rule" "internal_master_elb_to_master" {
-  type                     = "ingress"
-  security_group_id        = "${aws_security_group.master.id}"
-  source_security_group_id = "${aws_security_group.master_internal_elb.id}"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-}
-
 resource "aws_security_group" "master_elb" {
   name        = "${var.cluster_name}-master-elb"
   vpc_id      = "${var.vpc_id}"
@@ -144,21 +107,6 @@ resource "aws_security_group" "master_elb" {
   }
   tags {
     Name = "${var.cluster_name}_master_elb"
-  }
-}
-
-resource "aws_security_group" "master_internal_elb" {
-  name        = "${var.cluster_name}-master-internal-elb"
-  vpc_id      = "${var.vpc_id}"
-  description = "${var.cluster_name} master internal ELB"
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags {
-    Name = "${var.cluster_name}_master_internal_elb"
   }
 }
 
