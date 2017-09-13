@@ -15,7 +15,7 @@ resource "aws_autoscaling_group" "node" {
 
   tag = {
     key                 = "Name"
-    value               = "${var.cluster_name}_node"
+    value               = "nodes.${var.cluster_fqdn}"
     propagate_at_launch = true
   }
 
@@ -31,14 +31,14 @@ data "template_file" "node_user_data" {
   vars {
     cluster_fqdn           = "${var.cluster_fqdn}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    autoscaling_group_name = "nodes"
+    instance_group_name    = "nodes"
     kubernetes_master_tag  = ""
 
   }
 }
 
 resource "aws_launch_configuration" "node" {
-  name_prefix                 = "${var.cluster_name}-node"
+  name_prefix                 = "nodes.${var.cluster_fqdn}-"
   image_id                    = "${data.aws_ami.kops_ami.id}"
   instance_type               = "${var.node_instance_type}"
   key_name                    = "${var.instance_key_name}"
@@ -62,13 +62,13 @@ resource "aws_launch_configuration" "node" {
 }
 
 resource "aws_security_group" "node" {
-  name        = "${var.cluster_name}-node"
+  name        = "nodes.${var.cluster_fqdn}"
   vpc_id      = "${var.vpc_id}"
   description = "Kubernetes cluster ${var.cluster_name} nodes"
 
   tags = {
     KubernetesCluster = "${var.cluster_fqdn}"
-    Name              = "${var.cluster_name}_node"
+    Name              = "nodes.${var.cluster_fqdn}"
   }
 
   egress {
