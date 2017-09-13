@@ -98,11 +98,11 @@ resource "aws_route53_record" "master_elb" {
 }
 
 resource "aws_security_group" "master" {
-  name        = "${var.cluster_name}_master"
+  name        = "masters.${var.cluster_fqdn}"
   vpc_id      = "${var.vpc_id}"
   description = "${var.cluster_name} master"
   tags = {
-    Name              = "${var.cluster_name}_master"
+    Name              = "masters.${var.cluster_fqdn}"
     KubernetesCluster = "${var.cluster_fqdn}"
   }
 
@@ -168,14 +168,14 @@ data "template_file" "master_user_data" {
   vars {
     cluster_fqdn           = "${var.cluster_fqdn}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    autoscaling_group_name = "master-${element(sort(var.availability_zones), count.index)}"
+    instance_group_name    = "master-${data.aws_region.current.name}${element(split(",", data.template_file.az_letters.rendered), count.index)}"
     kubernetes_master_tag  = "- _kubernetes_master"
   }
 }
 
 resource "aws_launch_configuration" "master" {
   count                = "${data.template_file.master_resource_count.rendered}"
-  name_prefix          = "${var.cluster_name}-master-${element(sort(var.availability_zones), count.index)}-"
+  name_prefix          = "master-${data.aws_region.current.name}${element(split(",", data.template_file.az_letters.rendered), count.index)}.masters.${var.cluster_fqdn}-"
   image_id             = "${data.aws_ami.kops_ami.id}"
   instance_type        = "${var.master_instance_type}"
   key_name             = "${var.instance_key_name}"
