@@ -19,9 +19,6 @@ output "master_elb_sg_id" {
 output "master_elb_dns_name" {
   value = "${aws_elb.master.dns_name}"
 }
-output "master_internal_elb_dns_name" {
-  value = "${aws_elb.master_internal.dns_name}"
-}
 output "master_asg_name" {
   value = "${aws_autoscaling_group.master.name}"
 }
