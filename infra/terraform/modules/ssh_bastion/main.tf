@@ -1,3 +1,6 @@
+variable "env" {}
+variable "vpc_id" {}
+
 variable "allowed_cidr" {
   type        = "list"
   default     = ["0.0.0.0/0"]
@@ -10,7 +13,17 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
-variable "vpc_id" {}
+variable "num_instances" {
+  default = 1
+}
+
+variable "use_elb" {
+  default = false
+}
+
+variable "dns_zone_id" {
+  default = ""
+}
 
 variable "subnet_ids" {
   default     = []
