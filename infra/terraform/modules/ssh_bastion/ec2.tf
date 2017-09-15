@@ -123,6 +123,8 @@ resource "aws_autoscaling_group" "bastion" {
   lifecycle {
     create_before_destroy = true
   }
+
+  health_check_grace_period = 0
 }
 
 resource "aws_elb" "bastions" {
@@ -131,6 +133,7 @@ resource "aws_elb" "bastions" {
   security_groups = [
     "${aws_security_group.elb.id}",
   ]
+
   listener {
     instance_port     = 22
     instance_protocol = "tcp"
@@ -140,13 +143,16 @@ resource "aws_elb" "bastions" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout             = 3
+    timeout             = 5
     target              = "TCP:22"
-    interval            = 30
+    interval            = 10
   }
   tags {
     Name              = "${var.name}"
   }
+
+  idle_timeout = 300
+  cross_zone_load_balancing = false
 
   count = "${var.use_elb}"
 }
