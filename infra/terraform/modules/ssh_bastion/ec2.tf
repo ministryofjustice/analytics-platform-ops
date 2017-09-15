@@ -101,10 +101,6 @@ resource "aws_autoscaling_group" "bastion" {
     "${var.subnet_ids}",
   ]
 
-  load_balancers       = [
-    "${aws_elb.bastions.name}"
-  ]
-
   desired_capacity          = "${var.num_instances}"
   min_size                  = "${var.num_instances}"
   max_size                  = "${var.num_instances}"
@@ -125,6 +121,12 @@ resource "aws_autoscaling_group" "bastion" {
   }
 
   health_check_grace_period = 0
+}
+
+resource "aws_autoscaling_attachment" "bastion" {
+  autoscaling_group_name = "${aws_autoscaling_group.bastion.id}"
+  elb                    = "${aws_elb.bastions.id}"
+  count = "${var.use_elb}"
 }
 
 resource "aws_elb" "bastions" {
