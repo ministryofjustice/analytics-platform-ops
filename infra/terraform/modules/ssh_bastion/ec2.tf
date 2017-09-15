@@ -90,6 +90,10 @@ resource "aws_autoscaling_group" "bastion" {
     "${var.subnet_ids}",
   ]
 
+  load_balancers       = [
+    "${aws_elb.bastions.name}"
+  ]
+
   desired_capacity          = "${var.num_instances}"
   min_size                  = "${var.num_instances}"
   max_size                  = "${var.num_instances}"
