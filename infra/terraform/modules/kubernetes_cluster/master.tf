@@ -31,7 +31,7 @@ resource "aws_autoscaling_group" "master" {
 }
 
 resource "aws_elb" "master" {
-  name            = "${var.cluster_name}-master"
+  name            = "master-${var.cluster_name}"
   subnets         = ["${var.vpc_public_subnet_ids}"]
   security_groups = [
     "${aws_security_group.master_elb.id}",
