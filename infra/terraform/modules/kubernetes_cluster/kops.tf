@@ -64,10 +64,10 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --nat-gateway-subnets '${jsonencode(var.vpc_nat_gateway_subnets)}'
 
 
-kops create -f ${path.module}/out/cluster.yml
-kops create -f ${path.module}/out/bastions.yml
-kops create -f ${path.module}/out/masters.yml
-kops create -f ${path.module}/out/nodes.yml
+kops create -f ${path.module}/out/cluster.yml --state=s3://${var.kops_s3_bucket_id}
+kops create -f ${path.module}/out/bastions.yml --state=s3://${var.kops_s3_bucket_id}
+kops create -f ${path.module}/out/masters.yml --state=s3://${var.kops_s3_bucket_id}
+kops create -f ${path.module}/out/nodes.yml --state=s3://${var.kops_s3_bucket_id}
 
 echo "${var.ssh_public_key}" > ${path.module}/out/id_rsa.pub
 kops create secret --name ${var.cluster_fqdn} sshpublickey admin \
@@ -144,15 +144,15 @@ ${path.module}/bin/kops-specs/generate_specs.py \
   --private-subnet-cidrs '${jsonencode(var.vpc_private_subnet_cidrs)}' \
   --nat-gateway-subnets '${jsonencode(var.vpc_nat_gateway_subnets)}'
 
-kops replace -f ${path.module}/out/cluster.yml
-kops replace -f ${path.module}/out/bastions.yml
-kops replace -f ${path.module}/out/masters.yml
-kops replace -f ${path.module}/out/nodes.yml
+kops replace -f ${path.module}/out/cluster.yml --state=s3://${var.kops_s3_bucket_id}
+kops replace -f ${path.module}/out/bastions.yml --state=s3://${var.kops_s3_bucket_id}
+kops replace -f ${path.module}/out/masters.yml --state=s3://${var.kops_s3_bucket_id}
+kops replace -f ${path.module}/out/nodes.yml --state=s3://${var.kops_s3_bucket_id}
 
 kops update cluster ${var.cluster_fqdn} --target terraform \
   --state=s3://${var.kops_s3_bucket_id}
 
-kops rolling-update cluster ${var.cluster_fqdn} --yes
+kops rolling-update cluster ${var.cluster_fqdn} --state=s3://${var.kops_s3_bucket_id} --yes
 EOF
 
   }
