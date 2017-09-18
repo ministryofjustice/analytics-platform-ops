@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import pprint
 import os
+import operator
 
 import yaml
 
 
 # Output multiline YAML strings as pipe-prepended scalars
-def str_presenter(dumper, data):
-  if len(data.splitlines()) > 1:  # check for multiline string
-    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
-  return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+def multiline_str_representer(dumper, data):
+    style = None
+    if len(data.splitlines()) > 1:
+        style = '|'
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style=style)
 
-yaml.add_representer(str, str_presenter)
+
+yaml.add_representer(str, multiline_str_representer)
 
 
 parser = argparse.ArgumentParser()
@@ -45,23 +47,29 @@ parser.add_argument('--private-subnet-cidrs', type=json.loads, nargs='?',
 parser.add_argument('--nat-gateway-subnets', type=json.loads, nargs='?',
                     required=True)
 
-
 args = parser.parse_args()
 
 if not os.path.exists(args.out_path):
     os.makedirs(args.out_path)
 
+
 def template(fname):
     return os.path.join(args.template_path, fname)
+
 
 def outfile(fname):
     return os.path.join(args.out_path, fname)
 
 
+# Returns final letter from AZ, e.g. eu-west-1a -> a
+def zone_letter(zone):
+    return zone[-1]
+
+
 zones = sorted(args.zones.split(','))
 
 nat_gateway_zones = {
-    args.public_subnet_zones[k] : v
+    args.public_subnet_zones[k]: v
     for k, v in args.nat_gateway_subnets.items()
 }
 
@@ -70,29 +78,32 @@ subnets = {
     'private': []
 }
 for kind in ['private', 'public']:
-    cidrs = vars(args)["{}_subnet_cidrs".format(kind)]
-    subnet_zones = vars(args)["{}_subnet_zones".format(kind)]
+    cidrs = getattr(args, '{}_subnet_cidrs'.format(kind))
+    subnet_zones = getattr(args, '{}_subnet_zones'.format(kind))
 
-    for subnet_id, zone in sorted(subnet_zones.items(), key=lambda i: i[1]):
+    for subnet_id, zone in sorted(
+            subnet_zones.items(), key=operator.itemgetter(1)):
+
         subnet = {
             'id': subnet_id,
             'zone': zone,
-            'cidr': cidrs[subnet_id],
-            'type': 'Private' if kind == 'private' else 'Utility',
-            'name': zone if kind == 'private' else 'utility-{}'.format(zone)
+            'cidr': cidrs[subnet_id]
         }
 
         if kind == 'private':
+            subnet['type'] = 'Private'
+            subnet['name'] = zone
             subnet['egress'] = nat_gateway_zones[zone]
+        else:
+            subnet['type'] = 'Utility'
+            subnet['name'] = 'utility-{}'.format(zone)
 
         subnets[kind].append(subnet)
 
-# Cluster spec
+
+# Cluster spec
 with open(template('cluster.tpl.yml'), 'r') as stream:
-    try:
-        cluster = yaml.load(stream)
-    except yaml.YAMLError as exc:
-        raise(exc)
+    cluster = yaml.load(stream)
 
     cluster['metadata'] = {'name': args.cluster_name}
 
@@ -103,7 +114,7 @@ with open(template('cluster.tpl.yml'), 'r') as stream:
                 'etcdMembers': [
                     {
                         'instanceGroup': 'master-{}'.format(zone),
-                        'name': zone[-1]
+                        'name': zone_letter(zone)
                     }
                     for zone in zones
                 ]
@@ -112,15 +123,15 @@ with open(template('cluster.tpl.yml'), 'r') as stream:
         ],
         'subnets': subnets['public'] + subnets['private'],
         'networkID': args.vpc_id,
-        'configBase': "s3://{}/{}".format(args.state_bucket,
-                                          args.cluster_name),
+        'configBase': "s3://{}/{}".format(
+            args.state_bucket, args.cluster_name),
         'dnsZone': args.dns_zone,
         'networkCIDR': args.network_cidr,
         'kubernetesVersion': args.kubernetes_version,
     })
 
     cluster['spec']['topology'].update({
-        'bastion':  {
+        'bastion': {
             'bastionPublicName': 'bastion.{}'.format(args.cluster_name)
         }
     })
@@ -131,10 +142,7 @@ with open(template('cluster.tpl.yml'), 'r') as stream:
 
 # Bastions spec
 with open(template('bastions.tpl.yml'), 'r') as stream:
-    try:
-        bastions = yaml.load(stream)
-    except yaml.YAMLError as exc:
-        raise(exc)
+    bastions = yaml.load(stream)
 
     bastions['metadata'].update({
         'labels': {
@@ -156,10 +164,7 @@ with open(template('bastions.tpl.yml'), 'r') as stream:
 
 # Nodes spec
 with open(template('nodes.tpl.yml'), 'r') as stream:
-    try:
-        nodes = yaml.load(stream)
-    except yaml.YAMLError as exc:
-        raise(exc)
+    nodes = yaml.load(stream)
 
     nodes['metadata'].update({
         'labels': {
@@ -183,11 +188,8 @@ with open(template('nodes.tpl.yml'), 'r') as stream:
 # Masters specs
 masters = []
 for zone in zones:
-    with open(template('masters.tpl.yml'), 'r')  as stream:
-        try:
-            master = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            raise(exc)
+    with open(template('masters.tpl.yml'), 'r') as stream:
+        master = yaml.load(stream)
 
     name = 'master-{}'.format(zone)
 
