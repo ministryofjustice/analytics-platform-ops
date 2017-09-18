@@ -4,17 +4,6 @@ spec:
   kubeAPIServer:
     runtimeConfig:
       batch/v2alpha1: "true"
-  additionalPolicies:
-    node: |
-      [
-        {
-          "Action": [
-            "sts:AssumeRole"
-          ],
-          "Effect": "Allow",
-          "Resource": "*"
-        }
-      ]
   api:
     loadBalancer:
       type: Public
