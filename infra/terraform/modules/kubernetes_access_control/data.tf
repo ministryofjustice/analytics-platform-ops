@@ -100,15 +100,6 @@ data "aws_iam_policy_document" "kubernetes_nodes_aws_iam_role_policy" {
   statement {
     effect  = "Allow"
     actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket"
-    ]
-    resources = ["${var.kops_bucket_arn}"]
-  }
-
-  statement {
-    effect  = "Allow"
-    actions = [
       "autoscaling:DescribeAutoScalingGroups",
       "autoscaling:DescribeAutoScalingInstances",
       "autoscaling:DescribeTags",
