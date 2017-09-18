@@ -12,6 +12,12 @@ data "aws_iam_policy_document" "kubernetes_assume_role_policy" {
 data "aws_iam_policy_document" "kubernetes_nodes_aws_iam_role_policy" {
   statement {
     effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = ["*"]
+  }
+
+  statement {
+    effect    = "Allow"
     actions   = ["ec2:Describe*"]
     resources = ["*"]
   }
