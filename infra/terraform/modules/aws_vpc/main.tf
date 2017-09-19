@@ -44,7 +44,7 @@ output "cidr" {
 }
 
 output "availability_zones" {
-    value = "${join(",", var.availability_zones)}"
+  value = ["${var.availability_zones}"]
 }
 
 output "dmz_subnet_ids" {
@@ -67,6 +67,14 @@ output "private_subnets" {
     value = "${zipmap(aws_subnet.private.*.id, aws_subnet.private.*.availability_zone)}"
 }
 
+output "dmz_subnet_cidrs" {
+    value = "${zipmap(aws_subnet.dmz.*.id, aws_subnet.dmz.*.cidr_block)}"
+}
+
+output "private_subnet_cidrs" {
+    value = "${zipmap(aws_subnet.private.*.id, aws_subnet.private.*.cidr_block)}"
+}
+
 output "extra_node_sg_id" {
     value = "${aws_security_group.node_extra.id}"
 }
@@ -82,3 +90,15 @@ output "extra_bastion_sg_id" {
 output "nat_gateway_public_ips" {
   value = ["${aws_nat_gateway.private_gw.*.public_ip}"]
 }
+
+output "nat_gateway_subnets" {
+  value = "${zipmap(aws_nat_gateway.private_gw.*.subnet_id, aws_nat_gateway.private_gw.*.id)}"
+}
+
+# output "sg_inbound_ssh_id" {
+#   value = "${aws_security_group.inbound_ssh.id}"
+# }
+
+# output "sg_inbound_http_id" {
+#   value = "${aws_security_group.inbound_http.id}"
+# }

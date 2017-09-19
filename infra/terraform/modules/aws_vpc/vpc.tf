@@ -3,19 +3,16 @@ resource "aws_vpc" "main" {
     enable_dns_support = "true"
     enable_dns_hostnames = "true"
 
-    tags {
-        Name = "${var.name}"
-        Cluster = "${var.name}"
-    }
+    # Terraform does not support variable interpolation in key names,
+    # so map() is used as a workaround.
+    # See: https://github.com/hashicorp/terraform/issues/14516
+    tags = "${map("Name", "${var.name}", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_internet_gateway" "igw" {
     vpc_id = "${aws_vpc.main.id}"
 
-    tags {
-        Name = "${var.name}"
-        Cluster = "${var.name}"
-    }
+    tags = "${map("Name", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_eip" "private_gw" {

@@ -1,6 +1,6 @@
 resource "aws_route53_zone" "env" {
    name = "${var.env}.${var.root_zone_name}"
-   force_destroy = "false"
+   force_destroy = true
 }
 
 resource "aws_route53_record" "root_ns_record" {
