@@ -12,6 +12,13 @@ resource "aws_iam_role" "control_panel_api" {
       },
       "Effect": "Allow",
       "Sid": ""
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${var.k8s_worker_role_arn}"
+      },
+      "Action": "sts:AssumeRole"
     }
   ]
 }

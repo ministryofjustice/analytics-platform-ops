@@ -137,6 +137,7 @@ module "federated_identity" {
 #     env = "${var.env}"
 #     db_username = "${var.control_panel_api_db_username}"
 #     db_password = "${var.control_panel_api_db_password}"
+#     k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
 #     account_id = "${data.aws_caller_identity.current.account_id}"
 #     vpc_id = "${module.aws_vpc.vpc_id}"
 #     db_subnet_ids = ["${module.aws_vpc.storage_subnet_ids}"]
