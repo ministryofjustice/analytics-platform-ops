@@ -63,9 +63,6 @@ module "data_backup" {
     source = "../../modules/data_backup"
 
     env = "${var.env}"
-    abort_incomplete_multipart_upload_days = 1
-    backup_glacier_transition_days = 2
-    backup_expiration_days = 4
     k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
 }
 
