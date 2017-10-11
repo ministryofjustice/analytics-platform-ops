@@ -59,6 +59,15 @@ module "user_nfs_softnas" {
     dns_zone_domain = "${module.cluster_dns.dns_zone_domain}"
 }
 
+module "data_backup" {
+    source = "../../modules/data_backup"
+
+    env = "${var.env}"
+    abort_incomplete_multipart_upload_days = 1
+    backup_glacier_transition_days = 2
+    backup_expiration_days = 4
+}
+
 module "logging_elasticsearch" {
     source = "../../modules/logging_elasticsearch"
 
