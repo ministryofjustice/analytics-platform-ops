@@ -9,16 +9,16 @@ resource "aws_s3_bucket" "nfs_backup" {
 
   lifecycle_rule {
     id = "${var.env}-nfs-backup-transition"
-    abort_incomplete_multipart_upload_days = "${var.abort_incomplete_multipart_upload_days}"
+    abort_incomplete_multipart_upload_days = 1
     enabled = true
 
     transition {
-      days          = "${var.backup_glacier_transition_days}"
+      days          = "30"
       storage_class = "GLACIER"
     }
 
     expiration {
-      days = "${var.backup_expiration_days}"
+      days = "90"
     }
   }
 }
