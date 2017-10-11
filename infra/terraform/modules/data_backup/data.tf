@@ -11,6 +11,15 @@ data "aws_iam_policy_document" "assume_role_policy" {
       identifiers = ["ec2.amazonaws.com"]
     }
   }
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["${var.k8s_worker_role_arn}"]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "nfs_backup" {
