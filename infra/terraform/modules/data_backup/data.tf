@@ -27,10 +27,23 @@ data "aws_iam_policy_document" "nfs_backup" {
     effect = "Allow"
     actions = [
       "s3:AbortMultipartUpload",
+      "s3:DeleteObject",
+      "s3:GetObject",
       "s3:PutObject"
     ]
     resources = [
       "${aws_s3_bucket.nfs_backup.arn}/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${aws_s3_bucket.nfs_backup.arn}"
     ]
   }
 }
