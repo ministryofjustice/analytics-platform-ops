@@ -60,6 +60,14 @@ module "user_nfs_softnas" {
     dns_zone_domain = "${module.cluster_dns.dns_zone_domain}"
 }
 
+module "data_backup" {
+    source = "../../modules/data_backup"
+
+    env = "${var.env}"
+    k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
+    logs_bucket_arn = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
+}
+
 module "logging_elasticsearch" {
     source = "../../modules/logging_elasticsearch"
 
