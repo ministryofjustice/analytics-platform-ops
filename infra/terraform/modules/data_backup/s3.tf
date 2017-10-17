@@ -11,6 +11,11 @@ resource "aws_s3_bucket" "nfs_backup" {
     enabled = true
   }
 
+  logging {
+    target_bucket = "${var.logs_bucket_arn}"
+    target_prefix = "${var.env}-moj-analytics-nfs-backup/"
+  }
+
   # Current object versions transition to Glacier after 30 days
   # and are deleted after 90 (including deleted object markers)
 
