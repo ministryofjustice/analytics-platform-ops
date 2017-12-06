@@ -14,6 +14,8 @@ data "archive_file" "memberships_zip" {
     type        = "zip"
     source_dir  = "${path.module}/memberships"
     output_path = "/tmp/memberships.zip"
+
+    depends_on = ["null_resource.memberships_install_deps"]
 }
 
 # Lambda function to attach bucket IAM policy to IAM role
