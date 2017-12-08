@@ -14,6 +14,8 @@ data "archive_file" "users_zip" {
     type        = "zip"
     source_dir  = "${path.module}/users"
     output_path = "/tmp/users.zip"
+
+    depends_on = ["null_resource.users_install_deps"]
 }
 
 # Lambda function adds an IAM role given its username
