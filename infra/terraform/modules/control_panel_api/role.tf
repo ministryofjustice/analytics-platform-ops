@@ -110,6 +110,28 @@ resource "aws_iam_policy" "control_panel_api" {
         "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
         "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
       ]
+    },
+    {
+      "Sid": "CanReadRolesInlinePolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+      ]
+    },
+    {
+      "Sid": "CanUpdateRolesInlinePolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PutRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+      ]
     }
   ]
 }
