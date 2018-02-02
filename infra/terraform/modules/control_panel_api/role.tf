@@ -37,6 +37,7 @@ resource "aws_iam_policy" "control_panel_api" {
       "Action": [
         "s3:CreateBucket",
         "s3:PutBucketLogging",
+        "s3:PutBucketTagging",
         "s3:PutEncryptionConfiguration"
       ],
       "Resource": [
