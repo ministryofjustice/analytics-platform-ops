@@ -126,6 +126,9 @@ module "data_access" {
 module "federated_identity" {
     source ="../../modules/federated_identity"
     env = "${var.env}"
+    oidc_provider_url = "${var.oidc_provider_url}"
+    oidc_client_ids = ["${var.oidc_client_ids}"]
+    oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
 }
 
 module "control_panel_api" {
