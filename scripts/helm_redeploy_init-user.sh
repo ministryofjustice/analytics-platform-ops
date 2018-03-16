@@ -52,6 +52,14 @@ redeploy() {
 			
 		helm install --name=$RELEASE_NAME $CHART --set Username=$u -f $CONFIG_FILE
 				
+                if [[ $? -ne 0 ]]; then
+
+			 sleep 120
+
+			 helm install --name=$RELEASE_NAME $CHART --set Username=$u -f $CONFIG_FILE
+
+		fi
+
 	done <$USERNAME_FILE
     
 }
