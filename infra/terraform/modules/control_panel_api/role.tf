@@ -135,6 +135,16 @@ resource "aws_iam_policy" "control_panel_api" {
       ]
     },
     {
+      "Sid": "CanListPoliciesForLambdaMigration",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListPolicies"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:*"
+      ]
+    },
+    {
       "Sid": "TemporaryForOIDCMigration",
       "Effect": "Allow",
       "Action": [
