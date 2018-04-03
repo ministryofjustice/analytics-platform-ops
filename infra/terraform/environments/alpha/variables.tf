@@ -10,9 +10,6 @@ variable "availability_zones" {
     type = "list"
 }
 
-variable "sentry_dsn" {}
-
-variable "gh_hook_secret" {}
 variable "softnas_ssh_public_key" {}
 
 variable "control_panel_api_db_username" {}
