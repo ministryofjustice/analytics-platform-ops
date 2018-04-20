@@ -49,3 +49,11 @@ module "log_pruning" {
       days: 30
 EOF
 }
+
+module "hmpps_nomis_oasys_upload_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name = "hmpps"
+  system_name = "nomis_oasys"
+}
