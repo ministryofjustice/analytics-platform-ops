@@ -43,9 +43,9 @@ output "s3_logs_bucket_name" {
 }
 
 output "hmpps_nomis_oasys_access_key_id" {
-    value = "${module.hmpps_nomis_oasys_upload_user.system_user_access_key_id}"
+  value = "${module.hmpps_nomis_oasys_upload_user.access_key_id}"
 }
 
 output "hmpps_nomis_oasys_access_key_secret" {
-    value = "${module.hmpps_nomis_oasys_upload_user.system_user_access_key_secret}"
+  value = "${module.hmpps_nomis_oasys_upload_user.access_key_secret}"
 }
