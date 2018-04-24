@@ -12,4 +12,6 @@ variable "es_scheme" {
   default = "https"
 }
 
-variable "uploads_bucket_name" {}
+variable "uploads_bucket_name" {
+  default = "mojap-land"
+}
