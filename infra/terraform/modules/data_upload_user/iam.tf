@@ -1,5 +1,5 @@
 resource "aws_iam_user" "system" {
-  name = "${var.system_name}"
+  name = "${var.org_name}_${var.system_name}_uploader"
   path = "/uploaders/${var.org_name}/"
 }
 
@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "system_user_s3_upload_writeonly" {
 }
 
 resource "aws_iam_policy" "system_user_s3_writeonly" {
-  name   = "s3_upload_writeonly"
+  name   = "${var.org_name}_${var.system_name}_s3_upload_writeonly"
   path   = "/uploaders/${var.org_name}/${var.system_name}/"
   policy = "${data.aws_iam_policy_document.system_user_s3_upload_writeonly.json}"
 }
