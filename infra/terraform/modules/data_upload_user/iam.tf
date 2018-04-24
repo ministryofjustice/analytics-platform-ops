@@ -27,3 +27,8 @@ resource "aws_iam_policy" "system_user_s3_writeonly" {
   path   = "/uploaders/${var.org_name}/${var.system_name}/"
   policy = "${data.aws_iam_policy_document.system_user_s3_upload_writeonly.json}"
 }
+
+resource "aws_iam_user_policy_attachment" "system_user_s3_upload" {
+    user = "${aws_iam_user.system.name}"
+    policy_arn = "${aws_iam_policy.system_user_s3_writeonly.arn}"
+}
