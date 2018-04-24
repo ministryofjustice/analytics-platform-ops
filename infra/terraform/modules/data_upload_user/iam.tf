@@ -11,6 +11,7 @@ data "aws_iam_policy_document" "system_user_s3_upload_writeonly" {
   statement {
     actions = [
       "s3:PutObject",
+      "s3:ListMultipartUploadParts"
     ]
 
     resources = [
