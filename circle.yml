@@ -1,6 +1,0 @@
-machine:
-  python:
-    version: 3.6.1
-test:
-  override:
-    - infra/terraform/modules/data_access/test.sh
