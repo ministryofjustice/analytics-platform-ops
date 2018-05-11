@@ -86,43 +86,6 @@ module "container_registry" {
     env = "${var.env}"
 }
 
-module "webhooks_api" {
-    source = "../../modules/webhooks_api"
-
-    region = "${var.region}"
-    env = "${var.env}"
-
-    github_webhooks_handler_arn = "${module.notifications.github_webhooks_handler_arn}"
-}
-
-module "notifications" {
-    source = "../../modules/notifications"
-
-    region = "${var.region}"
-    account_id = "${data.aws_caller_identity.current.account_id}"
-    env = "${var.env}"
-
-    gh_hook_secret = "${var.gh_hook_secret}"
-}
-
-module "data_access" {
-    source = "../../modules/data_access"
-
-    region = "${var.region}"
-    env = "${var.env}"
-    account_id = "${data.aws_caller_identity.current.account_id}"
-
-    sentry_dsn = "${var.sentry_dsn}"
-
-    saml_provider_arn = "${module.federated_identity.saml_provider_arn}"
-    k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
-
-    membership_events_topic_arn = "${module.notifications.membership_events_topic_arn}"
-    organization_events_topic_arn = "${module.notifications.organization_events_topic_arn}"
-    team_events_topic_arn = "${module.notifications.team_events_topic_arn}"
-    logs_bucket_name = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
-}
-
 module "federated_identity" {
     source ="../../modules/federated_identity"
     env = "${var.env}"
