@@ -48,3 +48,29 @@ module "log_pruning" {
       days: 30
 EOF
 }
+
+// Backup etcd volumes attached to kubernetes masters -->
+
+# Create Snapshot policy document
+data "template_file" "lambda_create_snapshot_policy" {
+  template = "${file("assets/create_etcd_ebs_snapshot/lambda_create_snapshot_policy.json")}"
+}
+
+# Lambda requires that we zip the distribution in order to deploy it
+data "archive_file" "kubernetes_etcd_ebs_snapshot_code" {
+  source_file = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot"
+  output_path = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
+  type        = "zip"
+}
+
+module "kubernetes_etcd_ebs_snapshot" {
+  source               = "../modules/lambda_ebs_mgmt"
+  lambda_function_name = "create_etcd_ebs_snapshot"
+  zipfile              = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
+  handler              = "create_etcd_ebs_snapshot"
+  source_code_hash     = "${data.archive_file.kubernetes_etcd_ebs_snapshot_code.output_base64sha256}"
+  instance_tag_key     = "k8s.io/role/master"
+  instance_tag_value   = "1"
+  lamda_policy         = "${data.template_file.lambda_create_snapshot_policy.rendered}"
+}
+// -->
