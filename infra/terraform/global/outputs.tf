@@ -41,3 +41,19 @@ output "softnas_iam_role_arn" {
 output "s3_logs_bucket_name" {
     value = "${module.aws_account_logging.s3_logs_bucket_name}"
 }
+
+output "hmpps_nomis_access_key_id" {
+  value = "${module.hmpps_nomis_upload_user.access_key_id}"
+}
+
+output "hmpps_nomis_access_key_secret" {
+  value = "${module.hmpps_nomis_upload_user.access_key_secret}"
+}
+
+output "hmpps_oasys_access_key_id" {
+  value = "${module.hmpps_oasys_upload_user.access_key_id}"
+}
+
+output "hmpps_oasys_access_key_secret" {
+  value = "${module.hmpps_oasys_upload_user.access_key_secret}"
+}
