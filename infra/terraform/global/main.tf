@@ -8,6 +8,7 @@ terraform {
 
 provider "aws" {
   region = "${var.region}"
+  version = "~> 1.15"
 }
 
 data "aws_caller_identity" "current" {}
@@ -47,4 +48,20 @@ module "log_pruning" {
     - prefix: logstash-apps-alpha-
       days: 30
 EOF
+}
+
+module "hmpps_nomis_upload_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name          = "hmpps"
+  system_name       = "nomis"
+}
+
+module "hmpps_oasys_upload_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name          = "hmpps"
+  system_name       = "oasys"
 }
