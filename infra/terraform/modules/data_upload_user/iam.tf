@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "system_user_s3_upload_writeonly" {
   statement {
     actions = [
       "s3:PutObject",
-      "s3:ListMultipartUploadParts"
+      "s3:ListMultipartUploadParts",
     ]
 
     effect = "Allow"
@@ -29,6 +29,6 @@ resource "aws_iam_policy" "system_user_s3_writeonly" {
 }
 
 resource "aws_iam_user_policy_attachment" "system_user_s3_upload" {
-    user = "${aws_iam_user.system.name}"
-    policy_arn = "${aws_iam_policy.system_user_s3_writeonly.arn}"
+  user       = "${aws_iam_user.system.name}"
+  policy_arn = "${aws_iam_policy.system_user_s3_writeonly.arn}"
 }

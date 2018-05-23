@@ -1,7 +1,8 @@
 resource "aws_iam_role" "control_panel_api" {
-    name = "${var.env}_control_panel_api"
-    description = "IAM role assumed by the Control Panel API"
-    assume_role_policy = <<EOF
+  name        = "${var.env}_control_panel_api"
+  description = "IAM role assumed by the Control Panel API"
+
+  assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -26,8 +27,9 @@ EOF
 }
 
 resource "aws_iam_policy" "control_panel_api" {
-    name = "${var.env}_control_panel_api"
-    policy = <<EOF
+  name = "${var.env}_control_panel_api"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -161,6 +163,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "control_panel_api" {
-    role       = "${aws_iam_role.control_panel_api.name}"
-    policy_arn = "${aws_iam_policy.control_panel_api.arn}"
+  role       = "${aws_iam_role.control_panel_api.name}"
+  policy_arn = "${aws_iam_policy.control_panel_api.arn}"
 }

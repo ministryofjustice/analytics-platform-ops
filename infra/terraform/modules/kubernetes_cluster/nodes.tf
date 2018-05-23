@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "node" {
-  depends_on           = [ "null_resource.create_cluster" ]
+  depends_on           = ["null_resource.create_cluster"]
   name                 = "nodes.${var.cluster_fqdn}"
   launch_configuration = "${aws_launch_configuration.node.id}"
   max_size             = "${var.node_asg_max}"
@@ -28,27 +28,28 @@ resource "aws_autoscaling_group" "node" {
 
 data "template_file" "node_user_data" {
   template = "${file("${path.module}/data/nodeup/${var.kubernetes_version}.tpl")}"
-  vars {
-    cluster_fqdn           = "${var.cluster_fqdn}"
-    kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    instance_group_name    = "nodes"
-    kubernetes_master_tag  = ""
 
+  vars {
+    cluster_fqdn          = "${var.cluster_fqdn}"
+    kops_s3_bucket_id     = "${var.kops_s3_bucket_id}"
+    instance_group_name   = "nodes"
+    kubernetes_master_tag = ""
   }
 }
 
 resource "aws_launch_configuration" "node" {
-  name_prefix                 = "nodes.${var.cluster_fqdn}-"
-  image_id                    = "${data.aws_ami.kops_ami.id}"
-  instance_type               = "${var.node_instance_type}"
-  key_name                    = "${var.instance_key_name}"
-  iam_instance_profile        = "${var.node_iam_instance_profile}"
-  security_groups             = [
+  name_prefix          = "nodes.${var.cluster_fqdn}-"
+  image_id             = "${data.aws_ami.kops_ami.id}"
+  instance_type        = "${var.node_instance_type}"
+  key_name             = "${var.instance_key_name}"
+  iam_instance_profile = "${var.node_iam_instance_profile}"
+
+  security_groups = [
     "${aws_security_group.node.id}",
-    "${var.sg_allow_ssh}"
+    "${var.sg_allow_ssh}",
   ]
 
-  user_data                   = "${file("${path.module}/data/user_data.sh")}${data.template_file.node_user_data.rendered}"
+  user_data = "${file("${path.module}/data/user_data.sh")}${data.template_file.node_user_data.rendered}"
 
   root_block_device = {
     volume_type           = "gp2"

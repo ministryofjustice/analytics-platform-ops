@@ -7,25 +7,25 @@ variable "bastion_security_group_id" {}
 variable "ssh_public_key" {}
 
 variable "subnet_ids" {
-    type = "list"
+  type = "list"
 }
 
 variable "num_instances" {
-    default = 2
+  default = 2
 }
 
 variable "instance_type" {
-    default = "m4.large"
+  default = "m4.large"
 }
 
 variable "nfs_mountpoint_ip" {
-    default = "172.16.0.1"
+  default = "172.16.0.1"
 }
 
 variable "softnas_role_name" {
-    default = "SoftNAS_HA_IAM"
+  default = "SoftNAS_HA_IAM"
 }
 
 variable "default_volume_size" {
-    default = 10
+  default = 10
 }

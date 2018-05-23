@@ -1,8 +1,9 @@
 resource "null_resource" "check_supported_k8s_version" {
   triggers {
-    kubernetes_version = "${var.kubernetes_version}"
+    kubernetes_version  = "${var.kubernetes_version}"
     kubernetes_versions = "${join(",", sort(var.supported_k8s_versions))}"
   }
+
   provisioner "local-exec" {
     command = <<EOF
 status=${contains(var.supported_k8s_versions, var.kubernetes_version) ? 0 : 1}
@@ -17,7 +18,7 @@ EOF
 
 resource "null_resource" "check_kops_version" {
   depends_on = [
-    "null_resource.check_supported_k8s_version"
+    "null_resource.check_supported_k8s_version",
   ]
 
   provisioner "local-exec" {
@@ -35,7 +36,7 @@ resource "null_resource" "create_cluster" {
   depends_on = [
     "null_resource.check_supported_k8s_version",
     "null_resource.check_kops_version",
-    "null_resource.wait_for_dns_resolution"
+    "null_resource.wait_for_dns_resolution",
   ]
 
   provisioner "local-exec" {
@@ -77,14 +78,13 @@ kops update cluster ${var.cluster_fqdn} --target terraform \
   --state=s3://${var.kops_s3_bucket_id}
 
 EOF
-
   }
+
   provisioner "local-exec" {
     when    = "destroy"
     command = "kops delete cluster --yes --state=s3://${var.kops_s3_bucket_id} --unregister ${var.cluster_fqdn}"
   }
 }
-
 
 resource "null_resource" "wait_for_cluster_ready" {
   depends_on = ["null_resource.create_cluster"]
@@ -94,29 +94,28 @@ resource "null_resource" "wait_for_cluster_ready" {
   }
 }
 
-
 resource "null_resource" "update_cluster" {
   depends_on = [
     "null_resource.check_supported_k8s_version",
     "null_resource.check_kops_version",
-    "null_resource.wait_for_cluster_ready"
+    "null_resource.wait_for_cluster_ready",
   ]
 
   triggers {
-    kubernetes_version = "${var.kubernetes_version}"
-    node_instance_type = "${var.node_instance_type}"
-    node_count = "${var.node_asg_desired}"
-    node_volume_size = "${var.node_volume_size}"
-    ami_name = "${data.aws_ami.kops_ami.id}"
+    kubernetes_version    = "${var.kubernetes_version}"
+    node_instance_type    = "${var.node_instance_type}"
+    node_count            = "${var.node_asg_desired}"
+    node_volume_size      = "${var.node_volume_size}"
+    ami_name              = "${data.aws_ami.kops_ami.id}"
     bastion_instance_type = "${var.bastion_instance_type}"
-    bastion_count = "${var.bastion_asg_desired}"
-    master_instance_type = "${var.master_instance_type}"
-    master_user_data = "${data.template_file.master_user_data.0.rendered}"
-    node_user_data = "${data.template_file.node_user_data.rendered}"
-    cluster_spec = "${data.template_file.cluster_spec.rendered}"
-    bastions_spec = "${data.template_file.bastions_spec.rendered}"
-    masters_spec = "${data.template_file.masters_spec.rendered}"
-    nodes_spec = "${data.template_file.nodes_spec.rendered}"
+    bastion_count         = "${var.bastion_asg_desired}"
+    master_instance_type  = "${var.master_instance_type}"
+    master_user_data      = "${data.template_file.master_user_data.0.rendered}"
+    node_user_data        = "${data.template_file.node_user_data.rendered}"
+    cluster_spec          = "${data.template_file.cluster_spec.rendered}"
+    bastions_spec         = "${data.template_file.bastions_spec.rendered}"
+    masters_spec          = "${data.template_file.masters_spec.rendered}"
+    nodes_spec            = "${data.template_file.nodes_spec.rendered}"
   }
 
   provisioner "local-exec" {
@@ -154,19 +153,20 @@ kops update cluster ${var.cluster_fqdn} --target terraform \
 
 kops rolling-update cluster ${var.cluster_fqdn} --state=s3://${var.kops_s3_bucket_id} --yes
 EOF
-
   }
 }
 
 resource "null_resource" "delete_tf_files" {
-  depends_on = [ "null_resource.create_cluster" ]
+  depends_on = ["null_resource.create_cluster"]
+
   provisioner "local-exec" {
     command = "rm -rf out"
   }
 }
 
 resource "null_resource" "delete_kops_files" {
-  depends_on = [ "null_resource.create_cluster" ]
+  depends_on = ["null_resource.create_cluster"]
+
   provisioner "local-exec" {
     command = "rm -rf ${path.module}/out"
   }

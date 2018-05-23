@@ -1,22 +1,22 @@
 resource "aws_vpc" "main" {
-    cidr_block = "${var.cidr}"
-    enable_dns_support = "true"
-    enable_dns_hostnames = "true"
+  cidr_block           = "${var.cidr}"
+  enable_dns_support   = "true"
+  enable_dns_hostnames = "true"
 
-    # Terraform does not support variable interpolation in key names,
-    # so map() is used as a workaround.
-    # See: https://github.com/hashicorp/terraform/issues/14516
-    tags = "${map("Name", "${var.name}", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
+  # Terraform does not support variable interpolation in key names,
+  # so map() is used as a workaround.
+  # See: https://github.com/hashicorp/terraform/issues/14516
+  tags = "${map("Name", "${var.name}", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_internet_gateway" "igw" {
-    vpc_id = "${aws_vpc.main.id}"
+  vpc_id = "${aws_vpc.main.id}"
 
-    tags = "${map("Name", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
+  tags = "${map("Name", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_eip" "private_gw" {
-  vpc = true
+  vpc   = true
   count = "${length(var.availability_zones)}"
 }
 
