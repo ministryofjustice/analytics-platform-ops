@@ -10,6 +10,6 @@ variable "inbound_http_cidr_blocks" {
   type = "list"
 
   default = [
-    "0.0.0.0/0"
+    "0.0.0.0/0",
   ]
 }

@@ -1,26 +1,27 @@
 data "aws_iam_policy_document" "lambda_assume_role" {
-    statement {
-        actions = ["sts:AssumeRole"]
-        effect = "Allow"
-        principals = {
-            type = "Service"
-            identifiers = ["lambda.amazonaws.com"]
-        }
-    }
-}
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
 
+    principals = {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
 
 # Role assumed by the 'ship_s3_logs_to_elasticsearch' lambda function
 resource "aws_iam_role" "s3_logs_to_elasticsearch" {
-    name = "s3_logs_to_elasticsearch"
-    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
+  name               = "s3_logs_to_elasticsearch"
+  assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
 }
 
 # Policies for the 'ship_s3_logs_to_elasticsearch' role
 resource "aws_iam_role_policy" "s3_logs_to_elasticsearch" {
-    name = "s3_logs_to_elasticsearch"
-    role = "${aws_iam_role.s3_logs_to_elasticsearch.id}"
-    policy = <<EOF
+  name = "s3_logs_to_elasticsearch"
+  role = "${aws_iam_role.s3_logs_to_elasticsearch.id}"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -60,15 +61,16 @@ EOF
 
 # Role assumed by the 'ship_cloudtrail_to_elasticsearch' lambda function
 resource "aws_iam_role" "cloudtrail_to_elasticsearch" {
-    name = "cloudtrail_to_elasticsearch"
-    assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
+  name               = "cloudtrail_to_elasticsearch"
+  assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
 }
 
 # Policies for the 'ship_cloudtrail_to_elasticsearch' role
 resource "aws_iam_role_policy" "cloudtrail_to_elasticsearch" {
-    name = "cloudtrail_to_elasticsearch"
-    role = "${aws_iam_role.cloudtrail_to_elasticsearch.id}"
-    policy = <<EOF
+  name = "cloudtrail_to_elasticsearch"
+  role = "${aws_iam_role.cloudtrail_to_elasticsearch.id}"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

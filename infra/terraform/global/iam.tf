@@ -1,11 +1,12 @@
 resource "aws_iam_user" "auth0_ses" {
-    name = "auth0_ses_user"
+  name = "auth0_ses_user"
 }
 
 resource "aws_iam_user_policy" "auth0_ses" {
-    name = "auth0_ses_user_policy"
-    user = "${aws_iam_user.auth0_ses.name}"
-    policy = <<EOF
+  name = "auth0_ses_user_policy"
+  user = "${aws_iam_user.auth0_ses.name}"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -23,11 +24,12 @@ EOF
 }
 
 resource "aws_iam_access_key" "auth0_ses" {
-    user = "${aws_iam_user.auth0_ses.name}"
+  user = "${aws_iam_user.auth0_ses.name}"
 }
 
 resource "aws_iam_role" "softnas" {
   name = "SoftNAS_HA_IAM"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
