@@ -18,7 +18,7 @@ data "aws_ami" "ubuntu_xenial" {
 
   filter {
     name   = "owner-id"
-    values = ["099720109477"]  # Canonical
+    values = ["099720109477"] # Canonical
   }
 
   filter {

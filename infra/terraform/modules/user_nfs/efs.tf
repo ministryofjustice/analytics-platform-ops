@@ -1,5 +1,5 @@
 resource "aws_efs_file_system" "users" {
-  creation_token = "${var.env}-users"
+  creation_token   = "${var.env}-users"
   performance_mode = "${var.performance_mode}"
 
   tags {
@@ -8,21 +8,21 @@ resource "aws_efs_file_system" "users" {
 }
 
 resource "aws_security_group" "efs" {
-  name = "efs.${var.cluster_name}"
+  name        = "efs.${var.cluster_name}"
   description = "Allow inbound from k8s nodes"
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
-      from_port = 2049
-      to_port = 2049
-      protocol = "tcp"
-      security_groups = ["${var.node_security_group_id}"]
+    from_port       = 2049
+    to_port         = 2049
+    protocol        = "tcp"
+    security_groups = ["${var.node_security_group_id}"]
   }
 }
 
 resource "aws_efs_mount_target" "storage" {
-  file_system_id = "${aws_efs_file_system.users.id}"
-  subnet_id = "${element(var.subnet_ids, count.index)}"
+  file_system_id  = "${aws_efs_file_system.users.id}"
+  subnet_id       = "${element(var.subnet_ids, count.index)}"
   security_groups = ["${aws_security_group.efs.id}"]
-  count = "${length(var.availability_zones)}"
+  count           = "${length(var.availability_zones)}"
 }

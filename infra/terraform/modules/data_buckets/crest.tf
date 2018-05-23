@@ -4,12 +4,12 @@
 
 # S3 Bucket
 resource "aws_s3_bucket" "crest" {
-    bucket = "${var.env}-moj-analytics-crest"
-    acl = "private"
+  bucket = "${var.env}-moj-analytics-crest"
+  acl    = "private"
 
-    tags {
-        Name = "${var.env}-moj-analytics-crest"
-    }
+  tags {
+    Name = "${var.env}-moj-analytics-crest"
+  }
 }
 
 # IAM Group
@@ -19,9 +19,10 @@ resource "aws_iam_group" "crest_managers" {
 
 # IAM Group Policy
 resource "aws_iam_group_policy" "crest_managers_s3" {
-    name = "${var.env}-crest-managers"
-    group = "${aws_iam_group.crest_managers.id}"
-    policy = <<EOF
+  name  = "${var.env}-crest-managers"
+  group = "${aws_iam_group.crest_managers.id}"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

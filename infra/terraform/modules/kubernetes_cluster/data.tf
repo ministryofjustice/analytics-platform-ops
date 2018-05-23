@@ -27,30 +27,34 @@ data "aws_ami" "kops_ami" {
 
 data "template_file" "az_letters" {
   template = "$${az_letters}"
+
   vars {
     az_letters = "${ replace(join(",", sort(var.availability_zones)), data.aws_region.current.name, "") }"
   }
 }
 
 data "template_file" "master_resource_count" {
-   template = "$${master_resource_count}"
-   vars {
-     master_resource_count = "${var.force_single_master == 1 ? 1 : length(var.availability_zones)}"
-   }
+  template = "$${master_resource_count}"
+
+  vars {
+    master_resource_count = "${var.force_single_master == 1 ? 1 : length(var.availability_zones)}"
+  }
 }
 
 data "template_file" "master_azs" {
-   template = "$${master_azs}"
-   vars {
-     master_azs = "${var.force_single_master == 1 ? element(sort(var.availability_zones), 0) : join(",", var.availability_zones)}"
-   }
+  template = "$${master_azs}"
+
+  vars {
+    master_azs = "${var.force_single_master == 1 ? element(sort(var.availability_zones), 0) : join(",", var.availability_zones)}"
+  }
 }
 
 data "template_file" "etcd_azs" {
-   template = "$${etcd_azs}"
-   vars {
-     etcd_azs = "${var.force_single_master == 1 ? element(split(",", data.template_file.az_letters.rendered), 0) : data.template_file.az_letters.rendered}"
-   }
+  template = "$${etcd_azs}"
+
+  vars {
+    etcd_azs = "${var.force_single_master == 1 ? element(split(",", data.template_file.az_letters.rendered), 0) : data.template_file.az_letters.rendered}"
+  }
 }
 
 data "template_file" "cluster_spec" {

@@ -1,5 +1,6 @@
 resource "aws_kms_key" "cloudtrail" {
   description = "Cloudtrail S3 bucket KMS key"
+
   policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -100,27 +101,27 @@ POLICY
 }
 
 resource "aws_kms_alias" "cloudtrail" {
-  name = "alias/cloudtrail"
+  name          = "alias/cloudtrail"
   target_key_id = "${aws_kms_key.cloudtrail.key_id}"
 }
 
 resource "aws_cloudtrail" "global" {
-  name = "global"
-  s3_bucket_name = "${aws_s3_bucket.global_cloudtrail.id}"
-  is_multi_region_trail = true
+  name                       = "global"
+  s3_bucket_name             = "${aws_s3_bucket.global_cloudtrail.id}"
+  is_multi_region_trail      = true
   enable_log_file_validation = true
-  kms_key_id = "${aws_kms_key.cloudtrail.arn}"
+  kms_key_id                 = "${aws_kms_key.cloudtrail.arn}"
 }
 
 resource "aws_s3_bucket" "global_cloudtrail" {
-  bucket = "moj-analytics-global-cloudtrail"
+  bucket        = "moj-analytics-global-cloudtrail"
   force_destroy = false
 
   lifecycle_rule {
-    id = "logs-transition"
-    prefix = ""
+    id                                     = "logs-transition"
+    prefix                                 = ""
     abort_incomplete_multipart_upload_days = 7
-    enabled = true
+    enabled                                = true
 
     transition {
       days          = 30

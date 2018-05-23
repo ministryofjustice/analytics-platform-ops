@@ -2,6 +2,7 @@ data "aws_iam_policy_document" "kubernetes_assume_role_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
+
     principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
@@ -23,19 +24,22 @@ data "aws_iam_policy_document" "kubernetes_nodes_aws_iam_role_policy" {
   }
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "logs:DescribeLogStreams",
-      "logs:DescribeLogGroups"
+      "logs:DescribeLogGroups",
     ]
+
     resources = ["arn:aws:logs:*:*:*"]
   }
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
@@ -49,30 +53,35 @@ data "aws_iam_policy_document" "kubernetes_nodes_aws_iam_role_policy" {
       "ecr:UploadLayerPart",
       "ecr:CompleteLayerUpload",
       "ecr:PutImage",
-      "ecr:CreateRepository"
+      "ecr:CreateRepository",
     ]
+
     resources = ["*"]
   }
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "autoscaling:DescribeAutoScalingGroups",
       "autoscaling:DescribeAutoScalingInstances",
       "autoscaling:SetDesiredCapacity",
       "autoscaling:DescribeTags",
-      "autoscaling:TerminateInstanceInAutoScalingGroup"
+      "autoscaling:TerminateInstanceInAutoScalingGroup",
     ]
+
     resources = ["*"]
   }
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "route53:ChangeResourceRecordSets",
       "route53:ListResourceRecordSets",
-      "route53:GetHostedZone"
+      "route53:GetHostedZone",
     ]
+
     resources = ["arn:aws:route53:::hostedzone/*"]
   }
 
@@ -89,26 +98,28 @@ data "aws_iam_policy_document" "kubernetes_nodes_aws_iam_role_policy" {
   }
 
   statement {
-    effect    = "Allow"
-    actions   = ["s3:*"]
+    effect  = "Allow"
+    actions = ["s3:*"]
+
     resources = [
       "${var.kops_bucket_arn}",
-      "${var.kops_bucket_arn}/*"
+      "${var.kops_bucket_arn}/*",
     ]
   }
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "autoscaling:DescribeAutoScalingGroups",
       "autoscaling:DescribeAutoScalingInstances",
       "autoscaling:DescribeTags",
       "autoscaling:SetDesiredCapacity",
-      "autoscaling:TerminateInstanceInAutoScalingGroup"
+      "autoscaling:TerminateInstanceInAutoScalingGroup",
     ]
+
     resources = ["*"]
   }
-
 }
 
 data "aws_iam_policy_document" "kubernetes_masters_aws_iam_role_policy" {

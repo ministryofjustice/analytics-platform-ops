@@ -7,31 +7,31 @@ terraform {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region  = "${var.region}"
   version = "~> 1.15"
 }
 
 data "aws_caller_identity" "current" {}
 
 module "aws_account_logging" {
-    source = "../modules/aws_account_logging"
+  source = "../modules/aws_account_logging"
 
-    es_domain = "${var.es_domain}"
-    es_port = "${var.es_port}"
-    es_scheme = "${var.es_scheme}"
-    es_username = "${var.es_username}"
-    es_password = "${var.es_password}"
+  es_domain   = "${var.es_domain}"
+  es_port     = "${var.es_port}"
+  es_scheme   = "${var.es_scheme}"
+  es_username = "${var.es_username}"
+  es_password = "${var.es_password}"
 
-    cloudtrail_s3_bucket_arn = "${aws_s3_bucket.global_cloudtrail.arn}"
-    cloudtrail_s3_bucket_id = "${aws_s3_bucket.global_cloudtrail.id}"
+  cloudtrail_s3_bucket_arn = "${aws_s3_bucket.global_cloudtrail.arn}"
+  cloudtrail_s3_bucket_id  = "${aws_s3_bucket.global_cloudtrail.id}"
 
-    account_id = "${data.aws_caller_identity.current.account_id}"
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "log_pruning" {
-    source = "../modules/log_pruning"
+  source = "../modules/log_pruning"
 
-    curator_conf = <<EOF
+  curator_conf = <<EOF
 - name: main
   endpoint: ${var.es_scheme}://${var.es_username}:${var.es_password}@${var.es_domain}:${var.es_port}
   indices:

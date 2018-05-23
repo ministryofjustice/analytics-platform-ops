@@ -1,25 +1,26 @@
 resource "aws_s3_bucket" "source" {
-    bucket = "${var.env}-moj-analytics-source"
-    acl = "private"
+  bucket = "${var.env}-moj-analytics-source"
+  acl    = "private"
 
-    tags {
-        Name = "${var.env}-moj-analytics-source"
-    }
+  tags {
+    Name = "${var.env}-moj-analytics-source"
+  }
 }
 
 resource "aws_s3_bucket" "scratch" {
-    bucket = "${var.env}-moj-analytics-scratch"
-    acl = "private"
+  bucket = "${var.env}-moj-analytics-scratch"
+  acl    = "private"
 
-    tags {
-        Name = "${var.env}-moj-analytics-scratch"
-    }
+  tags {
+    Name = "${var.env}-moj-analytics-scratch"
+  }
 }
 
 # Data in the 'source' bucket must be encrypted
 resource "aws_s3_bucket_policy" "source" {
-    bucket = "${aws_s3_bucket.source.id}"
-    policy = <<EOF
+  bucket = "${aws_s3_bucket.source.id}"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

@@ -1,6 +1,6 @@
 resource "aws_security_group" "elb" {
-  name        = "elb-${var.name}"
-  vpc_id      = "${var.vpc_id}"
+  name   = "elb-${var.name}"
+  vpc_id = "${var.vpc_id}"
 
   tags {
     Name = "elb-${var.name}"
@@ -12,7 +12,7 @@ resource "aws_security_group" "elb" {
 resource "aws_security_group_rule" "elb_ssh_from_cidr" {
   security_group_id = "${aws_security_group.elb.id}"
 
-  type = "ingress"
+  type        = "ingress"
   from_port   = 22
   to_port     = 22
   protocol    = "tcp"
@@ -23,60 +23,59 @@ resource "aws_security_group_rule" "elb_ssh_from_cidr" {
 
 resource "aws_security_group_rule" "elb_egress" {
   security_group_id = "${aws_security_group.elb.id}"
-  type = "egress"
+  type              = "egress"
 
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
+  from_port        = 0
+  to_port          = 0
+  protocol         = "-1"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
 
   count = "${var.use_elb}"
 }
 
 resource "aws_security_group" "bastion" {
-  name = "hosts-${var.name}"
+  name   = "hosts-${var.name}"
   vpc_id = "${var.vpc_id}"
 
   tags {
     Name = "hosts-${var.name}"
   }
-
 }
 
 resource "aws_security_group_rule" "bastion_ssh_from_elb" {
   security_group_id = "${aws_security_group.bastion.id}"
-  type = "ingress"
+  type              = "ingress"
 
-  from_port                   = 22
-  to_port                     = 22
-  protocol                    = "tcp"
-  source_security_group_id    = "${aws_security_group.elb.id}"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.elb.id}"
 
   count = "${var.use_elb}"
 }
 
 resource "aws_security_group_rule" "bastion_ssh_from_cidr" {
   security_group_id = "${aws_security_group.bastion.id}"
-  type = "ingress"
+  type              = "ingress"
 
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = ["${var.allowed_cidr}"]
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["${var.allowed_cidr}"]
 
   count = "${var.use_elb ? "0" : "1"}"
 }
 
 resource "aws_security_group_rule" "bastion_egress" {
   security_group_id = "${aws_security_group.bastion.id}"
-  type = "egress"
+  type              = "egress"
 
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
+  from_port        = 0
+  to_port          = 0
+  protocol         = "-1"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
 }
 
 resource "aws_launch_configuration" "bastion" {
@@ -85,11 +84,11 @@ resource "aws_launch_configuration" "bastion" {
   instance_type = "${var.instance_type}"
 
   security_groups = [
-    "${aws_security_group.bastion.*.id}"
+    "${aws_security_group.bastion.*.id}",
   ]
 
   associate_public_ip_address = true
-  key_name = "${var.key_name}"
+  key_name                    = "${var.key_name}"
 
   lifecycle {
     create_before_destroy = true
@@ -128,12 +127,13 @@ resource "aws_autoscaling_group" "bastion" {
 resource "aws_autoscaling_attachment" "bastion" {
   autoscaling_group_name = "${aws_autoscaling_group.bastion.id}"
   elb                    = "${aws_elb.bastions.id}"
-  count = "${var.use_elb}"
+  count                  = "${var.use_elb}"
 }
 
 resource "aws_elb" "bastions" {
-  name            = "bastion-${var.env}"
-  subnets         = ["${var.subnet_ids}"]
+  name    = "bastion-${var.env}"
+  subnets = ["${var.subnet_ids}"]
+
   security_groups = [
     "${aws_security_group.elb.id}",
   ]
@@ -144,6 +144,7 @@ resource "aws_elb" "bastions" {
     lb_port           = 22
     lb_protocol       = "tcp"
   }
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -151,11 +152,12 @@ resource "aws_elb" "bastions" {
     target              = "TCP:22"
     interval            = 10
   }
+
   tags {
-    Name              = "${var.name}"
+    Name = "${var.name}"
   }
 
-  idle_timeout = 300
+  idle_timeout              = 300
   cross_zone_load_balancing = false
 
   count = "${var.use_elb}"

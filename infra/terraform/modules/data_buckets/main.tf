@@ -1,24 +1,23 @@
 variable "env" {}
 
-
 output "source_bucket_arn" {
-    value = "${aws_s3_bucket.source.arn}"
+  value = "${aws_s3_bucket.source.arn}"
 }
 
 output "scratch_bucket_arn" {
-    value = "${aws_s3_bucket.scratch.arn}"
+  value = "${aws_s3_bucket.scratch.arn}"
 }
 
 output "iam_managers_arn" {
-    value = "${aws_iam_group.managers.arn}"
+  value = "${aws_iam_group.managers.arn}"
 }
 
 output "iam_analysts_arn" {
-    value = "${aws_iam_group.analysts.arn}"
+  value = "${aws_iam_group.analysts.arn}"
 }
 
 output "scratch_bucket_id" {
-    value = "${aws_s3_bucket.scratch.id}"
+  value = "${aws_s3_bucket.scratch.id}"
 }
 
 output "shared_analyst_access_key_id" {
@@ -32,9 +31,9 @@ output "shared_analyst_access_key_secret" {
 # CREST bucket
 
 output "crest_bucket_arn" {
-    value = "${aws_s3_bucket.crest.arn}"
+  value = "${aws_s3_bucket.crest.arn}"
 }
 
 output "crest_bucket_id" {
-    value = "${aws_s3_bucket.crest.id}"
+  value = "${aws_s3_bucket.crest.id}"
 }

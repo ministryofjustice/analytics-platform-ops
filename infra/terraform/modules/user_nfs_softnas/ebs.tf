@@ -7,15 +7,15 @@
 ##
 
 resource "aws_ebs_volume" "softnas_vol1" {
-    availability_zone = "${element(aws_instance.softnas.*.availability_zone, count.index)}"
-    type = "gp2"
-    size = "${var.default_volume_size}"
+  availability_zone = "${element(aws_instance.softnas.*.availability_zone, count.index)}"
+  type              = "gp2"
+  size              = "${var.default_volume_size}"
 
-    count = "${var.num_instances}"
+  count = "${var.num_instances}"
 
-    tags {
-      Name = "${var.env}-softnas-vol1"
-    }
+  tags {
+    Name = "${var.env}-softnas-vol1"
+  }
 }
 
 resource "aws_volume_attachment" "softnas_vol1" {
