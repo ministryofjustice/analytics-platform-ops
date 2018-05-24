@@ -107,7 +107,9 @@ resource "aws_iam_policy" "control_panel_api" {
       "Action": [
         "iam:DeleteRole",
         "iam:ListAttachedRolePolicies",
-        "iam:DetachRolePolicy"
+        "iam:ListRolePolicies",
+        "iam:DetachRolePolicy",
+        "iam:DeleteRolePolicy"
       ],
       "Resource": [
         "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
