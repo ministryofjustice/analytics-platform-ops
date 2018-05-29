@@ -14,8 +14,7 @@ Module Input Variables
 - `source_code_hash` - The base64 encoded sha256 hash of the archive file - see TF [archive file provider](https://www.terraform.io/docs/providers/archive/d/archive_file.html)
 - `timeout` - (optional) The amount of time your Lambda Function has to run in seconds. Defaults to 3. See [Limits](https://docs.aws.amazon.com/lambda/latest/dg/limits.html)
 - `enabled` - (optional) Boolean expression. If false, the lambda function and the cloudwatch schedule are not set. Defaults to `true`.
-- `env_key_*` - (optional) The key of an environment variable to set for your lambda function
-- `env_value_*` - (optional) The value of an environment variable to set for your lambda function
+- `environment_variables` - (optional) The environment variables to set for your lambda function
 - `lambda_policy` - The IAM policy document.  Usually JSON 
 
 Usage 
@@ -24,6 +23,17 @@ Usage
 The example below provisions a lambda function that manages ebs snapshots
 
 ```
+variable "environment_variables" {
+  type = "map"
+
+  default = {
+    "TAG_KEY"            = "etcd"
+    "TAG_VALUE"          = "1"
+    "INSTANCE_TAG_KEY"   = "k8s.io/role/master"
+    "INSTANCE_TAG_VALUE" = "1"
+  }
+}
+
 data "template_file" "lambda_create_snapshot_policy" {
   template = "${file("assets/create_etcd_ebs_snapshot/lambda_create_snapshot_policy.json")}"
 }
@@ -35,16 +45,13 @@ data "archive_file" "kubernetes_etcd_ebs_snapshot_code" {
 }
 
 module "kubernetes_etcd_ebs_snapshot" {
-  source               = "../modules/lambda_mgmt"
-  lambda_function_name = "create_etcd_ebs_snapshot"
-  zipfile              = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
-  handler              = "create_etcd_ebs_snapshot"
-  source_code_hash     = "${data.archive_file.kubernetes_etcd_ebs_snapshot_code.output_base64sha256}"
-  env_key_1            = "INSTANCE_TAG_KEY"
-  env_value_1          = "k8s.io/role/master"
-  env_key_2            = "INSTANCE_TAG_VALUE"
-  env_value_2          = "1"
-  lamda_policy         = "${data.template_file.lambda_create_snapshot_policy.rendered}"
+  source                = "../modules/lambda_mgmt"
+  lambda_function_name  = "create_etcd_ebs_snapshot"
+  zipfile               = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
+  handler               = "create_etcd_ebs_snapshot"
+  source_code_hash      = "${data.archive_file.kubernetes_etcd_ebs_snapshot_code.output_base64sha256}"
+  lamda_policy          = "${data.template_file.lambda_create_snapshot_policy.rendered}"
+  environment_variables = "${var.environment_variables}"
 }
 ```
 
