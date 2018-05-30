@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["logs:*"],
+      "Resource": "arn:aws:logs:eu-west-1:*:log-group:/aws/lambda/prune_ebs_snapshots:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeTags",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeSnapshotAttribute"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["ec2:DeleteSnapshot"],
+      "Resource": ["*"]
+    }
+  ]
+}

@@ -66,18 +66,14 @@ module "hmpps_oasys_upload_user" {
   system_name       = "oasys"
 }
 
-// Backup etcd volumes attached to kubernetes masters -->
-
+// Empty Placeholder variable to be overrided when using the lambda_mgmt module
 variable "environment_variables" {
   type = "map"
 
-  default = {
-    "TAG_KEY"            = "etcd"
-    "TAG_VALUE"          = "1"
-    "INSTANCE_TAG_KEY"   = "k8s.io/role/master"
-    "INSTANCE_TAG_VALUE" = "1"
-  }
+  default = {}
 }
+
+// Backup etcd volumes attached to kubernetes masters -->
 
 // Create Snapshot policy document
 data "template_file" "lambda_create_snapshot_policy" {
@@ -101,5 +97,25 @@ module "kubernetes_etcd_ebs_snapshot" {
   environment_variables = "${var.environment_variables}"
 }
 
-// -->
+// Prune snapshots -->
 
+data "template_file" "lambda_prune_ebs_snapshots_policy" {
+  template = "${file("assets/prune_ebs_snapshots/prune_ebs_snapshots_policy.json")}"
+}
+
+// Lambda requires that we zip the distribution in order to deploy it
+data "archive_file" "kubernetes_prune_ebs_snapshots_code" {
+  source_file = "assets/prune_ebs_snapshots/prune_ebs_snapshots"
+  output_path = "assets/prune_ebs_snapshots/prune_ebs_snapshots.zip"
+  type        = "zip"
+}
+
+module "kubernetes_prune_ebs_snapshots" {
+  source                = "../modules/lambda_mgmt"
+  lambda_function_name  = "prune_ebs_snapshots"
+  zipfile               = "assets/prune_ebs_snapshots/prune_ebs_snapshots.zip"
+  handler               = "prune_ebs_snapshots"
+  source_code_hash      = "${data.archive_file.kubernetes_prune_ebs_snapshots_code.output_base64sha256}"
+  lamda_policy          = "${data.template_file.lambda_prune_ebs_snapshots_policy.rendered}"
+  environment_variables = "${var.environment_variables}"
+}
