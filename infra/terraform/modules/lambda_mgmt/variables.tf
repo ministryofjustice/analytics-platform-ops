@@ -29,26 +29,12 @@ variable "schedule_expression" {
 
 variable "source_code_hash" {}
 
-variable "env_name_1" {
-  default     = ""
-  description = "The key of an environment variable"
-}
-
-variable "env_value_1" {
-  default     = ""
-  description = "The value of an environment variable"
-}
-
-variable "env_name_2" {
-  default     = ""
-  description = "The key of an environment variable"
-}
-
-variable "env_value_2" {
-  default     = ""
-  description = "The value of an environment variable"
-}
-
 variable "lamda_policy" {
   description = "The IAM policy document.  Usually JSON"
+}
+
+variable "environment_variables" {
+  type        = "map"
+  default     = {}
+  description = "The environment variables for you lambda function"
 }
