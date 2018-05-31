@@ -10,10 +10,7 @@ resource "aws_lambda_function" "lambda_function" {
   timeout          = "${var.timeout}"
 
   environment {
-    variables {
-      "${var.env_name_1}" = "${var.env_value_1}"
-      "${var.env_name_2}" = "${var.env_value_2}"
-    }
+    variables = "${var.environment_variables}"
   }
 }
 
