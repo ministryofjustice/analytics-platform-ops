@@ -28,7 +28,7 @@ kubectl config use-context $DOMAIN_NAME
 
 # Initialise helm (install "tiller", helm server on k8s cluster)
 helm init
-helm repo add mojanalytics https://ministryofjustice.github.io/analytics-platform-helm-charts/charts/
+helm repo add mojanalytics http://moj-analytics-helm-repo.s3-website-eu-west-1.amazonaws.com
 helm repo update
 
 # Create directory for environent helm charts' values
