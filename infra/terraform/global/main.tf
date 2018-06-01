@@ -66,18 +66,14 @@ module "hmpps_oasys_upload_user" {
   system_name       = "oasys"
 }
 
-// Backup etcd volumes attached to kubernetes masters -->
-
+// Empty Placeholder variable to be overrided when using the lambda_mgmt module
 variable "environment_variables" {
   type = "map"
 
-  default = {
-    "TAG_KEY"            = "etcd"
-    "TAG_VALUE"          = "1"
-    "INSTANCE_TAG_KEY"   = "k8s.io/role/master"
-    "INSTANCE_TAG_VALUE" = "1"
-  }
+  default = {}
 }
+
+// Backup etcd volumes attached to kubernetes masters -->
 
 // Create Snapshot policy document
 data "template_file" "lambda_create_snapshot_policy" {

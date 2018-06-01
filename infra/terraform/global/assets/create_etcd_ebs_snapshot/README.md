@@ -17,8 +17,18 @@ GOOS=linux go build main.go
 
 ```
 
-Once you have built a distribution with the command above see [Lambda_EBS_Module](../../../modules/lambda_ebs_mgmt/README.md)
-for an example on how to deploy
+Once you have built a distribution with the command above. Rename the distribution to the same name as `function_name` from your [terraform](https://www.terraform.io/) lambda resource 
+and deploy the lambda function with the [terraform](https://www.terraform.io/) commands below
+
+__Note__ the commands below assume you are at the __root__ of the repository
+
+```
+mv infra/terraform/global/assets/create_etcd_ebs_snapshots/main infra/terraform/global/assets/create_etcd_ebs_snapshots/create_etcd_ebs_snapshots
+
+terraform plan -target=module.kubernetes_create_etcd_ebs_snapshots -var-file=infra/terraform/global/assets/create_etcd_ebs_snapshots/vars_create_etcd_ebs_snapshots.tfvars
+
+terraform apply -target=module.kubernetes_create_etcd_ebs_snapshots -var-file=infra/terraform/global/assets/create_etcd_ebs_snapshots/vars_create_etcd_ebs_snapshots.tfvars
+```
 
 To Test
 -------
