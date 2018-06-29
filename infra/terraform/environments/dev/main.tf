@@ -7,7 +7,8 @@ terraform {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region  = "${var.region}"
+  version = ">= v1.25.0"
 }
 
 data "aws_caller_identity" "current" {}
@@ -104,4 +105,26 @@ module "control_panel_api" {
   vpc_id                     = "${module.aws_vpc.vpc_id}"
   db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
   ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
+}
+
+module "airflow_storage_efs_volume" {
+  source = "../../modules/efs_volume"
+
+  name                   = "${var.env}-airflow-storage"
+  vpc_id                 = "${module.aws_vpc.vpc_id}"
+  node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
+  subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
+}
+
+module "airflow_db" {
+  source = "../../modules/postgres_db"
+
+  instance_name = "${var.env}-airflow"
+  db_name       = "airflow"
+  username      = "${var.airflow_db_username}"
+  password      = "${var.airflow_db_password}"
+
+  vpc_id                 = "${module.aws_vpc.vpc_id}"
+  node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
+  subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
 }
