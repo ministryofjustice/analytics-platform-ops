@@ -7,6 +7,8 @@ variable "subnet_ids" {
   type = "list"
 }
 
+variable "num_subnets" {}
+
 variable "performance_mode" {
   default = "generalPurpose"
 }

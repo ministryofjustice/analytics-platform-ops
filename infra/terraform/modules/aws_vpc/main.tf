@@ -59,6 +59,10 @@ output "storage_subnet_ids" {
   value = ["${aws_subnet.storage.*.id}"]
 }
 
+output "storage_cidr_blocks" {
+  value = "${var.storage_cidr_blocks}"
+}
+
 output "dmz_subnets" {
   value = "${zipmap(aws_subnet.dmz.*.id, aws_subnet.dmz.*.availability_zone)}"
 }
@@ -103,4 +107,3 @@ output "nat_gateway_subnets" {
 # output "sg_inbound_http_id" {
 #   value = "${aws_security_group.inbound_http.id}"
 # }
-

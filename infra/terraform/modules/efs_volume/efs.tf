@@ -24,5 +24,5 @@ resource "aws_efs_mount_target" "mount_target" {
   file_system_id  = "${aws_efs_file_system.fs.id}"
   subnet_id       = "${element(var.subnet_ids, count.index)}"
   security_groups = ["${aws_security_group.sg.id}"]
-  count           = "${length(var.subnet_ids)}"
+  count           = "${var.num_subnets}"
 }
