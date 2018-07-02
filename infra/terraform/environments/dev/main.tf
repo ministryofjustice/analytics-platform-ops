@@ -114,6 +114,7 @@ module "airflow_storage_efs_volume" {
   vpc_id                 = "${module.aws_vpc.vpc_id}"
   node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
   subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
+  num_subnets            = "${length(module.aws_vpc.storage_cidr_blocks)}"
 }
 
 module "airflow_db" {
