@@ -1,12 +1,12 @@
 {
-  "template": "s3logs-*",
+  "index_patterns": ["s3logs-*"],
   "settings": {
     "index.refresh_interval": "5s"
   },
   "mappings": {
     "_default_": {
       "_all": {
-        "enabled": true,
+        "enabled": false,
         "omit_norms": true
       },
       "dynamic_templates": [
