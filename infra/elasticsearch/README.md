@@ -8,6 +8,10 @@ The easiest way to administer elasticsearch itself is via the integrated __kopf_
 
 #### Backups
 
+It is recommended to use the __analytics-logging-backups__ `iam` user when performing backup operations
+
+You'll need the __analytics-logging-backups__ `iam` user's access keys when working with the __s3__ backed repository
+
 ##### Repository
 
 You'll need a repository to store snapshots.  For this we use an s3 backend
