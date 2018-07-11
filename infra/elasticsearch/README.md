@@ -4,7 +4,7 @@ We use a hosted service provided by [elastic](https://www.elastic.co) which can 
 
 #### Administration
 
-The easiest way to administer elasticsearch itself is via the integrated __kopf__ console which can be accessed once logged in to the [console](https://cloud.elastic.co/#/authentication/login/)
+The easiest way to administer elasticsearch itself is via the integrated __API Console__ which can be accessed once logged in to the [console](https://cloud.elastic.co/#/authentication/login/)
 
 #### Backups
 
@@ -16,7 +16,7 @@ You'll need the __analytics-logging-backups__ `iam` user's access keys when work
 
 You'll need a repository to store snapshots.  For this we use an s3 backend
 
-From __kopf__
+From the __API Console__
 
 ```
 PUT /_snapshot/repository 
@@ -36,7 +36,7 @@ PUT /_snapshot/repository
 
 With an existing repository, you can now create snapshots
 
-From __kopf__
+From the __API Console__
 
 ```
 PUT /_snapshot/repository/pre-upgrade-01-01-1970 {
@@ -45,4 +45,16 @@ PUT /_snapshot/repository/pre-upgrade-01-01-1970 {
   "compress": "true",
   "server_side_encryption": "true"
 }
+```
+
+##### List Templates
+
+```
+GET /_cat/templates?v&s=name
+```
+
+##### List Indices
+
+```
+GET /_cat/indices?v
 ```
