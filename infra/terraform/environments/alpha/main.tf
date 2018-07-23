@@ -121,10 +121,11 @@ module "airflow_storage_efs_volume" {
 module "airflow_db" {
   source = "../../modules/postgres_db"
 
-  instance_name = "${var.env}-airflow"
-  db_name       = "airflow"
-  username      = "${var.airflow_db_username}"
-  password      = "${var.airflow_db_password}"
+  instance_name  = "${var.env}-airflow"
+  instance_class = "db.m3.medium"
+  db_name        = "airflow"
+  username       = "${var.airflow_db_username}"
+  password       = "${var.airflow_db_password}"
 
   vpc_id                 = "${module.aws_vpc.vpc_id}"
   node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
