@@ -3,7 +3,7 @@ data "aws_ami" "softnas" {
 
   filter {
     name   = "name"
-    values = ["SoftNAS Cloud Meter*"]
+    values = ["SoftNAS Cloud 4.0*"]
   }
 
   filter {
@@ -115,7 +115,7 @@ resource "aws_network_interface" "softnas_eth1" {
 }
 
 resource "aws_instance" "softnas" {
-  ami                  = "${data.aws_ami.softnas.id}"
+  ami                  = "ami-22cecec8"
   instance_type        = "${var.instance_type}"
   key_name             = "${aws_key_pair.softnas.key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.softnas.name}"

@@ -15,7 +15,7 @@ variable "num_instances" {
 }
 
 variable "instance_type" {
-  default = "m4.large"
+  default = "m4.xlarge"
 }
 
 variable "nfs_mountpoint_ip" {
