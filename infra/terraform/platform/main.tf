@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = "terraform.analytics.justice.gov.uk"
+    bucket               = "terraform.analytics.justice.gov.uk"
     workspace_key_prefix = "platform:"
-    key    = "terraform.tfstate"
-    region = "eu-west-1"
+    key                  = "terraform.tfstate"
+    region               = "eu-west-1"
   }
 }
 
