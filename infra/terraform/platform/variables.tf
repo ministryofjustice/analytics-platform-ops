@@ -4,7 +4,7 @@ variable "region" {
 
 variable "terraform_bucket_name" {}
 variable "terraform_base_state_file" {}
-variable "env" {}
+
 variable "vpc_cidr" {}
 
 variable "availability_zones" {
