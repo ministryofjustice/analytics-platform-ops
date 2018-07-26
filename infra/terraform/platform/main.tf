@@ -11,46 +11,34 @@ provider "aws" {
   version = "~> 1.25"
 }
 
-data "aws_caller_identity" "current" {}
-
-data "terraform_remote_state" "base" {
-  backend = "s3"
-
-  config {
-    bucket = "${var.terraform_bucket_name}"
-    region = "${var.region}"
-    key    = "${var.terraform_base_state_file}"
-  }
-}
-
 module "aws_vpc" {
-  source = "../../modules/aws_vpc"
+  source = "../modules/aws_vpc"
 
-  name               = "${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
+  name               = "${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
   cidr               = "${var.vpc_cidr}"
   availability_zones = "${var.availability_zones}"
 }
 
 module "cluster_dns" {
-  source = "../../modules/cluster_dns"
+  source = "../modules/cluster_dns"
 
-  env              = "${var.env}"
+  env              = "${terraform.workspace}"
   root_zone_name   = "${data.terraform_remote_state.base.xyz_dns_zone_name}"
   root_zone_domain = "${data.terraform_remote_state.base.xyz_root_domain}"
   root_zone_id     = "${data.terraform_remote_state.base.xyz_dns_zone_id}"
 }
 
 module "data_buckets" {
-  source = "../../modules/data_buckets"
+  source = "../modules/data_buckets"
 
-  env = "${var.env}"
+  env = "${terraform.workspace}"
 }
 
 module "user_nfs_softnas" {
-  source = "../../modules/user_nfs_softnas"
+  source = "../modules/user_nfs_softnas"
 
   num_instances             = 1
-  env                       = "${var.env}"
+  env                       = "${terraform.workspace}"
   vpc_id                    = "${module.aws_vpc.vpc_id}"
   node_security_group_id    = "${module.aws_vpc.extra_node_sg_id}"
   bastion_security_group_id = "${module.aws_vpc.extra_bastion_sg_id}"
@@ -61,46 +49,46 @@ module "user_nfs_softnas" {
 }
 
 module "data_backup" {
-  source = "../../modules/data_backup"
+  source = "../modules/data_backup"
 
-  env                 = "${var.env}"
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
+  env                 = "${terraform.workspace}"
+  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
   logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
 }
 
 module "encrypt_scratch_lambda_function" {
-  source     = "../../modules/lambda_functions"
-  env        = "${var.env}"
+  source     = "../modules/lambda_functions"
+  env        = "${terraform.workspace}"
   bucket_id  = "${module.data_buckets.scratch_bucket_id}"
   bucket_arn = "${module.data_buckets.scratch_bucket_arn}"
 }
 
 module "encrypt_crest_lambda_function" {
-  source     = "../../modules/lambda_functions"
-  env        = "${var.env}"
+  source     = "../modules/lambda_functions"
+  env        = "${terraform.workspace}"
   bucket_id  = "${module.data_buckets.crest_bucket_id}"
   bucket_arn = "${module.data_buckets.crest_bucket_arn}"
 }
 
 module "container_registry" {
-  source = "../../modules/container_registry"
-  env    = "${var.env}"
+  source = "../modules/container_registry"
+  env    = "${terraform.workspace}"
 }
 
 module "federated_identity" {
-  source                    = "../../modules/federated_identity"
-  env                       = "${var.env}"
+  source                    = "../modules/federated_identity"
+  env                       = "${terraform.workspace}"
   oidc_provider_url         = "${var.oidc_provider_url}"
   oidc_client_ids           = ["${var.oidc_client_ids}"]
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
 }
 
 module "control_panel_api" {
-  source                     = "../../modules/control_panel_api"
-  env                        = "${var.env}"
+  source                     = "../modules/control_panel_api"
+  env                        = "${terraform.workspace}"
   db_username                = "${var.control_panel_api_db_username}"
   db_password                = "${var.control_panel_api_db_password}"
-  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${var.env}.${data.terraform_remote_state.base.xyz_root_domain}"
+  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
   account_id                 = "${data.aws_caller_identity.current.account_id}"
   vpc_id                     = "${module.aws_vpc.vpc_id}"
   db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
@@ -108,9 +96,9 @@ module "control_panel_api" {
 }
 
 module "airflow_storage_efs_volume" {
-  source = "../../modules/efs_volume"
+  source = "../modules/efs_volume"
 
-  name                   = "${var.env}-airflow-storage"
+  name                   = "${terraform.workspace}-airflow-storage"
   vpc_id                 = "${module.aws_vpc.vpc_id}"
   node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
   subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
@@ -118,9 +106,9 @@ module "airflow_storage_efs_volume" {
 }
 
 module "airflow_db" {
-  source = "../../modules/postgres_db"
+  source = "../modules/postgres_db"
 
-  instance_name  = "${var.env}-airflow"
+  instance_name  = "${terraform.workspace}-airflow"
   instance_class = "db.m3.medium"
   db_name        = "airflow"
   username       = "${var.airflow_db_username}"
