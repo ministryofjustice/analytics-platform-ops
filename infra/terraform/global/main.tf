@@ -66,6 +66,12 @@ module "hmpps_oasys_upload_user" {
   system_name       = "oasys"
 }
 
+module "mojanalytics_concourse_iam_list_roles_user" {
+  source      = "../modules/iam_list_roles"
+  org_name    = "mojanalytics"
+  system_name = "concourse"
+}
+
 // Empty Placeholder variable to be overrided when using the lambda_mgmt module
 variable "environment_variables" {
   type = "map"
