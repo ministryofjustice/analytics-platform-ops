@@ -57,3 +57,11 @@ output "hmpps_oasys_access_key_id" {
 output "hmpps_oasys_access_key_secret" {
   value = "${module.hmpps_oasys_upload_user.access_key_secret}"
 }
+
+output "mojanalytics_concourse_iam_list_roles_access_key_id" {
+  value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_id}"
+}
+
+output "mojanalytics_concourse_iam_list_roles_access_key_secret" {
+  value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_secret}"
+}
