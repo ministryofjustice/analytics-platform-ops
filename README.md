@@ -94,7 +94,7 @@ Once complete your base AWS resources should be in place
 ### Create Kubernetes cluster
 
 1. Install [kubectl](https://kubernetes.io/docs/user-guide/prereqs/) and [Kops][kops] if you haven't already
-2. `$ cp -R infra/kops/example_cluster infra/kops/clusters/YOUR_ENV`
+2. `$ cp -R infra/kops/clusters/alpha infra/kops/clusters/YOUR_ENV`
 3. `$ cd infra/kops/clusters/YOUR_ENV`
 4. Replace placeholders in all YAML files for your cluster with appropriate Terraform output values:
 
@@ -108,6 +108,7 @@ Once complete your base AWS resources should be in place
 | `DMZ_SUBNET_ID`  | Each subnet ID from `$ terraform output -module=aws_vpc dmz_subnets` - zones in `cluster.yml` and terraform output must match |
 | `EXTRA_MASTER_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_master_sg_id` |
 | `EXTRA_NODE_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_node_sg_id` |
+| `EXTRA_BASTION_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_bastion_sg_id` |
 
 4. Set Kops state store environment variable:
   `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET_NAME`
