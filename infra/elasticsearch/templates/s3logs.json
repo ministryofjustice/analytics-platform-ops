@@ -23,7 +23,7 @@
         {
           "geo_point_fields": {
             "match": "*",
-            "match_mapping_type": "geo_point",
+            "match_mapping_type": "object",
             "mapping": {
               "type": "geo_point",
               "doc_values": true
