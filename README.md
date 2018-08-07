@@ -30,8 +30,8 @@ This project and repository is designed to manage multiple environments (staging
 
 Because both Terraform and Kops create AWS resources in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
 
-1. `terraform apply` for 'global' resources shared across all environments. This currently consists of root DNS records, and S3 buckets for Terraform and Kops state storage. These resources only needed to be created once for all environments.
-2. `terraform apply` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and EFS file storage.
+1. `terraform apply` within `infra/terraform/global` for 'global' resources shared across all environments. This currently consists of root DNS records, and S3 buckets for Terraform and Kops state storage. These resources only needed to be created once for all environments.
+2. `terraform workspace [new|select] $envname && terraform apply` within `infra/terraform/platform` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and NFS file storage.
 3. `kops create|update cluster` for the Kubernetes cluster itself. This creates EC2 instances, AutoScaling groups, Security Groups, ELBs, etc. within the Terraform-created VPC.
 
 ## Secrets and git-crypt
@@ -46,12 +46,21 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
-Global AWS resources (DNS and S3 buckets) only need to be created once, and are then used by all environments created subsequently. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
+Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
 
-  1. `$ cd infra/terraform/global`
-  2. `$ terraform init` - set up remote state backend and pull modules
-  3. `$ terraform plan` - check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53.
-  4. `$ terraform apply` to create resources
+```
+# Enter global Terraform resources directory
+cd infra/terraform/global
+
+# set up remote state backend and pull modules
+terraform init
+
+# check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
+terraform plan
+
+# create resources
+terraform apply
+```
 
 ### NFS server licensing
 
@@ -60,12 +69,20 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 **Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
 
 ### Defining new environment
-1. Copy example Terraform resources from `infra/terraform/environments/example` to `infra/terraform/environments/YOUR_ENV`
-2. Edit values in `infra/terraform/environments/YOUR_ENV/terraform.tfvars`:
+
+```
+# Enter platform Terraform resources directory
+cd infra/terraform/platform
+
+# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
+terraform workspace new $envname
+
+# Create vars file with config values for this environment - refer to existing .tfvars files for reference
+vim infra/terraform/platform/vars/$envname.tfvars 
+```
 
 | Variable  | Value |
 | ------------- | ------------- |
-| `env`  | Environment name, e.g. `dev`, `test`  |
 | `domain`  | Base domain name for platform, e.g. `dev.example.com`. This must be a subdomain of a domain already present in Route53 (e.g. `example.com`), and all services will be created under this subdomain (e.g. `grafana.dev.example.com`)  |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
 | `terraform_bucket_name`  | S3 bucket name for Terraform state storage, as created by Terraform `global` resources |
@@ -77,16 +94,34 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 ### Working with an existing environment
 You must initialize your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing.
 
-1. `$ cd infra/terraform/environments/YOUR_ENV`
-2. `$ terraform init` - initialize remote state and pull required modules
+```
+# Enter platform resources directory
+cd infra/terraform/platform
+
+# Select environment
+terraform workspace select $envname
+
+# Initialize remote state and pull required modules
+terraform init
+```
 
 ### Creating AWS resources, or applying changes to existing environment
 
 Once remote Terraform state has been configured you can now apply changes to existing environments, or create a new environment:
 
-1. `$ cd infra/terraform/environments/YOUR_ENV`
-2. `$ terraform plan` - this will preview the changes Terraform plans to make
-3. `$ terraform apply` - applies the above changes
+```
+# Enter platform resources directory
+cd infra/terraform/platform
+
+# Select environment
+terraform workspace select $envname
+
+# Plan and preview changes - you must use the correct .tfvars file for this environment
+terraform plan -var-file=vars/$envname.tfvars
+
+# Apply the above changes
+terraform apply -var-file=vars/$envname.tfvars
+```
 
 Once complete your base AWS resources should be in place
 
