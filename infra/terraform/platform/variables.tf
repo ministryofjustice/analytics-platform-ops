@@ -4,7 +4,7 @@ variable "region" {
 
 variable "terraform_bucket_name" {}
 variable "terraform_base_state_file" {}
-variable "env" {}
+
 variable "vpc_cidr" {}
 
 variable "availability_zones" {
@@ -12,6 +12,14 @@ variable "availability_zones" {
 }
 
 variable "softnas_ssh_public_key" {}
+
+variable "softnas_num_instances" {
+  default = 2
+}
+
+variable "softnas_default_volume_size" {
+  default = 10
+}
 
 variable "control_panel_api_db_username" {}
 variable "control_panel_api_db_password" {}
