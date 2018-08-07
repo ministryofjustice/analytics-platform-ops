@@ -132,3 +132,19 @@ module "airflow_db" {
   node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
   subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
 }
+
+
+# Alternative to using SoftNAS as the NFS
+module "home_efs_volume" {
+  source = "../../modules/efs_volume"
+  # TODO: for better performance, edit the module to switch it to
+  # "new provisioned throughput mode" (and play with the number).
+
+  # once we've done this we need to hook it up in the user-init helm chart.
+
+  name                   = "${var.env}-home-storage"
+  vpc_id                 = "${module.aws_vpc.vpc_id}"
+  node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
+  subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
+  num_subnets            = "${length(module.aws_vpc.storage_cidr_blocks)}"
+}
