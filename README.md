@@ -48,10 +48,19 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
 
-  1. `$ cd infra/terraform/global`
-  2. `$ terraform init` - set up remote state backend and pull modules
-  3. `$ terraform plan` - check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53.
-  4. `$ terraform apply` to create resources
+```
+# Enter global Terraform resources directory
+cd infra/terraform/global
+
+# set up remote state backend and pull modules
+terraform init
+
+# check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
+terraform plan
+
+# create resources
+terraform apply
+```
 
 ### NFS server licensing
 
@@ -60,9 +69,17 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 **Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
 
 ### Defining new environment
-1. Enter platform Terraform resources directory: `$ cd infra/terraform/platform`
-2. Create a new workspace: `$ terraform workspace new $envname` - 'workspace' and 'environment' are interchangeable concepts here
-3. Create a `infra/terraform/platform/vars/$envar.tfvars` file with config values for this environment - refer to existing `.tfvars` files for reference
+
+```
+# Enter platform Terraform resources directory
+cd infra/terraform/platform
+
+# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
+terraform workspace new $envname
+
+# Create vars file with config values for this environment - refer to existing .tfvars files for reference
+vim infra/terraform/platform/vars/$envname.tfvars 
+```
 
 | Variable  | Value |
 | ------------- | ------------- |
@@ -77,18 +94,34 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 ### Working with an existing environment
 You must initialize your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing.
 
-1. `$ cd infra/terraform/platform`
-2. `$ terraform workspace select $envname`
-3. `$ terraform init` - initialize remote state and pull required modules
+```
+# Enter platform resources directory
+cd infra/terraform/platform
+
+# Select environment
+terraform workspace select $envname
+
+# Initialize remote state and pull required modules
+terraform init
+```
 
 ### Creating AWS resources, or applying changes to existing environment
 
 Once remote Terraform state has been configured you can now apply changes to existing environments, or create a new environment:
 
-1. `$ cd infra/terraform/platform`
-2. `$ terraform workspace select $envname`
-3. `$ terraform plan -var-file=vars/$envname.tfvars` - this will preview the changes Terraform plans to make
-4. `$ terraform apply -var-file=vars/$envname.tfvars` - applies the above changes
+```
+# Enter platform resources directory
+cd infra/terraform/platform
+
+# Select environment
+terraform workspace select $envname
+
+# Plan and preview changes - you must use the correct .tfvars file for this environment
+terraform plan -var-file=vars/$envname.tfvars
+
+# Apply the above changes
+terraform apply -var-file=vars/$envname.tfvars
+```
 
 Once complete your base AWS resources should be in place
 
