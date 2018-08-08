@@ -1,8 +1,5 @@
 terraform {
   backend "s3" {
-    bucket = "terraform.analytics.justice.gov.uk"
-    key    = "base/terraform.tfstate"
-    region = "eu-west-1"
   }
 }
 
@@ -26,6 +23,8 @@ module "aws_account_logging" {
   cloudtrail_s3_bucket_id  = "${aws_s3_bucket.global_cloudtrail.id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
+
+  s3_logs_bucket_name = "${var.s3_logs_bucket_name}"
 }
 
 module "log_pruning" {
