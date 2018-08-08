@@ -42,18 +42,67 @@ Terraform `terraform.tfvars` files contain sensitive information, so are encrypt
 
 All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are served via our [Helm repository](http://moj-analytics-helm-repo.s3-website-eu-west-1.amazonaws.com) - source code is in the [ministryofjustice/analytics-platform-helm-charts](https://github.com/ministryofjustice/analytics-platform-helm-charts) repository, and chart values for each environment are stored in the [ministryofjustice/analytics-platform-config](https://github.com/ministryofjustice/analytics-platform-config) repository.
 
-## Creating global AWS resources, and preparing Terraform remote state
-
-**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+## Global setup
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
 
+### Compiling Go functions
+
+You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
+
+* [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
+* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshot/README.md)
+
+If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
+
+### Elastic Search
+
+Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
+
+'Create deployment' with settings:
+
+    * Provider: AWS
+    * Region: EU (Ireland)
+
+On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+### Global terraform.tfvars
+
+You need to set the values in `infra/terraform/global/terraform.tfvars`:
+
+| Variable  | Value |
+| ------------- | ------------- |
+| `region` | `eu-west-1` |
+| `terraform_bucket_name` | Choose an S3 bucket name that will be created by global terraform, which will store the environments' terraform state. |
+| `terraform_base_state_file`| "base/terraform.tfstate" |
+| `kops_bucket_name` | The name of an S3 bucket to store the kops state |
+| `xyz_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
+| `es_domain` | In the elastic.co sidebar click "ElasticSearch" and from "API Endpoint" use the domain e.g. `abc123.eu-west-1.aws.found.io` |
+| `es_port` | `9243` |
+| `es_username` | `elastic` |
+| `es_password` | This is displayed once only, at the point of completing the Elastic Search deployment |
+| `global_cloudtrail_bucket_name` | Choose an S3 bucket name for cloudtrail |
+| `uploads_bucket_name` | Choose an S3 bucket name for uploads |
+| `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs|
+
+### Creating global AWS resources, and preparing Terraform remote state
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+
 ```
+# Create an S3 bucket for the global terraform state
+# (replace GLOBAL_STATE_BUCKET_NAME)
+aws s3api create-bucket --bucket GLOBAL_STATE_BUCKET_NAME --region=eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
+aws s3api put-bucket-versioning
+  --bucket myapp-status-reports
+  --versioning-configuration Status=Enabled
+
 # Enter global Terraform resources directory
 cd infra/terraform/global
 
 # set up remote state backend and pull modules
-terraform init
+# (replace GLOBAL_STATE_BUCKET_NAME, as before)
+terraform init -backend-config "bucket=GLOBAL_STATE_BUCKET_NAME" -backend-config "region=eu-west-1" -backend-config "key=base/terraform.tfstate"
 
 # check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
 terraform plan
@@ -62,6 +111,10 @@ terraform plan
 terraform apply
 ```
 
+NB If you have macOS and used Homebrew to install python, you'll see this pip install error: `must supply either home or prefix/exec-prefix -- not both` during the terraform planning. In this case, follow this solution: https://stackoverflow.com/a/24357384/1512326
+
+## Environment setup
+
 ### NFS server licensing
 
 User network home directories are provided by [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title). The default image defined in Terraform uses a per-terabyte consumption billing model; if required storage exceeds 1TB the [per server version](https://aws.amazon.com/marketplace/pp/B00PJ9FGVU?qid=1495795249740&sr=0-2&ref_=srh_res_product_title) will be more cost effective.
@@ -69,6 +122,8 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 **Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
 
 ### Defining new environment
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ```
 # Enter platform Terraform resources directory
