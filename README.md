@@ -85,6 +85,8 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 | `uploads_bucket_name` | Choose an S3 bucket name for uploads |
 | `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs|
 
+The checked-in `terraform.tfvars` is for MoJ, so your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
+
 ### Creating global AWS resources, and preparing Terraform remote state
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
@@ -102,26 +104,57 @@ cd infra/terraform/global
 
 # set up remote state backend and pull modules
 # (replace GLOBAL_STATE_BUCKET_NAME, as before)
-terraform init -backend-config "bucket=GLOBAL_STATE_BUCKET_NAME" -backend-config "region=eu-west-1" -backend-config "key=base/terraform.tfstate"
+terraform init -backend-config "bucket=GLOBAL_STATE_BUCKET_NAME"
 
 # check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
-terraform plan
+terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources
-terraform apply
+terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
 NB If you have macOS and used Homebrew to install python, you'll see this pip install error: `must supply either home or prefix/exec-prefix -- not both` during the terraform planning. In this case, follow this solution: https://stackoverflow.com/a/24357384/1512326
 
 ## Environment setup
 
-### NFS server licensing
-
-User network home directories are provided by [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title). The default image defined in Terraform uses a per-terabyte consumption billing model; if required storage exceeds 1TB the [per server version](https://aws.amazon.com/marketplace/pp/B00PJ9FGVU?qid=1495795249740&sr=0-2&ref_=srh_res_product_title) will be more cost effective.
-
-**Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
-
 ### Defining new environment
+
+#### NFS server licensing
+
+User network home directories are provided by SoftNAS from AWS Marketplace. There are a few different versions e.g.:
+
+* [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title) is "For Lower Compute Requirements".
+* [SoftNAS Cloud Developer Edition 4.0.x](https://aws.amazon.com/marketplace/pp/B06Y5W7TKY?qid=1533814033150&sr=0-4&ref_=srh_res_product_title) is limited to 250GB but the software is **free** - you just pay $0.085/hr for c5.large EC2 machine.
+
+There are about 20 SoftNAS options on AWS Marketplace, with varying cost models etc, so it's worth evaluating which ones suit your purpose.
+
+Once selected, on the SoftNAS product web page you need to:
+
+1. Click "Continue to Subscribe"
+2. Ensure you select the same region ('eu-west-1')
+3. Agree and deploy, wait 30 seconds.
+4. At the end it will give you the AMI id (e.g. `ami-22cecec8`) and other SoftNAS details which you put in the `infra/terraform/platform/vars/$envname.tfvars` - see below.
+
+#### Auth0
+
+1. Create a new tenant.
+
+2. Create an application:
+
+    Name: AWS Console
+    Application Type: Regular Web Application
+    Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
+    Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
+
+    Record the Client ID for the tfvar
+
+3. Download SAML2 metadata:
+
+    In Auth0: Applicaions | Addons | SAML2 |Identity Provider Metadata 'download'
+
+    save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
+
+#### Terraform
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
@@ -138,12 +171,21 @@ vim infra/terraform/platform/vars/$envname.tfvars
 
 | Variable  | Value |
 | ------------- | ------------- |
-| `domain`  | Base domain name for platform, e.g. `dev.example.com`. This must be a subdomain of a domain already present in Route53 (e.g. `example.com`), and all services will be created under this subdomain (e.g. `grafana.dev.example.com`)  |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
 | `terraform_bucket_name`  | S3 bucket name for Terraform state storage, as created by Terraform `global` resources |
 | `terraform_base_state_file`  | Path for Terraform state file for global/base resources created in `infra/terraform/global`, (e.g. `base/terraform.tfstate`)  |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
+| `control_panel_api_db_username` | |
+| `control_panel_api_db_password` | |
+| `airflow_db_username` | |
+| `airflow_db_password` | |
+| `softnas_ssh_public_key` | |
+| `softnas_ami_id` | e.g. `ami-22cecec8` |
+| `softnas_instance_type` | e.g. `m4.large` |
+| `oidc_provider_url` | e.g. `https://dev-analytics-moj.eu.auth0.com/` |
+| `oidc_client_ids` | In Auth0 look in the Application called 'AWS Console' for its Client ID. e.g. `[ "Npai3Y", ]` |
+| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6EF423E5272B2347200970D1CD9D1A72BEABC592", "9E99A48A9960B14926BB7F3B02E22DA2B0AB7280",]`|
 
 
 ### Working with an existing environment
@@ -157,7 +199,7 @@ cd infra/terraform/platform
 terraform workspace select $envname
 
 # Initialize remote state and pull required modules
-terraform init
+terraform init -backend-config "bucket=GLOBAL_STATE_BUCKET_NAME"
 ```
 
 ### Creating AWS resources, or applying changes to existing environment
@@ -178,15 +220,34 @@ terraform plan -var-file=vars/$envname.tfvars
 terraform apply -var-file=vars/$envname.tfvars
 ```
 
+Note:
+
 Once complete your base AWS resources should be in place
 
 
 ### Create Kubernetes cluster
 
-1. Install [kubectl](https://kubernetes.io/docs/user-guide/prereqs/) and [Kops][kops] if you haven't already
-2. `$ cp -R infra/kops/example_cluster infra/kops/clusters/YOUR_ENV`
-3. `$ cd infra/kops/clusters/YOUR_ENV`
-4. Replace placeholders in all YAML files for your cluster with appropriate Terraform output values:
+1. Install tools (if you've not already):
+
+* [kubectl](https://kubernetes.io/docs/user-guide/prereqs/)
+* [Kops][kops]
+* jq
+* yq
+
+(On macOS you can: `brew install kubectl kops jq yq`)
+
+2. Copy an existing cluster config:
+```
+cp -R infra/kops/clusters/alpha infra/kops/clusters/YOUR_ENV`
+```
+
+3. Set the correct values for your new cluster config:
+```
+cd infra/kops/clusters/YOUR_ENV`
+```
+** TODO instructions for inserting values using jq, instead of the next bit **
+
+Replace placeholders in all YAML files for your cluster with appropriate Terraform output values:
 
 | Placeholder  | Terraform output value |
 | ------------- | ------------- |
