@@ -12,9 +12,21 @@ To Build and Deploy
 ---------
 
 The Lambda execution environment uses a Linux kernel, so you'll need to build the binary for linux
-```
-GOOS=linux go build main.go 
 
+A good way to do this if you don't have Go installed is to use Docker:
+```
+docker run -it -v $(pwd):/src golang:alpine sh
+```
+This will start a Docker container with Go installed and launch a shell. From
+there you need to install git and the aws client library:
+```
+cd /src
+apk add git
+go get github.com/aws/aws-sdk-go
+```
+Then you can compile the binary using the following command:
+```
+GOOS=linux go build main.go
 ```
 
 Once you have built a distribution with the command above. Rename the distribution to the same name as `function_name` from your [terraform](https://www.terraform.io/) lambda resource 
