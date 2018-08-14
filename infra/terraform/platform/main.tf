@@ -119,3 +119,10 @@ module "airflow_db" {
   node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
   subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
 }
+
+module "cert_manager" {
+  source           = "../modules/ec2_cert_manager_role"
+  role_name        = "${terraform.workspace}-cert-manager"
+  trusted_entity   = ["${var.trusted_entity}"]
+  hostedzoneid_arn = ["${var.hostedzoneid_arn}"]
+}
