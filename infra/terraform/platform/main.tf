@@ -39,6 +39,8 @@ module "user_nfs_softnas" {
   source = "../modules/user_nfs_softnas"
 
   num_instances             = 1
+  softnas_ami_id            = "${var.softnas_ami_id}"
+  instance_type             = "${var.softnas_instance_type}"
   env                       = "${terraform.workspace}"
   vpc_id                    = "${module.aws_vpc.vpc_id}"
   node_security_group_id    = "${module.aws_vpc.extra_node_sg_id}"
@@ -49,13 +51,13 @@ module "user_nfs_softnas" {
   dns_zone_domain           = "${module.cluster_dns.dns_zone_domain}"
 }
 
-module "data_backup" {
-  source = "../modules/data_backup"
-
-  env                 = "${terraform.workspace}"
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
-  logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
-}
+# module "data_backup" {
+#   source = "../modules/data_backup"
+# 
+#   env                 = "${terraform.workspace}"
+#   k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
+#   logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
+# }
 
 module "encrypt_scratch_lambda_function" {
   source     = "../modules/lambda_functions"
@@ -84,17 +86,17 @@ module "federated_identity" {
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
 }
 
-module "control_panel_api" {
-  source                     = "../modules/control_panel_api"
-  env                        = "${terraform.workspace}"
-  db_username                = "${var.control_panel_api_db_username}"
-  db_password                = "${var.control_panel_api_db_password}"
-  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
-  account_id                 = "${data.aws_caller_identity.current.account_id}"
-  vpc_id                     = "${module.aws_vpc.vpc_id}"
-  db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
-  ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
-}
+# module "control_panel_api" {
+#   source                     = "../modules/control_panel_api"
+#   env                        = "${terraform.workspace}"
+#   db_username                = "${var.control_panel_api_db_username}"
+#   db_password                = "${var.control_panel_api_db_password}"
+#   k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
+#   account_id                 = "${data.aws_caller_identity.current.account_id}"
+#   vpc_id                     = "${module.aws_vpc.vpc_id}"
+#   db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
+#   ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
+# }
 
 module "airflow_storage_efs_volume" {
   source = "../modules/efs_volume"
