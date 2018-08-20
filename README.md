@@ -26,7 +26,7 @@ A combination of [Terraform](https://www.terraform.io) and [Kops](https://github
 
 **[Helm][helm]** is used to manage installation and updates of all Kubernetes resources, including end-user software.
 
-This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely S3 buckets for Terraform and Kops, and a Route53 DNS zone.
+This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely an S3 bucket for Kops and a Route53 DNS zone.
 
 Because both Terraform and Kops create AWS resources in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
 
@@ -73,7 +73,7 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 | Variable  | Value |
 | ------------- | ------------- |
 | `region` | `eu-west-1` |
-| `terraform_bucket_name` | Choose an S3 bucket name that will be created by global terraform, which will store the environments' terraform state. |
+| `terraform_bucket_name` | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
 | `terraform_base_state_file`| "base/terraform.tfstate" |
 | `kops_bucket_name` | The name of an S3 bucket to store the kops state |
 | `xyz_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
@@ -92,19 +92,23 @@ The checked-in `terraform.tfvars` is for MoJ, so your platform is for another pu
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ```
-# Create an S3 bucket for the global terraform state
-# (replace GLOBAL_STATE_BUCKET_NAME)
-aws s3api create-bucket --bucket GLOBAL_STATE_BUCKET_NAME --region=eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
-aws s3api put-bucket-versioning
-  --bucket myapp-status-reports
-  --versioning-configuration Status=Enabled
+# Create an S3 bucket for the platform's terraform state
+# Choose a unique name for this platform and save it in an env var:
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
+# Now create the bucket and set options:
+aws s3api create-bucket --bucket $TERRAFORM_STATE_BUCKET_NAME --region=eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
+aws s3api put-bucket-versioning --bucket $TERRAFORM_STATE_BUCKET_NAME --versioning-configuration Status=Enabled
+aws s3api put-bucket-encryption --bucket $TERRAFORM_STATE_BUCKET_NAME --server-side-encryption-configuration 'rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm: "AES256"
+      }
+    }'
 
 # Enter global Terraform resources directory
 cd infra/terraform/global
 
 # set up remote state backend and pull modules
-# (replace GLOBAL_STATE_BUCKET_NAME, as before)
-terraform init -backend-config "bucket=GLOBAL_STATE_BUCKET_NAME"
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
 # check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
@@ -172,7 +176,7 @@ vim infra/terraform/platform/vars/$envname.tfvars
 | Variable  | Value |
 | ------------- | ------------- |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
-| `terraform_bucket_name`  | S3 bucket name for Terraform state storage, as created by Terraform `global` resources |
+| `terraform_bucket_name`  | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
 | `terraform_base_state_file`  | Path for Terraform state file for global/base resources created in `infra/terraform/global`, (e.g. `base/terraform.tfstate`)  |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
@@ -198,8 +202,8 @@ cd infra/terraform/platform
 # Select environment
 terraform workspace select $envname
 
-# Initialize remote state and pull required modules
-terraform init -backend-config "bucket=GLOBAL_STATE_BUCKET_NAME"
+# Initialize remote state and pull required modules (check the env variable is still set from earlier on)
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 ```
 
 ### Creating AWS resources, or applying changes to existing environment
