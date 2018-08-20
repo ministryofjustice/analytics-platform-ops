@@ -51,7 +51,7 @@ Global AWS resources (DNS and S3 buckets) are resources which are shared or refe
 You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
 
 * [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
-* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshot/README.md)
+* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshots/README.md)
 
 If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
 
