@@ -76,7 +76,7 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 | `terraform_bucket_name` | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
 | `terraform_base_state_file`| "base/terraform.tfstate" |
 | `kops_bucket_name` | The name of an S3 bucket to store the kops state |
-| `xyz_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
+| `platform_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
 | `es_domain` | In the elastic.co sidebar click "ElasticSearch" and from "API Endpoint" use the domain e.g. `abc123.eu-west-1.aws.found.io` |
 | `es_port` | `9243` |
 | `es_username` | `elastic` |
@@ -110,7 +110,7 @@ cd infra/terraform/global
 # set up remote state backend and pull modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
-# check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
+# check that Terraform plans to create global infra (e..g the Kops S3 bucket and a root DNS zone in Route53)
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources
