@@ -244,21 +244,25 @@ cp -R infra/kops/clusters/alpha infra/kops/clusters/YOUR_ENV`
 3. Set the correct values for your new cluster config:
 ```
 cd infra/kops/clusters/YOUR_ENV`
-```
-** TODO instructions for inserting values using jq, instead of the next bit **
 
-Replace placeholders in all YAML files for your cluster with appropriate Terraform output values:
-
-| Placeholder  | Terraform output value |
-| ------------- | ------------- |
+# TODO: CLUSTER_NAME and STATE_BUCKET
 | `CLUSTER_NAME`  | (Not from Terraform) - base domain name - must match value in `terraform.tfvars`, e.g. `dev.example.com` |
 | `STATE_BUCKET`  | (Not from Terraform) - Terraform state bucket - must match value in `terraform.tfvars`, e.g. `terraform.bucket.name` |
-| `DNS_ZONE_ID`  | `$ terraform output -module=cluster_dns dns_zone_id` |
-| `VPC_ID`  | `$ terraform output -module=aws_vpc vpc_id` |
-| `PRIVATE_SUBNET_ID`  | Each subnet ID from `$ terraform output -module=aws_vpc private_subnets` - zones in `cluster.yml` and terraform output must match |
-| `DMZ_SUBNET_ID`  | Each subnet ID from `$ terraform output -module=aws_vpc dmz_subnets` - zones in `cluster.yml` and terraform output must match |
-| `EXTRA_MASTER_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_master_sg_id` |
-| `EXTRA_NODE_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_node_sg_id` |
+
+yq w cluster.yml spec.dnsZone `terraform output -module=cluster_dns dns_zone_id` (edited)
+yq w cluster.yml spec.networkID `terraform output -module=aws_vpc vpc_id`
+terraform output -module=aws_vpc private_subnets > /tmp/private_subnets
+yq w cluster.yml spec.subnets[0].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/private_subnets`
+yq w cluster.yml spec.subnets[1].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/private_subnets`
+yq w cluster.yml spec.subnets[2].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/private_subnets`
+terraform output -module=aws_vpc dmz_subnets > /tmp/dmz_subnets
+yq w cluster.yml spec.subnets[3].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/dmz_subnets`
+yq w cluster.yml spec.subnets[4].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/dmz_subnets`
+yq w cluster.yml spec.subnets[5].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/dmz_subnets`
+yq w masters.yml -d'*' spec.additionalSecurityGroups `terraform output -module=aws_vpc extra_master_sg_id`
+yq w nodes.yml -d'*' spec.additionalSecurityGroups `terraform output -module=aws_vpc extra_nod_sg_id`
+yq w bastions.yml -d'*' spec.additionalSecurityGroups `terraform output -module=aws_vpc extra_bastion_sg_id`
+```
 
 4. Set Kops state store environment variable:
   `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET_NAME`
