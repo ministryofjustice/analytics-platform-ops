@@ -191,7 +191,7 @@ Once selected, on the SoftNAS product web page you need to:
     4. Click "SAML2 Web App"
     5. Click "Save"
     6. Click tab "Usage"
-    7. Under "Identity Provider Certificate" click "download Auth0 certificate"
+    7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
 
           Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
 
@@ -212,7 +212,7 @@ export ENVNAME=giraffe
 # Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
 terraform workspace new $ENVNAME
 
-# Create vars file with config values for this environment - refer to existing .tfvars files for reference
+# Create vars file with config values for this environment - refer to existing .tfvars files for reference (or create one using the variable names listed in platform/variables.tf)
 cp vars/alpha.tfvars vars/$ENVNAME.tfvars
 vim vars/$ENVNAME.tfvars
 ```
