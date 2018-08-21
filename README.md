@@ -283,51 +283,69 @@ Once complete your base AWS resources should be in place
 
 2. Copy an existing cluster config:
 ```
-cp -R infra/kops/clusters/alpha infra/kops/clusters/YOUR_ENV`
+cp -R infra/kops/clusters/alpha infra/kops/clusters/$ENVNAME
 ```
 
 3. Set the correct values for your new cluster config:
 ```
-cd infra/kops/clusters/YOUR_ENV`
+cd infra/terraform/global
+export KOPS_STATE_STORE=s3://`terraform output kops_bucket_name` >/tmp/kops_bucket_name
 
-# TODO: CLUSTER_NAME and STATE_BUCKET
-| `CLUSTER_NAME`  | (Not from Terraform) - base domain name - must match value in `terraform.tfvars`, e.g. `dev.example.com` |
-| `STATE_BUCKET`  | (Not from Terraform) - Terraform state bucket - must match value in `terraform.tfvars`, e.g. `terraform.bucket.name` |
-
-yq w cluster.yml spec.dnsZone `terraform output -module=cluster_dns dns_zone_id` (edited)
-yq w cluster.yml spec.networkID `terraform output -module=aws_vpc vpc_id`
-terraform output -module=aws_vpc private_subnets > /tmp/private_subnets
-yq w cluster.yml spec.subnets[0].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/private_subnets`
-yq w cluster.yml spec.subnets[1].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/private_subnets`
-yq w cluster.yml spec.subnets[2].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/private_subnets`
-terraform output -module=aws_vpc dmz_subnets > /tmp/dmz_subnets
-yq w cluster.yml spec.subnets[3].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/dmz_subnets`
-yq w cluster.yml spec.subnets[4].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/dmz_subnets`
-yq w cluster.yml spec.subnets[5].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/dmz_subnets`
-yq w masters.yml -d'*' spec.additionalSecurityGroups `terraform output -module=aws_vpc extra_master_sg_id`
-yq w nodes.yml -d'*' spec.additionalSecurityGroups `terraform output -module=aws_vpc extra_nod_sg_id`
-yq w bastions.yml -d'*' spec.additionalSecurityGroups `terraform output -module=aws_vpc extra_bastion_sg_id`
+cd ../../../infra/terraform/platform
+export ENV_DOMAIN=`terraform output -module=cluster_dns dns_zone_domain`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.configBase $KOPS_STATE_STORE/$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.kubeAPIServer.oidcClientID `terraform output oidc_client_ids`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.kubeAPIServer.oidcGroupsClaim https://api.$ENV_DOMAIN/claims/groups
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.kubeAPIServer.oidcIssuerURL `terraform output oidc_provider_url`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml metadata.name $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.masterInternalName api.internal.$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.masterPublicName api.$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.topology.bastion.bastionPublicName bastion.$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.dnsZone `terraform output -module=cluster_dns dns_zone_id`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.networkID `terraform output -module=aws_vpc vpc_id`
+terraform output -module=aws_vpc -json private_subnets > /tmp/private_subnets
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[0].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/private_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[1].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/private_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[2].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/private_subnets`
+terraform output -module=aws_vpc -json dmz_subnets > /tmp/dmz_subnets
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[3].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/dmz_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[4].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/dmz_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[5].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/dmz_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/masters.yml -d'*' 'metadata.labels[kops.k8s.io/cluster]' $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/masters.yml -d'*' spec.additionalSecurityGroups[0] `terraform output -module=aws_vpc extra_master_sg_id`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/nodes.yml 'metadata.labels[kops.k8s.io/cluster]' $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/nodes.yml -d'*' spec.additionalSecurityGroups[0] `terraform output -module=aws_vpc extra_node_sg_id`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/bastions.yml 'metadata.labels[kops.k8s.io/cluster]' $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/bastions.yml -d'*' spec.additionalSecurityGroups[0] `terraform output -module=aws_vpc extra_bastion_sg_id`
 ```
 
-4. Set Kops state store environment variable:
-  `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET_NAME`
+4. Ensure you've set the Kops state store environment variable (see previous step):
+  ```
+  $ echo $KOPS_STATE_STORE
+  s3://kops.analytics.justice.gov.uk
+  ```
+
 4. Plan Kops cluster resource creation:
 
 	```
-	$ kops create -f cluster.yml
-	$ kops create -f bastions.yml
-	$ kops create -f masters.yml
-	$ kops create -f nodes.yml
-	```
+  cd ../../../infra/kops/clusters/$ENVNAME
+  kops create -f cluster.yml
+  kops create -f bastions.yml
+  kops create -f masters.yml
+  kops create -f nodes.yml
+  ```
+
 5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
-6. Add key to Kops cluster:
-  `$ kops create secret --name CLUSTER_NAME sshpublickey admin -i PATH_TO_PUBLIC_KEY`
-  Where `$CLUSTER_NAME` matches the name provided in YAML files
+6. Add the .pub key to Kops cluster:
+  ```
+  kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
+  ```
+  ($ENV_DOMAIN was set recently, and matches the cluster name in cluster.yml)
 7. Plan and create cluster:
 
   ```
-  $ kops update cluster $CLUSTER_NAME
-  $ kops update cluster $CLUSTER_NAME --yes
+  kops update cluster $ENV_DOMAIN
+  kops update cluster $ENV_DOMAIN --yes
   ```
 
 
