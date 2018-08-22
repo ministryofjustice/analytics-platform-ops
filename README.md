@@ -87,6 +87,12 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 
 The checked-in `terraform.tfvars` is for MoJ, so your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
 
+### Domain name
+
+The platform runs on lots of subdomains stemming off a domain name or subdomain.
+
+It's easiest if you use a domain name that has been purchased using the same AWS account as the platform runs in, but other configurations are possible. See: https://github.com/kubernetes/kops/blob/master/docs/aws.md#configure-dns
+
 ### Creating global AWS resources, and preparing Terraform remote state
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
@@ -353,6 +359,24 @@ yq w -i ../../../infra/kops/clusters/$ENVNAME/bastions.yml -d'*' spec.additional
 1. `$ kubectl cluster-info`
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
+
+### Helm RBAC setup
+
+Helm/Tiller should use its own service account. Create it like this:
+```
+kubectl create -f config/helm/helm.yml
+# Tell helm to use it
+helm init --service-account helm
+# Check it creates
+kubectl describe deployment tiller-deploy -n kube-system -f
+```
+
+### Ingress DNS setup
+
+Some extra DNS entries need creating for ingress:
+```
+./ingress_elb_create_dns.sh $CLUSTER_NAME
+```
 
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
