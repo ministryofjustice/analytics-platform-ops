@@ -86,17 +86,17 @@ module "federated_identity" {
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
 }
 
-# module "control_panel_api" {
-#   source                     = "../modules/control_panel_api"
-#   env                        = "${terraform.workspace}"
-#   db_username                = "${var.control_panel_api_db_username}"
-#   db_password                = "${var.control_panel_api_db_password}"
-#   k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
-#   account_id                 = "${data.aws_caller_identity.current.account_id}"
-#   vpc_id                     = "${module.aws_vpc.vpc_id}"
-#   db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
-#   ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
-# }
+module "control_panel_api" {
+  source                     = "../modules/control_panel_api"
+  env                        = "${terraform.workspace}"
+  db_username                = "${var.control_panel_api_db_username}"
+  db_password                = "${var.control_panel_api_db_password}"
+  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
+  account_id                 = "${data.aws_caller_identity.current.account_id}"
+  vpc_id                     = "${module.aws_vpc.vpc_id}"
+  db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
+  ingress_security_group_ids = ["${module.aws_vpc.extra_node_sg_id}"]
+}
 
 module "airflow_storage_efs_volume" {
   source = "../modules/efs_volume"
