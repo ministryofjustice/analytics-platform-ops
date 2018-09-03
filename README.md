@@ -180,12 +180,13 @@ Once selected, on the SoftNAS product web page you need to:
 
     1. In the side-bar click "Applications"
     2. Click "Create Application"
-         * Name: AWS Console
+         * Name: AWS
          * Application Type: Regular Web Applications
-    3. Click "Settings"
+    3. Click "Save"
+    4. Click "Settings"
          * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
          * Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
-    4. Click "Save changes"
+    5. Click "Save changes"
 
     Record the Domain and Client ID values - you'll use them in your .tfvars file in a moment.
 
@@ -237,8 +238,8 @@ vim vars/$ENVNAME.tfvars
 | `softnas_ssh_public_key` | |
 | `softnas_ami_id` | e.g. `ami-22cecec8` |
 | `softnas_instance_type` | e.g. `m4.large` |
-| `oidc_provider_url` | In Auth0 look in the Application called 'AWS Console' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
-| `oidc_client_ids` | In Auth0 look in the Application called 'AWS Console' for its Client ID. e.g. `[ "Npai3Y", ]` |
+| `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
+| `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
 | `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6EF423E5272B2347200970D1CD9D1A72BEABC592", "9E99A48A9960B14926BB7F3B02E22DA2B0AB7280",]`|
 
 
