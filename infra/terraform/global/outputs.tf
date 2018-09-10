@@ -14,6 +14,10 @@ output "xyz_root_domain" {
   value = "${var.xyz_root_domain}"
 }
 
+output "xyz_root_domain_ses_identity_arn" {
+  value = "${module.ses_domain.identity_arn}"
+}
+
 output "kops_bucket_name" {
   value = "${var.kops_bucket_name}"
 }
