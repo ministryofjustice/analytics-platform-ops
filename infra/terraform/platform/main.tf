@@ -120,6 +120,14 @@ module "airflow_db" {
   subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
 }
 
+module "airflow_smtp_user" {
+  source = "../modules/ses_smtp_user"
+
+  ses_domain_identity_arn = "${data.terraform_remote_state.base.xyz_root_domain_ses_identity_arn}"
+
+  username = "${terraform.workspace}_airflow_smtp_user"
+}
+
 module "cert_manager" {
   source           = "../modules/ec2_cert_manager_role"
   role_name        = "${terraform.workspace}-cert-manager"
