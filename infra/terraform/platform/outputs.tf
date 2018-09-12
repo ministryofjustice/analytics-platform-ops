@@ -6,8 +6,12 @@ output "airflow_efs_host" {
   value = "${module.airflow_storage_efs_volume.dns_name}"
 }
 
+output "airflow_smtp_username" {
+  value = "${module.airflow_smtp_user.smtp_username}"
+}
+
 output "airflow_smtp_password" {
-  value = "${module.airflow_smtp_user.password}"
+  value = "${module.airflow_smtp_user.smtp_password}"
 }
 
 output "control_panel_api_db_host" {
