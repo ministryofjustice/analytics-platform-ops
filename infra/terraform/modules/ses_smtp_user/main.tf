@@ -1,5 +1,5 @@
 resource "aws_iam_user" "smtp_user" {
-  name = "${var.username}"
+  name = "${var.iam_user_name}"
 }
 
 resource "aws_iam_access_key" "access_key" {
@@ -20,7 +20,7 @@ resource "aws_iam_user_policy" "smtp_user_policy" {
             "ses:SendEmail"
         ],
         "Effect": "Allow",
-        "Resource": "${var.ses_domain_identity_arn}"
+        "Resource": "${var.ses_address_identity_arn}"
     }
   ]
 }
