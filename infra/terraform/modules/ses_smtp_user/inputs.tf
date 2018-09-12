@@ -1,3 +1,3 @@
-variable "ses_domain_identity_arn" {}
+variable "ses_address_identity_arn" {}
 
-variable "username" {}
+variable "iam_user_name" {}
