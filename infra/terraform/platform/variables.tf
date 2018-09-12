@@ -27,6 +27,8 @@ variable "control_panel_api_db_password" {}
 variable "airflow_db_username" {}
 variable "airflow_db_password" {}
 
+variable "ses_ap_email_identity_arn" {}
+
 # Auth0 tenant URLs MUST end with a trailing slash
 variable "oidc_provider_url" {}
 
