@@ -37,6 +37,8 @@ variable "control_panel_api_db_password" {}
 variable "airflow_db_username" {}
 variable "airflow_db_password" {}
 
+variable "ses_ap_email_identity_arn" {}
+
 # Auth0 tenant URLs MUST end with a trailing slash
 variable "oidc_provider_url" {}
 
@@ -46,4 +48,14 @@ variable "oidc_client_ids" {
 
 variable "oidc_provider_thumbprints" {
   type = "list"
+}
+
+variable "trusted_entity" {
+  type        = "list"
+  description = "Cert-Manager: Trusted entity ARN to assume the instance role"
+}
+
+variable "hostedzoneid_arn" {
+  type        = "list"
+  description = "Cert-Manager: ARN of the hosted zone to perform the DNS01 challenge"
 }
