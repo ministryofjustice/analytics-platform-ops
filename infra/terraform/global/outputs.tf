@@ -69,3 +69,11 @@ output "mojanalytics_concourse_iam_list_roles_access_key_id" {
 output "mojanalytics_concourse_iam_list_roles_access_key_secret" {
   value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_secret}"
 }
+
+output "hmpps_prisonss_access_key_id" {
+  value = "${module.hmpps_prisonss_upload_user.access_key_id}"
+}
+
+output "hmpps_nomis_access_key_secret" {
+  value = "${module.hmpps_prisonss_upload_user.access_key_secret}"
+}
