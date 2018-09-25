@@ -38,6 +38,15 @@ Because both Terraform and Kops create AWS resources in two different phases, th
 
 Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
 
+If you get merge conflicts on gitcrypted files then by default it will not put the <<< ---- >>> sections to show you the different versions. You can fix this behaviour by specifying this custom merge driver in your .git/config:
+```
+[merge "git-crypt"]
+       name = A custom merge driver used to merge git-crypted files.
+       driver = ./gitcrypt-merge-tool.sh %O %A %B
+       recursive = binary
+```
+See: https://github.com/AGWA/git-crypt/issues/140#issuecomment-361031719
+
 ## Kubernetes resource management
 
 All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are served via our [Helm repository](http://moj-analytics-helm-repo.s3-website-eu-west-1.amazonaws.com) - source code is in the [ministryofjustice/analytics-platform-helm-charts](https://github.com/ministryofjustice/analytics-platform-helm-charts) repository, and chart values for each environment are stored in the [ministryofjustice/analytics-platform-config](https://github.com/ministryofjustice/analytics-platform-config) repository.
