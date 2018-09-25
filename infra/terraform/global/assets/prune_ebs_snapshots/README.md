@@ -15,7 +15,7 @@ The Lambda execution environment uses a Linux kernel, so you'll need to build th
 A good way to do this if you don't have Go installed is to use Docker:
 ```
 cd infra/terraform/global/assets/prune_ebs_snapshots
-docker run -it -v $(pwd):/src golang:alpine sh
+docker run -it -v "$(pwd)":/src golang:alpine sh
 ```
 This will start a Docker container with Go installed and launch a shell. From
 there you need to install git and the aws client library:

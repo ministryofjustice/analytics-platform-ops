@@ -36,7 +36,7 @@ Because both Terraform and Kops create AWS resources in two different phases, th
 
 ## Secrets and git-crypt
 
-Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
+Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key. You can use the instructions here, but change the repo name: https://github.com/ministryofjustice/analytics-platform-config/blob/master/README.md#git-crypt
 
 ## Kubernetes resource management
 
