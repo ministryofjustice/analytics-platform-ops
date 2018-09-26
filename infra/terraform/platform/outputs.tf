@@ -72,6 +72,8 @@ output "oidc_provider_url" {
 
 output "oidc_client_ids" {
   value = "${var.oidc_client_ids}"
+}
+
 output "airflow_smtp_username" {
   value = "${module.airflow_smtp_user.smtp_username}"
 }
