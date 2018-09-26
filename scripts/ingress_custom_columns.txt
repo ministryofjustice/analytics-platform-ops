@@ -1,0 +1,5 @@
+ING_CLASS NAMESPACE HOST
+metadata.annotations.kubernetes\.io\/ingress\.class metadata.namespace spec.rules[0].host
+
+# USAGE
+# kubectl get ingress --all-namespaces -o=custom-columns-file=scripts/ingress_custom_columns.txt
