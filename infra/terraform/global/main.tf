@@ -130,7 +130,7 @@ module "kubernetes_prune_ebs_snapshots" {
 
 module "ses_domain" {
   source = "../modules/ses_domain"
-  domain = "${var.xyz_root_domain}"
+  domain = "${var.platform_root_domain}"
 
-  aws_route53_zone_id = "${aws_route53_zone.xyz_zone.zone_id}"
+  aws_route53_zone_id = "${aws_route53_zone.platform_zone.zone_id}"
 }
