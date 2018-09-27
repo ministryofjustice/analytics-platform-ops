@@ -57,6 +57,15 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
 
+### Compiling Go functions
+
+You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
+
+* [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
+* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshots/README.md)
+
+If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
+
 ```
 # Enter global Terraform resources directory
 cd infra/terraform/global
@@ -64,11 +73,11 @@ cd infra/terraform/global
 # set up remote state backend and pull modules
 terraform init
 
-# check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
-terraform plan
+# check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
+terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources
-terraform apply
+terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
 ### NFS server licensing
