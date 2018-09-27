@@ -138,8 +138,9 @@ module "cert_manager" {
 }
 
 resource "aws_iam_policy" "read-user-roles-inline-policies" {
-  name   = "${terraform.workspace}-read-user-roles-inline-policies"
-  path  = "/"
+  name = "${terraform.workspace}-read-user-roles-inline-policies"
+  path = "/"
+
   policy = <<EOF
 {
     "Version": "2012-10-17",
