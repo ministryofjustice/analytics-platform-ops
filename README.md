@@ -79,6 +79,41 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 
 ### Defining new environment
 
+#### Auth0
+
+1. Create a new tenant:
+
+    1. Log-in to Auth0
+    2. Click on your user
+    3. In the drop-down menu click "Create tenant"
+         * Tenant domain: include the environment name, if not the platform
+
+2. Create an application:
+
+    1. In the side-bar click "Applications"
+    2. Click "Create Application"
+         * Name: AWS
+         * Application Type: Regular Web Applications
+    3. Click "Save"
+    4. Click "Settings"
+         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
+         * Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
+    5. Click "Save changes"
+
+    Record the Domain and Client ID values - you'll use them in your .tfvars file in a moment.
+
+3. Download SAML2 metadata:
+
+    1. In the side-bar click "Applications"
+    2. Click "AWS Console" (created in previous step)
+    3. Click the tab "Addons"
+    4. Click "SAML2 Web App"
+    5. Click "Save"
+    6. Click tab "Usage"
+    7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
+
+          Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
+
 ```
 # Enter platform Terraform resources directory
 cd infra/terraform/platform
