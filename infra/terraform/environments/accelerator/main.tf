@@ -148,3 +148,25 @@ module "home_efs_volume" {
   subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
   num_subnets            = "${length(module.aws_vpc.storage_cidr_blocks)}"
 }
+
+resource "aws_iam_policy" "read-user-roles-inline-policies" {
+  name   = "${var.env}-read-user-roles-inline-policies"
+  path   = "/"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CanReadUserRolesInlinePolicies",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.env}_user_*"
+            ]
+        }
+    ]
+}
+EOF
+}
