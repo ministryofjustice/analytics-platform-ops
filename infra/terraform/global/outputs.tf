@@ -14,7 +14,7 @@ output "platform_root_domain" {
   value = "${var.platform_root_domain}"
 }
 
-output "xyz_root_domain_ses_identity_arn" {
+output "platform_root_domain_ses_identity_arn" {
   value = "${module.ses_domain.identity_arn}"
 }
 
