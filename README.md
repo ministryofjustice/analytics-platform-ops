@@ -38,6 +38,15 @@ Because both Terraform and Kops create AWS resources in two different phases, th
 
 Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key. You can use the instructions here, but change the repo name: https://github.com/ministryofjustice/analytics-platform-config/blob/master/README.md#git-crypt
 
+If you get merge conflicts on gitcrypted files then by default it will not put the <<< ---- >>> sections to show you the different versions. You can fix this behaviour by specifying this custom merge driver in your .git/config:
+```
+[merge "git-crypt"]
+       name = A custom merge driver used to merge git-crypted files.
+       driver = ./gitcrypt-merge-tool.sh %O %A %B
+       recursive = binary
+```
+See: https://github.com/AGWA/git-crypt/issues/140#issuecomment-361031719
+
 ## Kubernetes resource management
 
 All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are served via our [Helm repository](http://moj-analytics-helm-repo.s3-website-eu-west-1.amazonaws.com) - source code is in the [ministryofjustice/analytics-platform-helm-charts](https://github.com/ministryofjustice/analytics-platform-helm-charts) repository, and chart values for each environment are stored in the [ministryofjustice/analytics-platform-config](https://github.com/ministryofjustice/analytics-platform-config) repository.
@@ -55,6 +64,7 @@ You need to compile some Go scripts (because AWS Lambda requires binaries). Foll
 
 If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
 
+<<<<<<< HEAD
 ### Elastic Search
 
 Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
@@ -97,6 +107,8 @@ It's easiest if you use a domain name that has been purchased using the same AWS
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
+=======
+>>>>>>> master
 ```
 # Create an S3 bucket for the platform's terraform state
 # Choose a unique name for this platform and save it in an env var:
@@ -116,7 +128,11 @@ cd infra/terraform/global
 # set up remote state backend and pull modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
+<<<<<<< HEAD
 # check that Terraform plans to create global infra (e..g the Kops S3 bucket and a root DNS zone in Route53)
+=======
+# check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
+>>>>>>> master
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources

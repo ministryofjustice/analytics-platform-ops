@@ -11,9 +11,8 @@
 __pycache__
 .cache
 venv
-/infra/terraform/modules/kubernetes_cluster/out
 
-infra/terraform/global/assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot
-infra/terraform/global/assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip
-infra/terraform/global/assets/prune_ebs_snapshots/prune_ebs_snapshots
-infra/terraform/global/assets/prune_ebs_snapshots/prune_ebs_snapshots.zip
+/infra/terraform/global/assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot
+/infra/terraform/global/assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip
+/infra/terraform/global/assets/prune_ebs_snapshots/prune_ebs_snapshots
+/infra/terraform/global/assets/prune_ebs_snapshots/prune_ebs_snapshots.zip
