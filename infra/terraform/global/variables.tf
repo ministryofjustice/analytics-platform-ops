@@ -3,7 +3,6 @@ variable "region" {
 }
 
 variable "kops_bucket_name" {}
-variable "terraform_bucket_name" {}
 variable "xyz_root_domain" {}
 variable "es_domain" {}
 variable "es_port" {}
