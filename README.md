@@ -189,6 +189,28 @@ Once complete your base AWS resources should be in place
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
 
+
+### kube2iam setup
+
+An annotation needs adding to allow roles to be assumed:
+
+```
+kubectl edit namespace default
+```
+and under metadata add 'annotations':
+```
+metadata:
+  annotations:
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha|accelerator)_.*"]'
+```
+
+### Ingress DNS setup
+
+Some extra DNS entries need creating for ingress:
+```
+./ingress_elb_create_dns.sh $CLUSTER_NAME
+```
+
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
 
