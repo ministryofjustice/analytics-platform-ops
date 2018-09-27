@@ -39,6 +39,8 @@ module "user_nfs_softnas" {
   source = "../modules/user_nfs_softnas"
 
   num_instances             = 1
+  softnas_ami_id            = "${var.softnas_ami_id}"
+  instance_type             = "${var.softnas_instance_type}"
   env                       = "${terraform.workspace}"
   vpc_id                    = "${module.aws_vpc.vpc_id}"
   node_security_group_id    = "${module.aws_vpc.extra_node_sg_id}"
