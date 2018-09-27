@@ -51,18 +51,32 @@ See: https://github.com/AGWA/git-crypt/issues/140#issuecomment-361031719
 
 All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are served via our [Helm repository](http://moj-analytics-helm-repo.s3-website-eu-west-1.amazonaws.com) - source code is in the [ministryofjustice/analytics-platform-helm-charts](https://github.com/ministryofjustice/analytics-platform-helm-charts) repository, and chart values for each environment are stored in the [ministryofjustice/analytics-platform-config](https://github.com/ministryofjustice/analytics-platform-config) repository.
 
-## Creating global AWS resources, and preparing Terraform remote state
-
-**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+## Global setup
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
 
+### Creating global AWS resources, and preparing Terraform remote state
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+
 ```
+# Create an S3 bucket for the platform's terraform state
+# Choose a unique name for this platform and save it in an env var:
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
+# Now create the bucket and set options:
+aws s3api create-bucket --bucket $TERRAFORM_STATE_BUCKET_NAME --region=eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
+aws s3api put-bucket-versioning --bucket $TERRAFORM_STATE_BUCKET_NAME --versioning-configuration Status=Enabled
+aws s3api put-bucket-encryption --bucket $TERRAFORM_STATE_BUCKET_NAME --server-side-encryption-configuration 'rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm: "AES256"
+      }
+    }'
+
 # Enter global Terraform resources directory
 cd infra/terraform/global
 
 # set up remote state backend and pull modules
-terraform init
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
 # check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
 terraform plan
@@ -79,9 +93,17 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 
 ### Defining new environment
 
+
+#### Terraform
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+
 ```
 # Enter platform Terraform resources directory
 cd infra/terraform/platform
+
+# Initialize remote state and pull required modules (check the env variable is still set from earlier on)
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
 # Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
 terraform workspace new $envname
@@ -94,8 +116,8 @@ vim infra/terraform/platform/vars/$envname.tfvars
 | ------------- | ------------- |
 | `domain`  | Base domain name for platform, e.g. `dev.example.com`. This must be a subdomain of a domain already present in Route53 (e.g. `example.com`), and all services will be created under this subdomain (e.g. `grafana.dev.example.com`)  |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
-| `terraform_bucket_name`  | S3 bucket name for Terraform state storage, as created by Terraform `global` resources |
-| `terraform_base_state_file`  | Path for Terraform state file for global/base resources created in `infra/terraform/global`, (e.g. `base/terraform.tfstate`)  |
+| `terraform_bucket_name`  | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
+| `terraform_base_state_file`  | Path for global Terraform state (as specified in global/main.tf `backend.s3.key`, e.g. `base/terraform.tfstate`) |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
 
