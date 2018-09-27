@@ -180,6 +180,17 @@ Once complete your base AWS resources should be in place
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
 
+### Helm RBAC setup
+
+Helm/Tiller should use its own service account. Create it like this:
+```
+kubectl create -f config/helm/helm.yml
+# Tell helm to use it
+helm init --service-account helm
+# Check it creates
+kubectl describe deployment tiller-deploy -n kube-system -f
+```
+
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
 
