@@ -53,7 +53,7 @@ module "data_backup" {
   source = "../modules/data_backup"
 
   env                 = "${terraform.workspace}"
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
+  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
   logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
 }
 
