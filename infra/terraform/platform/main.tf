@@ -134,3 +134,26 @@ module "cert_manager" {
   trusted_entity   = ["${var.trusted_entity}"]
   hostedzoneid_arn = ["${var.hostedzoneid_arn}"]
 }
+
+resource "aws_iam_policy" "read-user-roles-inline-policies" {
+  name = "${terraform.workspace}-read-user-roles-inline-policies"
+  path = "/"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CanReadUserRolesInlinePolicies",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${terraform.workspace}_user_*"
+            ]
+        }
+    ]
+}
+EOF
+}
