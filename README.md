@@ -372,6 +372,20 @@ helm init --service-account helm
 kubectl describe deployment tiller-deploy -n kube-system -f
 ```
 
+### kube2iam setup
+
+An annotation needs adding to allow roles to be assumed:
+
+```
+kubectl edit namespace default
+```
+and under metadata add 'annotations':
+```
+metadata:
+  annotations:
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha|accelerator)_.*"]'
+```
+
 ### Ingress DNS setup
 
 Some extra DNS entries need creating for ingress:
