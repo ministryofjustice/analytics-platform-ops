@@ -53,6 +53,18 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 ## Creating global AWS resources, and preparing Terraform remote state
 
+### Elastic Search
+
+Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
+
+'Create deployment' with settings:
+
+    * Provider: AWS
+    * Region: EU (Ireland)
+
+On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
