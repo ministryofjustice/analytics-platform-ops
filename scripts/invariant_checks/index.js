@@ -14,15 +14,20 @@ const checks = require('./checks')
 program
   .version(package.version)
   .option('--all', 'Run all checks [default]')
+  .option('-f, --fix', 'autofix any failed checks')
   .parse(process.argv);
 
 async function main() {
   try {
     await client.loadSpec();
     Object.entries(checks).forEach(async ([key, val]) => {
-      process.stdout.write(`starting check: ${key}`);
+      console.log(`🔎 starting check: ${key}`);
       let passed = await val.check(client);
-      console.log(`${key}: ${passed ? chalk.green('PASS') : chalk.red('FAIL')}`)
+      console.log(`▶ ${key}: \t${passed ? chalk.green('✅ PASS') : chalk.red('❎ FAIL')}`)
+      if (program.fix && !passed && val.fix) {
+        console.log(`🛠 FIXING: ${key}`)
+        val.fix(client);
+      }
     });
 
 

@@ -7,7 +7,7 @@ function hasReplicas(deployment) {
 }
 
 function formatInfo(deployment) {
-  return `${deployment.metadata.namespace}/${deployment.metadata.name} - Replicas: ${deployment.spec.replicas}`
+  return `${deployment.metadata.namespace} / ${deployment.metadata.name} - Replicas: ${deployment.spec.replicas}`
 
 }
 
