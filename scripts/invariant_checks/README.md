@@ -7,10 +7,10 @@ Initially there is only one check. If there are any deployments marked as
 
 Examples of things we can add in future:
 
-* user's url is in unidler but not in the tls block
-* user is running old version of rstudio / jupyter
-* resources left in cluster for users that have left
-* pod iam annotations match iam ns annotations
+* [x] user's url is in unidler but not in the tls block
+* [ ] user is running old version of rstudio / jupyter
+* [ ] resources left in cluster for users that have left
+* [ ] pod iam annotations match iam ns annotations
 
 ## Usage
 
@@ -30,8 +30,8 @@ $ node ./index.js
 
 
 ## TODOS
-* Make it possible to run a single check
-* Allow checks to expose a `fix` function that is called automatically if the
+* [ ] Make it possible to run a single check
+* [x] Allow checks to expose a `fix` function that is called automatically if the
   check fails. (if `--fix` paramater is pased to the runner)
-* Make it possible to run in the cluster (currently the client expects a
+* [ ] Make it possible to run in the cluster (currently the client expects a
   `.kubeconfig` file)
