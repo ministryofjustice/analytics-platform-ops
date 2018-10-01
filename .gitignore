@@ -6,6 +6,7 @@
 /infra/terraform/modules/lambda_functions/*.zip
 *.sublime-project
 *.sublime-workspace
+/*.iml
 
 # Python caches and virtual env
 __pycache__
