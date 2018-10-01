@@ -197,18 +197,18 @@ An annotation needs adding to allow roles to be assumed:
 ```
 kubectl edit namespace default
 ```
-and under metadata add 'annotations':
+and under metadata add 'annotations', ensuring you substitute your environment name for `(dev|alpha)`:
 ```
 metadata:
   annotations:
-    iam.amazonaws.com/allowed-roles: '["(dev|alpha|accelerator)_.*"]'
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
 ```
 
 ### Ingress DNS setup
 
 Some extra DNS entries need creating for ingress:
 ```
-./ingress_elb_create_dns.sh $CLUSTER_NAME
+./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
 ```
 
 ### Modifying AWS and cluster post-creation
