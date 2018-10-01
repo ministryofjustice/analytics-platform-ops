@@ -15,7 +15,7 @@ provider "aws" {
 module "aws_vpc" {
   source = "../modules/aws_vpc"
 
-  name               = "${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
+  name               = "${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
   cidr               = "${var.vpc_cidr}"
   availability_zones = "${var.availability_zones}"
 }
@@ -24,9 +24,9 @@ module "cluster_dns" {
   source = "../modules/cluster_dns"
 
   env              = "${terraform.workspace}"
-  root_zone_name   = "${data.terraform_remote_state.base.xyz_dns_zone_name}"
-  root_zone_domain = "${data.terraform_remote_state.base.xyz_root_domain}"
-  root_zone_id     = "${data.terraform_remote_state.base.xyz_dns_zone_id}"
+  root_zone_name   = "${data.terraform_remote_state.base.platform_dns_zone_name}"
+  root_zone_domain = "${data.terraform_remote_state.base.platform_root_domain}"
+  root_zone_id     = "${data.terraform_remote_state.base.platform_dns_zone_id}"
 }
 
 module "data_buckets" {
@@ -53,7 +53,7 @@ module "data_backup" {
   source = "../modules/data_backup"
 
   env                 = "${terraform.workspace}"
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
+  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
   logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
 }
 
@@ -89,7 +89,7 @@ module "control_panel_api" {
   env                        = "${terraform.workspace}"
   db_username                = "${var.control_panel_api_db_username}"
   db_password                = "${var.control_panel_api_db_password}"
-  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.xyz_root_domain}"
+  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
   account_id                 = "${data.aws_caller_identity.current.account_id}"
   vpc_id                     = "${module.aws_vpc.vpc_id}"
   db_subnet_ids              = ["${module.aws_vpc.storage_subnet_ids}"]
