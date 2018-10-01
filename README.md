@@ -53,9 +53,30 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 ## Creating global AWS resources, and preparing Terraform remote state
 
+### Elastic Search
+
+Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
+
+'Create deployment' with settings:
+
+    * Provider: AWS
+    * Region: EU (Ireland)
+
+On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
+
+### Compiling Go functions
+
+You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
+
+* [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
+* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshots/README.md)
+
+If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
 
 ```
 # Enter global Terraform resources directory
@@ -64,11 +85,11 @@ cd infra/terraform/global
 # set up remote state backend and pull modules
 terraform init
 
-# check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
-terraform plan
+# check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
+terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources
-terraform apply
+terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
 
@@ -212,6 +233,38 @@ Once complete your base AWS resources should be in place
 1. `$ kubectl cluster-info`
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
+
+### Helm RBAC setup
+
+Helm's Tiller should use its own service account. Create it like this:
+```
+kubectl create -f config/helm/tiller.yml
+# Tell helm to use it
+helm init --service-account helm
+# Check it deployed the Tiller image
+kubectl describe deployment tiller-deploy -n kube-system
+```
+
+### kube2iam setup
+
+An annotation needs adding to allow roles to be assumed:
+
+```
+kubectl edit namespace default
+```
+and under metadata add 'annotations', ensuring you substitute your environment name for `(dev|alpha)`:
+```
+metadata:
+  annotations:
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
+```
+
+### Ingress DNS setup
+
+Some extra DNS entries need creating for ingress:
+```
+./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
+```
 
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
