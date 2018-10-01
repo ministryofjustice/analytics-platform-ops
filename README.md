@@ -212,6 +212,27 @@ helm init --service-account helm
 kubectl describe deployment tiller-deploy -n kube-system
 ```
 
+### kube2iam setup
+
+An annotation needs adding to allow roles to be assumed:
+
+```
+kubectl edit namespace default
+```
+and under metadata add 'annotations', ensuring you substitute your environment name for `(dev|alpha)`:
+```
+metadata:
+  annotations:
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
+```
+
+### Ingress DNS setup
+
+Some extra DNS entries need creating for ingress:
+```
+./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
+```
+
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
 
