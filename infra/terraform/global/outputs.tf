@@ -2,16 +2,20 @@ output "region" {
   value = "${var.region}"
 }
 
-output "xyz_dns_zone_id" {
-  value = "${aws_route53_zone.xyz_zone.id}"
+output "platform_dns_zone_id" {
+  value = "${aws_route53_zone.platform_zone.id}"
 }
 
-output "xyz_dns_zone_name" {
-  value = "${aws_route53_zone.xyz_zone.name}"
+output "platform_dns_zone_name" {
+  value = "${aws_route53_zone.platform_zone.name}"
 }
 
-output "xyz_root_domain" {
-  value = "${var.xyz_root_domain}"
+output "platform_root_domain" {
+  value = "${var.platform_root_domain}"
+}
+
+output "platform_root_domain_ses_identity_arn" {
+  value = "${module.ses_domain.identity_arn}"
 }
 
 output "kops_bucket_name" {
@@ -56,4 +60,20 @@ output "hmpps_oasys_access_key_id" {
 
 output "hmpps_oasys_access_key_secret" {
   value = "${module.hmpps_oasys_upload_user.access_key_secret}"
+}
+
+output "mojanalytics_concourse_iam_list_roles_access_key_id" {
+  value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_id}"
+}
+
+output "mojanalytics_concourse_iam_list_roles_access_key_secret" {
+  value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_secret}"
+}
+
+output "hmpps_prisonss_access_key_id" {
+  value = "${module.hmpps_prisonss_upload_user.access_key_id}"
+}
+
+output "hmpps_prisonss_access_key_secret" {
+  value = "${module.hmpps_prisonss_upload_user.access_key_secret}"
 }

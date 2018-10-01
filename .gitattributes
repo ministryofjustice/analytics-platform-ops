@@ -1,10 +1,10 @@
-secretfile filter=git-crypt diff=git-crypt
-*.tfvars filter=git-crypt diff=git-crypt
-k8s-resources/grafana/config.yml filter=git-crypt diff=git-crypt
-k8s-resources/kibana-auth-proxy/envs/**/* filter=git-crypt diff=git-crypt
-k8s-resources/fluentd/envs/**/* filter=git-crypt diff=git-crypt
-k8s-resources/jenkins/envs/**/* filter=git-crypt diff=git-crypt
-k8s-resources/prometheus/envs/**/* filter=git-crypt diff=git-crypt
-infra/kops/clusters/**/* filter=git-crypt diff=git-crypt
-chart-env-config/**/* filter=git-crypt diff=git-crypt
-infra/terraform/modules/federated_identity/saml/**/* filter=git-crypt diff=git-crypt
+secretfile filter=git-crypt diff=git-crypt merge=git-crypt
+*.tfvars filter=git-crypt diff=git-crypt merge=git-crypt
+k8s-resources/grafana/config.yml filter=git-crypt diff=git-crypt merge=git-crypt
+k8s-resources/kibana-auth-proxy/envs/**/* filter=git-crypt diff=git-crypt merge=git-crypt
+k8s-resources/fluentd/envs/**/* filter=git-crypt diff=git-crypt merge=git-crypt
+k8s-resources/jenkins/envs/**/* filter=git-crypt diff=git-crypt merge=git-crypt
+k8s-resources/prometheus/envs/**/* filter=git-crypt diff=git-crypt merge=git-crypt
+infra/kops/clusters/**/* filter=git-crypt diff=git-crypt merge=git-crypt
+chart-env-config/**/* filter=git-crypt diff=git-crypt merge=git-crypt
+infra/terraform/modules/federated_identity/saml/**/* filter=git-crypt diff=git-crypt merge=git-crypt
