@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "s3_logs" {
-  bucket = "moj-analytics-s3-logs"
+  bucket = "${var.s3_logs_bucket_name}"
   acl    = "log-delivery-write"
 
   lifecycle_rule {
