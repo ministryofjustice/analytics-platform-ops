@@ -7,10 +7,13 @@ module.exports = {
     "globals": {
       "$": false,
       "moj": true,
+      "module": true
     },
     "rules": {
       "camelcase": ["off"],
       "no-alert": ["off"],
+      "no-console": ["off"],
+      "no-restricted-syntax": ["off"],
       "import/no-dynamic-require": ["off"],
       "no-use-before-define": ["error", { "classes": false }],
       "no-param-reassign": ["error", { "props": false }],
