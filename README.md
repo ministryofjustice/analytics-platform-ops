@@ -182,13 +182,13 @@ If kubectl is unable to connect, the cluster is still starting, so wait a few mi
 
 ### Helm RBAC setup
 
-Helm/Tiller should use its own service account. Create it like this:
+Helm's Tiller should use its own service account. Create it like this:
 ```
-kubectl create -f config/helm/helm.yml
+kubectl create -f config/helm/tiller.yml
 # Tell helm to use it
 helm init --service-account helm
-# Check it creates
-kubectl describe deployment tiller-deploy -n kube-system -f
+# Check it deployed the Tiller image
+kubectl describe deployment tiller-deploy -n kube-system
 ```
 
 ### Modifying AWS and cluster post-creation
