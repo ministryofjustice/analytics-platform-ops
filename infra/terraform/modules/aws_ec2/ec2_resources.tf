@@ -1,7 +1,0 @@
-resource "aws_key_pair" "default_instance_key" {
-  # key_name = "${module.cluster_dns.dns_zone_domain}"
-  key_name = "${var.ssh_key_name}"
-
-  # public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC97bXjQ2Og9h8WgH1t2U/paC1jK1WvY+2K1aSG2ItGspxEJ+3p7xhWm5N9kVnFpzT/XgVpVequbc1rZcO1sn7WXzBndgOzS0HZEgccqQQy+IkfMfy6tzaJkSy/lUfMZ87Wtwd9wxozmzpy4Hwgrov//zn0HEUxFGKxNz51CtZagjjTuw8QUXEUHyloK0UMxoEO6A5be5MiiBFREOppuwP6WWAdZ1JIATO2VCAt7Mm/uEl6L1MRv/etysn2hcq0yQkjs4MWHirCXqO+R38Hq1GQx+nSY3AwpDbD1wqpHtSQQcLD4HAXPZgUCik6E4cAG96Bg4jvfxgBwWU78fy4HladhXKtRTnUAQfIJuR6OhZ7sCf7pi8oW5LPTPsa2vrGKxRmWbMfJm4dnt0b/FBQoI3G9NKDh9hNaMWqRlloDmDM/JjQ7ZZNkjjs/0Br4W5HVhSjjPQ4h2lkGlFhdsGR5B3KZJ+JRS92NIy4OG1w5vRE7sg2dH5Tn6G8ypishJ8gMKSRFWwj3J+UCPSvK/8GXor4rKjNk30IMMIiF0Su+5nhrLi96x2ys2D7uRij3bg0miCt9DbGheTyv+1H/sY8JfxmMLRgXsBiMFhbBwmzo4OyyqMMNgMssQUJtqqD7aL3VkLA0rWebk6VYRLpbSiHWoTzIA3aanaVgF988M0BxUUQTw== kerin.mojanalytics.xyz"
-  public_key = "${var.ssh_public_key}"
-}

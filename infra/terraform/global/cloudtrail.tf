@@ -114,7 +114,7 @@ resource "aws_cloudtrail" "global" {
 }
 
 resource "aws_s3_bucket" "global_cloudtrail" {
-  bucket        = "accelerator-global-cloudtrail"
+  bucket        = "${var.global_cloudtrail_bucket_name}"
   force_destroy = false
 
   lifecycle_rule {
@@ -157,7 +157,7 @@ resource "aws_s3_bucket" "global_cloudtrail" {
               "Service": "cloudtrail.amazonaws.com"
             },
             "Action": "s3:GetBucketAcl",
-            "Resource": "arn:aws:s3:::accelerator-global-cloudtrail"
+            "Resource": "arn:aws:s3:::${var.global_cloudtrail_bucket_name}"
         },
         {
             "Sid": "AWSCloudTrailWrite",
@@ -166,7 +166,7 @@ resource "aws_s3_bucket" "global_cloudtrail" {
               "Service": "cloudtrail.amazonaws.com"
             },
             "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::accelerator-global-cloudtrail/*",
+            "Resource": "arn:aws:s3:::${var.global_cloudtrail_bucket_name}/*",
             "Condition": {
                 "StringEquals": {
                     "s3:x-amz-acl": "bucket-owner-full-control"
