@@ -6,10 +6,13 @@ output "airflow_efs_host" {
   value = "${module.airflow_storage_efs_volume.dns_name}"
 }
 
+<<<<<<< HEAD
 # output "control_panel_api_iam_role_name" {
 #   value = "${module.control_panel_api.iam_role_name}"
 # }
 
+=======
+>>>>>>> master
 output "region" {
   value = "${var.region}"
 }
@@ -50,6 +53,7 @@ output "softnas_instance_type" {
   value = "${var.softnas_instance_type}"
 }
 
+<<<<<<< HEAD
 output "control_panel_api_db_username" {
   value = "${var.control_panel_api_db_username}"
 }
@@ -58,6 +62,8 @@ output "control_panel_api_db_password" {
   value = "${var.control_panel_api_db_password}"
 }
 
+=======
+>>>>>>> master
 output "airflow_db_username" {
   value = "${var.airflow_db_username}"
 }
@@ -66,6 +72,7 @@ output "airflow_db_password" {
   value = "${var.airflow_db_password}"
 }
 
+<<<<<<< HEAD
 output "oidc_provider_url" {
   value = "${var.oidc_provider_url}"
 }
@@ -74,6 +81,8 @@ output "oidc_client_ids" {
   value = "${var.oidc_client_ids}"
 }
 
+=======
+>>>>>>> master
 output "airflow_smtp_username" {
   value = "${module.airflow_smtp_user.smtp_username}"
 }
@@ -82,10 +91,29 @@ output "airflow_smtp_password" {
   value = "${module.airflow_smtp_user.smtp_password}"
 }
 
+output "control_panel_api_db_username" {
+  value = "${var.control_panel_api_db_username}"
+}
+
+output "control_panel_api_db_password" {
+  value = "${var.control_panel_api_db_password}"
+}
+
 output "control_panel_api_db_host" {
   value = "${module.control_panel_api.db_host}"
 }
 
+<<<<<<< HEAD
+=======
+output "oidc_provider_url" {
+  value = "${var.oidc_provider_url}"
+}
+
+output "oidc_client_ids" {
+  value = "${var.oidc_client_ids}"
+}
+
+>>>>>>> master
 output "oidc_provider_thumbprints" {
   value = "${var.oidc_provider_thumbprints}"
 }

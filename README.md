@@ -85,7 +85,6 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 | Variable  | Value |
 | ------------- | ------------- |
 | `region` | `eu-west-1` |
-| `terraform_bucket_name` | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
 | `terraform_base_state_file`| "base/terraform.tfstate" |
 | `kops_bucket_name` | The name of an S3 bucket to store the kops state |
 | `platform_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
@@ -97,7 +96,7 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 | `uploads_bucket_name` | Choose an S3 bucket name for uploads |
 | `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs|
 
-The checked-in `terraform.tfvars` is for MoJ, so your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
+The checked-in `terraform.tfvars` is for MoJ, so if your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
 
 ### Domain name
 
@@ -225,7 +224,7 @@ cd infra/terraform/platform
 # Initialize remote state and pull required modules (check the env variable is still set from earlier on)
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
-# Choose a name for the environment
+# Choose a name for the environment e.g.
 export ENVNAME=giraffe
 
 # Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
@@ -252,7 +251,8 @@ vim vars/$ENVNAME.tfvars
 | `softnas_instance_type` | e.g. `m4.large` |
 | `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
 | `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
-| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6EF423E5272B2347200970D1CD9D1A72BEABC592", "9E99A48A9960B14926BB7F3B02E22DA2B0AB7280",]`|
+| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592",
+  "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
 
 
 ### Working with an existing environment
@@ -294,7 +294,7 @@ Once complete your base AWS resources should be in place
 1. Install tools (if you've not already):
 
 * [kubectl](https://kubernetes.io/docs/user-guide/prereqs/)
-* [Kops][kops]
+* [Kops](https://github.com/kubernetes/kops)
 * jq
 * yq
 
