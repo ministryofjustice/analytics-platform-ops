@@ -180,14 +180,17 @@ Once complete your base AWS resources should be in place
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
 
-### Helm RBAC setup
+### Helm setup
 
-Helm's Tiller should use its own service account. Create it like this:
+Because the k8s cluster is configured to use RBAC, Helm's Tiller should use its own service account.
 ```
+# Create Tiller's service account
 kubectl create -f config/helm/tiller.yml
-# Tell helm to use it
-helm init --service-account helm
-# Check it deployed the Tiller image
+
+# Install Tiller, configured to use the new service account
+helm init --service-account tiller
+
+# Check it deployed the Tiller image ok
 kubectl describe deployment tiller-deploy -n kube-system
 ```
 
