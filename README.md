@@ -108,10 +108,6 @@ It's easiest if you use a domain name that has been purchased using the same AWS
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
-### Creating global AWS resources, and preparing Terraform remote state
-
-**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
-
 ```
 # Create an S3 bucket for the platform's terraform state
 # Choose a unique name for this platform and save it in an env var:
