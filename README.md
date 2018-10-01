@@ -31,12 +31,12 @@ This project and repository is designed to manage multiple environments (staging
 Because both Terraform and Kops create AWS resources in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
 
 1. `terraform apply` within `infra/terraform/global` for 'global' resources shared across all environments. This currently consists of root DNS records, and S3 buckets for Terraform and Kops state storage. These resources only needed to be created once for all environments.
-2. `terraform workspace [new|select] $envname && terraform apply` within `infra/terraform/platform` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and NFS file storage.
+2. `terraform workspace [new|select] $ENVNAME && terraform apply` within `infra/terraform/platform` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and NFS file storage.
 3. `kops create|update cluster` for the Kubernetes cluster itself. This creates EC2 instances, AutoScaling groups, Security Groups, ELBs, etc. within the Terraform-created VPC.
 
 ## Secrets and git-crypt
 
-Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
+Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key. You can use the instructions here, but change the repo name: https://github.com/ministryofjustice/analytics-platform-config/blob/master/README.md#git-crypt
 
 If you get merge conflicts on gitcrypted files then by default it will not put the <<< ---- >>> sections to show you the different versions. You can fix this behaviour by specifying this custom merge driver in your .git/config:
 ```
@@ -51,7 +51,18 @@ See: https://github.com/AGWA/git-crypt/issues/140#issuecomment-361031719
 
 All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the Kubernetes package manager. Analytics-specific charts are served via our [Helm repository](http://moj-analytics-helm-repo.s3-website-eu-west-1.amazonaws.com) - source code is in the [ministryofjustice/analytics-platform-helm-charts](https://github.com/ministryofjustice/analytics-platform-helm-charts) repository, and chart values for each environment are stored in the [ministryofjustice/analytics-platform-config](https://github.com/ministryofjustice/analytics-platform-config) repository.
 
-## Creating global AWS resources, and preparing Terraform remote state
+## Global setup
+
+Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
+
+### Compiling Go functions
+
+You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
+
+* [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
+* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshots/README.md)
+
+If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
 
 ### Elastic Search
 
@@ -67,16 +78,35 @@ On completion, fill in the `es_*` settings in the global `terraform.tfvars` - se
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
-Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
+### Global terraform.tfvars
 
-### Compiling Go functions
+You need to set the values in `infra/terraform/global/terraform.tfvars`:
 
-You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
+| Variable  | Value |
+| ------------- | ------------- |
+| `region` | `eu-west-1` |
+| `terraform_base_state_file`| "base/terraform.tfstate" |
+| `kops_bucket_name` | The name of an S3 bucket to store the kops state |
+| `platform_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
+| `es_domain` | In the elastic.co sidebar click "ElasticSearch" and from "API Endpoint" use the domain e.g. `abc123.eu-west-1.aws.found.io` |
+| `es_port` | `9243` |
+| `es_username` | `elastic` |
+| `es_password` | This is displayed once only, at the point of completing the Elastic Search deployment |
+| `global_cloudtrail_bucket_name` | Choose an S3 bucket name for cloudtrail |
+| `uploads_bucket_name` | Choose an S3 bucket name for uploads |
+| `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs|
 
-* [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
-* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshots/README.md)
+The checked-in `terraform.tfvars` is for MoJ, so if your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
 
-If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
+### Domain name
+
+The platform runs on lots of subdomains stemming off a domain name or subdomain.
+
+It's easiest if you use a domain name that has been purchased using the same AWS account as the platform runs in, but other configurations are possible. See: https://github.com/kubernetes/kops/blob/master/docs/aws.md#configure-dns
+
+### Creating global AWS resources, and preparing Terraform remote state
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ```
 # Enter global Terraform resources directory
@@ -176,21 +206,38 @@ Once selected, on the SoftNAS product web page you need to:
 # Enter platform Terraform resources directory
 cd infra/terraform/platform
 
-# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
-terraform workspace new $envname
+# Initialize remote state and pull required modules (check the env variable is still set from earlier on)
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
-# Create vars file with config values for this environment - refer to existing .tfvars files for reference
-vim infra/terraform/platform/vars/$envname.tfvars 
+# Choose a name for the environment e.g.
+export ENVNAME=giraffe
+
+# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
+terraform workspace new $ENVNAME
+
+# Create vars file with config values for this environment - refer to existing .tfvars files for reference (or create one using the variable names listed in platform/variables.tf)
+cp vars/alpha.tfvars vars/$ENVNAME.tfvars
+vim vars/$ENVNAME.tfvars
 ```
 
 | Variable  | Value |
 | ------------- | ------------- |
-| `domain`  | Base domain name for platform, e.g. `dev.example.com`. This must be a subdomain of a domain already present in Route53 (e.g. `example.com`), and all services will be created under this subdomain (e.g. `grafana.dev.example.com`)  |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
 | `terraform_bucket_name`  | S3 bucket name for Terraform state storage, as created by Terraform `global` resources |
 | `terraform_base_state_file`  | Path for Terraform state file for global/base resources created in `infra/terraform/global`, (e.g. `base/terraform.tfstate`)  |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
+| `control_panel_api_db_username` | |
+| `control_panel_api_db_password` | |
+| `airflow_db_username` | |
+| `airflow_db_password` | |
+| `softnas_ssh_public_key` | |
+| `softnas_ami_id` | e.g. `ami-22cecec8` |
+| `softnas_instance_type` | e.g. `m4.large` |
+| `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
+| `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
+| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592",
+  "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
 
 
 ### Working with an existing environment
@@ -201,10 +248,7 @@ You must initialize your local Terraform environment to work with remote state s
 cd infra/terraform/platform
 
 # Select environment
-terraform workspace select $envname
-
-# Initialize remote state and pull required modules
-terraform init
+terraform workspace select $ENVNAME
 ```
 
 ### Creating AWS resources, or applying changes to existing environment
@@ -216,14 +260,16 @@ Once remote Terraform state has been configured you can now apply changes to exi
 cd infra/terraform/platform
 
 # Select environment
-terraform workspace select $envname
+terraform workspace select $ENVNAME
 
 # Plan and preview changes - you must use the correct .tfvars file for this environment
-terraform plan -var-file=vars/$envname.tfvars
+terraform plan -var-file=vars/$ENVNAME.tfvars
 
 # Apply the above changes
-terraform apply -var-file=vars/$envname.tfvars
+terraform apply -var-file=vars/$ENVNAME.tfvars
 ```
+
+Note:
 
 Once complete your base AWS resources should be in place
 
