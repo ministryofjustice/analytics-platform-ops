@@ -105,7 +105,7 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
 3. Download SAML2 metadata:
 
     1. In the side-bar click "Applications"
-    2. Click "AWS Console" (created in previous step)
+    2. Click "AWS" (created in previous step)
     3. Click the tab "Addons"
     4. Click "SAML2 Web App"
     5. Click "Save"
