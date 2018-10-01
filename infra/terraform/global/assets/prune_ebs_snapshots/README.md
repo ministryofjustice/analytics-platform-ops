@@ -7,16 +7,32 @@ You'll also need a working [Go](www.golang.org/doc/) environment to build a dist
 
 For working with the [Go](www.golang.org) runtime in AWS Lambda. See [lambda-go-how-to-create-deployment-package](https://docs.aws.amazon.com/lambda/latest/dg/lambda-go-how-to-create-deployment-package.html)
 
-To Build and Deploy
----------
+To Build
+--------
 
 The Lambda execution environment uses a Linux kernel, so you'll need to build the binary for linux
-```
-GOOS=linux go build prune_ebs_snapshots.go 
 
+A good way to do this if you don't have Go installed is to use Docker:
+```
+cd infra/terraform/global/assets/prune_ebs_snapshots
+docker run -it -v "$(pwd)":/src golang:alpine sh
+```
+This will start a Docker container with Go installed and launch a shell. From
+there you need to install git and the aws client library:
+```
+cd /src
+apk add git
+go get github.com/aws/aws-sdk-go
+```
+Then you can compile the binary using the following command:
+```
+GOOS=linux go build prune_ebs_snapshots.go
 ```
 
-Once you have built a distribution with the command above. Deploy the lambda function with the [terraform](https://www.terraform.io/) commands below
+To Deploy
+---------
+
+Once you have built a binary/distribution with the command above, deploy the lambda function with the [terraform](https://www.terraform.io/) commands below
 
 __Note__ the commands below assume you are at the __root__ of the repository
 

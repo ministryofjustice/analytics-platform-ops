@@ -31,12 +31,12 @@ This project and repository is designed to manage multiple environments (staging
 Because both Terraform and Kops create AWS resources in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
 
 1. `terraform apply` within `infra/terraform/global` for 'global' resources shared across all environments. This currently consists of root DNS records, and S3 buckets for Terraform and Kops state storage. These resources only needed to be created once for all environments.
-2. `terraform workspace [new|select] $envname && terraform apply` within `infra/terraform/platform` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and NFS file storage.
+2. `terraform workspace [new|select] $ENVNAME && terraform apply` within `infra/terraform/platform` for the specific environment. This creates the VPC, subnets, gateways etc. for the Kubernetes cluster, a Route53 hosted zone for the environment, S3 data buckets for the platform, and NFS file storage.
 3. `kops create|update cluster` for the Kubernetes cluster itself. This creates EC2 instances, AutoScaling groups, Security Groups, ELBs, etc. within the Terraform-created VPC.
 
 ## Secrets and git-crypt
 
-Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key.
+Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key. You can use the instructions here, but change the repo name: https://github.com/ministryofjustice/analytics-platform-config/blob/master/README.md#git-crypt
 
 If you get merge conflicts on gitcrypted files then by default it will not put the <<< ---- >>> sections to show you the different versions. You can fix this behaviour by specifying this custom merge driver in your .git/config:
 ```
@@ -54,6 +54,59 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 ## Global setup
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
+
+### Compiling Go functions
+
+You need to compile some Go scripts (because AWS Lambda requires binaries). Follow the build instructions found in these READMEs:
+
+* [Create etcd EBS Snapshot README](infra/terraform/global/assets/create_etcd_ebs_snapshot/README.md)
+* [Prune EBS Snapshot README](infra/terraform/global/assets/prune_ebs_snapshots/README.md)
+
+If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
+
+### Elastic Search
+
+Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
+
+'Create deployment' with settings:
+
+    * Provider: AWS
+    * Region: EU (Ireland)
+
+On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+
+### Global terraform.tfvars
+
+You need to set the values in `infra/terraform/global/terraform.tfvars`:
+
+| Variable  | Value |
+| ------------- | ------------- |
+| `region` | `eu-west-1` |
+| `terraform_base_state_file`| "base/terraform.tfstate" |
+| `kops_bucket_name` | The name of an S3 bucket to store the kops state |
+| `platform_root_domain` | The domain name that the platform will sit under e.g. `mojanalytics.xyz` |
+| `es_domain` | In the elastic.co sidebar click "ElasticSearch" and from "API Endpoint" use the domain e.g. `abc123.eu-west-1.aws.found.io` |
+| `es_port` | `9243` |
+| `es_username` | `elastic` |
+| `es_password` | This is displayed once only, at the point of completing the Elastic Search deployment |
+| `global_cloudtrail_bucket_name` | Choose an S3 bucket name for cloudtrail |
+| `uploads_bucket_name` | Choose an S3 bucket name for uploads |
+| `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs|
+
+The checked-in `terraform.tfvars` is for MoJ, so if your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
+
+### Domain name
+
+The platform runs on lots of subdomains stemming off a domain name or subdomain.
+
+It's easiest if you use a domain name that has been purchased using the same AWS account as the platform runs in, but other configurations are possible. See: https://github.com/kubernetes/kops/blob/master/docs/aws.md#configure-dns
+
+### Creating global AWS resources, and preparing Terraform remote state
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ### Creating global AWS resources, and preparing Terraform remote state
 
@@ -78,21 +131,90 @@ cd infra/terraform/global
 # set up remote state backend and pull modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
-# check that Terraform plans to create two S3 buckets (Terraform and Kops state) and a root DNS zone in Route53
-terraform plan
+# check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
+terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources
-terraform apply
+terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
-### NFS server licensing
 
-User network home directories are provided by [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title). The default image defined in Terraform uses a per-terabyte consumption billing model; if required storage exceeds 1TB the [per server version](https://aws.amazon.com/marketplace/pp/B00PJ9FGVU?qid=1495795249740&sr=0-2&ref_=srh_res_product_title) will be more cost effective.
-
-**Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
+## Environment setup
 
 ### Defining new environment
 
+Give the environment a name - e.g. `dev`. This will be known as $ENVNAME in these instructions.
+
+#### SoftNAS NFS server setup
+
+User network home directories are provided by SoftNAS from AWS Marketplace. There are a few different versions e.g.:
+
+* [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title) is "For Lower Compute Requirements".
+* [SoftNAS Cloud Developer Edition 4.0.x](https://aws.amazon.com/marketplace/pp/B06Y5W7TKY?qid=1533814033150&sr=0-4&ref_=srh_res_product_title) is limited to 250GB but the software is **free** - you just pay $0.085/hr for c5.large EC2 machine.
+
+There are about 20 SoftNAS options on AWS Marketplace, with varying cost models etc, so it's worth evaluating which ones suit your purpose.
+
+Once selected, on the SoftNAS product web page you need to:
+
+1. Click "Continue to Subscribe"
+2. Click "Accept terms"
+3. Wait 30 seconds before the flash message appears "Thank you for subscribing to this product!"
+4. Click "Continue to Configuration" (which has also appeared)
+5. Configure:
+
+   * Region: choose the same as chosen for the rest of your platform (e.g. EU Ireland)
+
+6. Click "Continue to Launch"
+
+   * EC2 Instance Type - select a suitable one, considering cost. Record the instance type (e.g. `m5.large`) - you'll use this in your .tfvars file in a moment.
+   * Key pair - create one called "softnas-$ENVNAME" (replacing the $ENVNAME) and save the private key (.pem file) locally
+
+7. Click "Launch"
+
+   Record the AMI id (e.g. `ami-22cecec8`) - you'll use this in your .tfvars file in a moment.
+
+8. Extract the public key, to use in your .tfvars file
+
+   ```
+   chmod 400 ~/Downloads/softnas-$ENVNAME.pem
+   ssh-keygen -y -f ~/Downloads/softnas-$ENVNAME.pem
+   ```
+   Record the entire output for your .tfvars file in a moment.
+
+#### Auth0
+
+1. Create a new tenant:
+
+    1. Log-in to Auth0
+    2. Click on your user
+    3. In the drop-down menu click "Create tenant"
+         * Tenant domain: include the environment name, if not the platform
+
+2. Create an application:
+
+    1. In the side-bar click "Applications"
+    2. Click "Create Application"
+         * Name: AWS
+         * Application Type: Regular Web Applications
+    3. Click "Save"
+    4. Click "Settings"
+         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
+         * Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
+    5. Click "Save changes"
+
+    Record the Domain and Client ID values - you'll use them in your .tfvars file in a moment.
+
+3. Download SAML2 metadata:
+
+    1. In the side-bar click "Applications"
+    2. Click "AWS" (created in previous step)
+    3. Click the tab "Addons"
+    4. Click "SAML2 Web App"
+    5. Click "Save"
+    6. Click tab "Usage"
+    7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
+
+          Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
 
 #### Terraform
 
@@ -105,21 +227,35 @@ cd infra/terraform/platform
 # Initialize remote state and pull required modules (check the env variable is still set from earlier on)
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
-# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
-terraform workspace new $envname
+# Store the name of the environment in the environment e.g.
+export ENVNAME=giraffe
 
-# Create vars file with config values for this environment - refer to existing .tfvars files for reference
-vim infra/terraform/platform/vars/$envname.tfvars 
+# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
+terraform workspace new $ENVNAME
+
+# Create vars file with config values for this environment - refer to existing .tfvars files for reference (or create one using the variable names listed in platform/variables.tf)
+cp vars/alpha.tfvars vars/$ENVNAME.tfvars
+vim vars/$ENVNAME.tfvars
 ```
 
 | Variable  | Value |
 | ------------- | ------------- |
-| `domain`  | Base domain name for platform, e.g. `dev.example.com`. This must be a subdomain of a domain already present in Route53 (e.g. `example.com`), and all services will be created under this subdomain (e.g. `grafana.dev.example.com`)  |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
 | `terraform_bucket_name`  | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
 | `terraform_base_state_file`  | Path for global Terraform state (as specified in global/main.tf `backend.s3.key`, e.g. `base/terraform.tfstate`) |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
 | `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
+| `control_panel_api_db_username` | |
+| `control_panel_api_db_password` | |
+| `airflow_db_username` | |
+| `airflow_db_password` | |
+| `softnas_ssh_public_key` | |
+| `softnas_ami_id` | e.g. `ami-22cecec8` |
+| `softnas_instance_type` | e.g. `m4.large` |
+| `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
+| `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
+| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592",
+  "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
 
 
 ### Working with an existing environment
@@ -130,10 +266,7 @@ You must initialize your local Terraform environment to work with remote state s
 cd infra/terraform/platform
 
 # Select environment
-terraform workspace select $envname
-
-# Initialize remote state and pull required modules
-terraform init
+terraform workspace select $ENVNAME
 ```
 
 ### Creating AWS resources, or applying changes to existing environment
@@ -145,55 +278,96 @@ Once remote Terraform state has been configured you can now apply changes to exi
 cd infra/terraform/platform
 
 # Select environment
-terraform workspace select $envname
+terraform workspace select $ENVNAME
 
 # Plan and preview changes - you must use the correct .tfvars file for this environment
-terraform plan -var-file=vars/$envname.tfvars
+terraform plan -var-file=vars/$ENVNAME.tfvars
 
 # Apply the above changes
-terraform apply -var-file=vars/$envname.tfvars
+terraform apply -var-file=vars/$ENVNAME.tfvars
 ```
+
+Note:
 
 Once complete your base AWS resources should be in place
 
 
 ### Create Kubernetes cluster
 
-1. Install [kubectl](https://kubernetes.io/docs/user-guide/prereqs/) and [Kops][kops] if you haven't already
-2. `$ cp -R infra/kops/example_cluster infra/kops/clusters/YOUR_ENV`
-3. `$ cd infra/kops/clusters/YOUR_ENV`
-4. Replace placeholders in all YAML files for your cluster with appropriate Terraform output values:
+1. Install tools (if you've not already):
 
-| Placeholder  | Terraform output value |
-| ------------- | ------------- |
-| `CLUSTER_NAME`  | (Not from Terraform) - base domain name - must match value in `terraform.tfvars`, e.g. `dev.example.com` |
-| `STATE_BUCKET`  | (Not from Terraform) - Terraform state bucket - must match value in `terraform.tfvars`, e.g. `terraform.bucket.name` |
-| `DNS_ZONE_ID`  | `$ terraform output -module=cluster_dns dns_zone_id` |
-| `VPC_ID`  | `$ terraform output -module=aws_vpc vpc_id` |
-| `PRIVATE_SUBNET_ID`  | Each subnet ID from `$ terraform output -module=aws_vpc private_subnets` - zones in `cluster.yml` and terraform output must match |
-| `DMZ_SUBNET_ID`  | Each subnet ID from `$ terraform output -module=aws_vpc dmz_subnets` - zones in `cluster.yml` and terraform output must match |
-| `EXTRA_MASTER_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_master_sg_id` |
-| `EXTRA_NODE_SECURITY_GROUP_ID`  | `$ terraform output -module=aws_vpc extra_node_sg_id` |
+* [kubectl](https://kubernetes.io/docs/user-guide/prereqs/)
+* [Kops](https://github.com/kubernetes/kops)
+* jq
+* yq
 
-4. Set Kops state store environment variable:
-  `$ export KOPS_STATE_STORE=s3://$STATE_BUCKET_NAME`
+(On macOS you can: `brew install kubectl kops jq yq`)
+
+2. Copy an existing cluster config:
+```
+cp -R infra/kops/clusters/alpha infra/kops/clusters/$ENVNAME
+```
+
+3. Set the correct values for your new cluster config:
+```
+cd infra/terraform/global
+export KOPS_STATE_STORE=s3://`terraform output kops_bucket_name` >/tmp/kops_bucket_name
+
+cd ../../../infra/terraform/platform
+export ENV_DOMAIN=`terraform output -module=cluster_dns dns_zone_domain`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.configBase $KOPS_STATE_STORE/$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.kubeAPIServer.oidcClientID `terraform output oidc_client_ids`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.kubeAPIServer.oidcGroupsClaim https://api.$ENV_DOMAIN/claims/groups
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.kubeAPIServer.oidcIssuerURL `terraform output oidc_provider_url`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml metadata.name $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.masterInternalName api.internal.$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.masterPublicName api.$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.topology.bastion.bastionPublicName bastion.$ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.dnsZone `terraform output -module=cluster_dns dns_zone_id`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.networkID `terraform output -module=aws_vpc vpc_id`
+terraform output -module=aws_vpc -json private_subnets > /tmp/private_subnets
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[0].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/private_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[1].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/private_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[2].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/private_subnets`
+terraform output -module=aws_vpc -json dmz_subnets > /tmp/dmz_subnets
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[3].id `jq '.value|to_entries|sort_by(.value)[0].key' /tmp/dmz_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[4].id `jq '.value|to_entries|sort_by(.value)[1].key' /tmp/dmz_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/cluster.yml spec.subnets[5].id `jq '.value|to_entries|sort_by(.value)[2].key' /tmp/dmz_subnets`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/masters.yml -d'*' 'metadata.labels[kops.k8s.io/cluster]' $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/masters.yml -d'*' spec.additionalSecurityGroups[0] `terraform output -module=aws_vpc extra_master_sg_id`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/nodes.yml 'metadata.labels[kops.k8s.io/cluster]' $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/nodes.yml -d'*' spec.additionalSecurityGroups[0] `terraform output -module=aws_vpc extra_node_sg_id`
+yq w -i ../../../infra/kops/clusters/$ENVNAME/bastions.yml 'metadata.labels[kops.k8s.io/cluster]' $ENV_DOMAIN
+yq w -i ../../../infra/kops/clusters/$ENVNAME/bastions.yml -d'*' spec.additionalSecurityGroups[0] `terraform output -module=aws_vpc extra_bastion_sg_id`
+```
+
+4. Ensure you've set the Kops state store environment variable (see previous step):
+  ```
+  $ echo $KOPS_STATE_STORE
+  s3://kops.analytics.justice.gov.uk
+  ```
+
 4. Plan Kops cluster resource creation:
 
 	```
-	$ kops create -f cluster.yml
-	$ kops create -f bastions.yml
-	$ kops create -f masters.yml
-	$ kops create -f nodes.yml
-	```
+  cd ../../../infra/kops/clusters/$ENVNAME
+  kops create -f cluster.yml
+  kops create -f bastions.yml
+  kops create -f masters.yml
+  kops create -f nodes.yml
+  ```
+
 5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
-6. Add key to Kops cluster:
-  `$ kops create secret --name CLUSTER_NAME sshpublickey admin -i PATH_TO_PUBLIC_KEY`
-  Where `$CLUSTER_NAME` matches the name provided in YAML files
+6. Add the .pub key to Kops cluster:
+  ```
+  kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
+  ```
+  ($ENV_DOMAIN was set recently, and matches the cluster name in cluster.yml)
 7. Plan and create cluster:
 
   ```
-  $ kops update cluster $CLUSTER_NAME
-  $ kops update cluster $CLUSTER_NAME --yes
+  kops update cluster $ENV_DOMAIN
+  kops update cluster $ENV_DOMAIN --yes
   ```
 
 
@@ -201,6 +375,41 @@ Once complete your base AWS resources should be in place
 1. `$ kubectl cluster-info`
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
+
+### Helm setup
+
+Because the k8s cluster is configured to use RBAC, Helm's Tiller should use its own service account.
+```
+# Create Tiller's service account
+kubectl create -f config/helm/tiller.yml
+
+# Install Tiller, configured to use the new service account
+helm init --service-account tiller
+
+# Check it deployed the Tiller image ok
+kubectl describe deployment tiller-deploy -n kube-system
+```
+
+### kube2iam setup
+
+An annotation needs adding to allow roles to be assumed:
+
+```
+kubectl edit namespace default
+```
+and under metadata add 'annotations', ensuring you substitute your environment name for `(dev|alpha)`:
+```
+metadata:
+  annotations:
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
+```
+
+### Ingress DNS setup
+
+Some extra DNS entries need creating for ingress:
+```
+./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
+```
 
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
