@@ -53,6 +53,18 @@ All [Kubernetes][kubernetes] resources are managed as [Helm][helm] charts, the K
 
 ## Creating global AWS resources, and preparing Terraform remote state
 
+### Elastic Search
+
+Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
+
+'Create deployment' with settings:
+
+    * Provider: AWS
+    * Region: EU (Ireland)
+
+On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 Global AWS resources (DNS and S3 buckets) are resources which are shared or referred to by all instances of the platform, and only need to be created once. These resources have likely already been created, in which case you can skip ahead to remote state setup, but if you are starting from a clean slate:
@@ -189,6 +201,16 @@ Once complete your base AWS resources should be in place
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
 
+### Helm RBAC setup
+
+Helm's Tiller should use its own service account. Create it like this:
+```
+kubectl create -f config/helm/tiller.yml
+# Tell helm to use it
+helm init --service-account helm
+# Check it deployed the Tiller image
+kubectl describe deployment tiller-deploy -n kube-system
+```
 
 ### kube2iam setup
 
