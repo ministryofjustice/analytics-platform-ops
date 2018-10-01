@@ -92,13 +92,46 @@ terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapsh
 terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
-### NFS server licensing
 
-User network home directories are provided by [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title). The default image defined in Terraform uses a per-terabyte consumption billing model; if required storage exceeds 1TB the [per server version](https://aws.amazon.com/marketplace/pp/B00PJ9FGVU?qid=1495795249740&sr=0-2&ref_=srh_res_product_title) will be more cost effective.
-
-**Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
+## Environment setup
 
 ### Defining new environment
+
+#### SoftNAS NFS server setup
+
+User network home directories are provided by SoftNAS from AWS Marketplace. There are a few different versions e.g.:
+
+* [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title) is "For Lower Compute Requirements".
+* [SoftNAS Cloud Developer Edition 4.0.x](https://aws.amazon.com/marketplace/pp/B06Y5W7TKY?qid=1533814033150&sr=0-4&ref_=srh_res_product_title) is limited to 250GB but the software is **free** - you just pay $0.085/hr for c5.large EC2 machine.
+
+There are about 20 SoftNAS options on AWS Marketplace, with varying cost models etc, so it's worth evaluating which ones suit your purpose.
+
+Once selected, on the SoftNAS product web page you need to:
+
+1. Click "Continue to Subscribe"
+2. Click "Accept terms"
+3. Wait 30 seconds before the flash message appears "Thank you for subscribing to this product!"
+4. Click "Continue to Configuration" (which has also appeared)
+5. Configure:
+
+   * Region: choose the same as chosen for the rest of your platform (e.g. EU Ireland)
+
+6. Click "Continue to Launch"
+
+   * EC2 Instance Type - select a suitable one, considering cost. Record the instance type (e.g. `m5.large`) - you'll use this in your .tfvars file in a moment.
+   * Key pair - create one called "softnas-$ENVNAME" (replacing the $ENVNAME) and save the private key (.pem file) locally
+
+7. Click "Launch"
+
+   Record the AMI id (e.g. `ami-22cecec8`) - you'll use this in your .tfvars file in a moment.
+
+8. Extract the public key, to use in your .tfvars file
+
+   ```
+   chmod 400 ~/Downloads/softnas-$ENVNAME.pem
+   ssh-keygen -y -f ~/Downloads/softnas-$ENVNAME.pem
+   ```
+   Record the entire output for your .tfvars file in a moment.
 
 #### Auth0
 
@@ -134,6 +167,10 @@ User network home directories are provided by [SoftNAS from AWS Marketplace](htt
     7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
 
           Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
+
+#### Terraform
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ```
 # Enter platform Terraform resources directory
