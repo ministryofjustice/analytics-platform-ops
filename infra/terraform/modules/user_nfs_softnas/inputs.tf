@@ -14,6 +14,10 @@ variable "num_instances" {
   default = 2
 }
 
+variable "softnas_ami_id" {
+  default = "ami-6498ac02"
+}
+
 variable "instance_type" {
   default = "m4.large"
 }

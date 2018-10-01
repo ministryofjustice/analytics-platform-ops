@@ -10,3 +10,4 @@ variable "es_scheme" {
 variable "cloudtrail_s3_bucket_id" {}
 variable "cloudtrail_s3_bucket_arn" {}
 variable "account_id" {}
+variable "s3_logs_bucket_name" {}
