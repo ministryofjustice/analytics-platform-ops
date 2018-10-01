@@ -64,7 +64,6 @@ You need to compile some Go scripts (because AWS Lambda requires binaries). Foll
 
 If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
 
-<<<<<<< HEAD
 ### Elastic Search
 
 Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
@@ -75,6 +74,9 @@ Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They off
     * Region: EU (Ireland)
 
 On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
 ### Global terraform.tfvars
 
@@ -107,8 +109,6 @@ It's easiest if you use a domain name that has been purchased using the same AWS
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
-=======
->>>>>>> master
 ```
 # Create an S3 bucket for the platform's terraform state
 # Choose a unique name for this platform and save it in an env var:
@@ -128,11 +128,7 @@ cd infra/terraform/global
 # set up remote state backend and pull modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
-<<<<<<< HEAD
-# check that Terraform plans to create global infra (e..g the Kops S3 bucket and a root DNS zone in Route53)
-=======
 # check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
->>>>>>> master
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # create resources
@@ -379,13 +375,13 @@ If kubectl is unable to connect, the cluster is still starting, so wait a few mi
 
 ### Helm RBAC setup
 
-Helm/Tiller should use its own service account. Create it like this:
+Helm's Tiller should use its own service account. Create it like this:
 ```
-kubectl create -f config/helm/helm.yml
+kubectl create -f config/helm/tiller.yml
 # Tell helm to use it
 helm init --service-account helm
-# Check it creates
-kubectl describe deployment tiller-deploy -n kube-system -f
+# Check it deployed the Tiller image
+kubectl describe deployment tiller-deploy -n kube-system
 ```
 
 ### kube2iam setup
@@ -395,18 +391,18 @@ An annotation needs adding to allow roles to be assumed:
 ```
 kubectl edit namespace default
 ```
-and under metadata add 'annotations':
+and under metadata add 'annotations', ensuring you substitute your environment name for `(dev|alpha)`:
 ```
 metadata:
   annotations:
-    iam.amazonaws.com/allowed-roles: '["(dev|alpha|accelerator)_.*"]'
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
 ```
 
 ### Ingress DNS setup
 
 Some extra DNS entries need creating for ingress:
 ```
-./ingress_elb_create_dns.sh $CLUSTER_NAME
+./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
 ```
 
 ### Modifying AWS and cluster post-creation
