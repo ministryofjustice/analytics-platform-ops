@@ -17,3 +17,11 @@ variable "es_scheme" {
 variable "uploads_bucket_name" {
   default = "mojap-land"
 }
+
+variable "global_cloudtrail_bucket_name" {
+  default = "moj-analytics-global-cloudtrail"
+}
+
+variable "s3_logs_bucket_name" {
+  default = "moj-analytics-s3-logs"
+}
