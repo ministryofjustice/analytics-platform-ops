@@ -233,7 +233,7 @@ Once complete your base AWS resources should be in place
 1. Install tools (if you've not already):
 
 * [kubectl](https://kubernetes.io/docs/user-guide/prereqs/)
-* [Kops][kops]
+* [Kops](https://github.com/kubernetes/kops)
 * jq
 * yq
 
