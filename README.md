@@ -64,6 +64,20 @@ You need to compile some Go scripts (because AWS Lambda requires binaries). Foll
 
 If you miss this step, you'll get an error to do with `archive_file.create_etcd_ebs_snapshot`/`archive_file.prune_ebs_snapshots` not finding a file (the compiled one).
 
+### Elastic Search
+
+Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They offer a free 15 day trial account which we can use for tests.)
+
+'Create deployment' with settings:
+
+    * Provider: AWS
+    * Region: EU (Ireland)
+
+On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
+
+
+**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
+
 ### Global terraform.tfvars
 
 You need to set the values in `infra/terraform/global/terraform.tfvars`:
@@ -108,13 +122,81 @@ terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapsh
 terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
-### NFS server licensing
 
-User network home directories are provided by [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title). The default image defined in Terraform uses a per-terabyte consumption billing model; if required storage exceeds 1TB the [per server version](https://aws.amazon.com/marketplace/pp/B00PJ9FGVU?qid=1495795249740&sr=0-2&ref_=srh_res_product_title) will be more cost effective.
-
-**Before proceeding with setup of a new environment the SoftNAS subscription must be accepted manually at the URL(s) above.**
+## Environment setup
 
 ### Defining new environment
+
+#### SoftNAS NFS server setup
+
+User network home directories are provided by SoftNAS from AWS Marketplace. There are a few different versions e.g.:
+
+* [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title) is "For Lower Compute Requirements".
+* [SoftNAS Cloud Developer Edition 4.0.x](https://aws.amazon.com/marketplace/pp/B06Y5W7TKY?qid=1533814033150&sr=0-4&ref_=srh_res_product_title) is limited to 250GB but the software is **free** - you just pay $0.085/hr for c5.large EC2 machine.
+
+There are about 20 SoftNAS options on AWS Marketplace, with varying cost models etc, so it's worth evaluating which ones suit your purpose.
+
+Once selected, on the SoftNAS product web page you need to:
+
+1. Click "Continue to Subscribe"
+2. Click "Accept terms"
+3. Wait 30 seconds before the flash message appears "Thank you for subscribing to this product!"
+4. Click "Continue to Configuration" (which has also appeared)
+5. Configure:
+
+   * Region: choose the same as chosen for the rest of your platform (e.g. EU Ireland)
+
+6. Click "Continue to Launch"
+
+   * EC2 Instance Type - select a suitable one, considering cost. Record the instance type (e.g. `m5.large`) - you'll use this in your .tfvars file in a moment.
+   * Key pair - create one called "softnas-$ENVNAME" (replacing the $ENVNAME) and save the private key (.pem file) locally
+
+7. Click "Launch"
+
+   Record the AMI id (e.g. `ami-22cecec8`) - you'll use this in your .tfvars file in a moment.
+
+8. Extract the public key, to use in your .tfvars file
+
+   ```
+   chmod 400 ~/Downloads/softnas-$ENVNAME.pem
+   ssh-keygen -y -f ~/Downloads/softnas-$ENVNAME.pem
+   ```
+   Record the entire output for your .tfvars file in a moment.
+
+#### Auth0
+
+1. Create a new tenant:
+
+    1. Log-in to Auth0
+    2. Click on your user
+    3. In the drop-down menu click "Create tenant"
+         * Tenant domain: include the environment name, if not the platform
+
+2. Create an application:
+
+    1. In the side-bar click "Applications"
+    2. Click "Create Application"
+         * Name: AWS
+         * Application Type: Regular Web Applications
+    3. Click "Save"
+    4. Click "Settings"
+         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
+         * Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
+    5. Click "Save changes"
+
+    Record the Domain and Client ID values - you'll use them in your .tfvars file in a moment.
+
+3. Download SAML2 metadata:
+
+    1. In the side-bar click "Applications"
+    2. Click "AWS" (created in previous step)
+    3. Click the tab "Addons"
+    4. Click "SAML2 Web App"
+    5. Click "Save"
+    6. Click tab "Usage"
+    7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
+
+          Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
 
 #### Terraform
 
@@ -236,6 +318,38 @@ Once complete your base AWS resources should be in place
 1. `$ kubectl cluster-info`
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
+
+### Helm RBAC setup
+
+Helm's Tiller should use its own service account. Create it like this:
+```
+kubectl create -f config/helm/tiller.yml
+# Tell helm to use it
+helm init --service-account helm
+# Check it deployed the Tiller image
+kubectl describe deployment tiller-deploy -n kube-system
+```
+
+### kube2iam setup
+
+An annotation needs adding to allow roles to be assumed:
+
+```
+kubectl edit namespace default
+```
+and under metadata add 'annotations', ensuring you substitute your environment name for `(dev|alpha)`:
+```
+metadata:
+  annotations:
+    iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
+```
+
+### Ingress DNS setup
+
+Some extra DNS entries need creating for ingress:
+```
+./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
+```
 
 ### Modifying AWS and cluster post-creation
 Once all of the above has been carried out, both Terraform and Kops state buckets will be populated, and your local directory will be configured to push/pull from those buckets, so changes can be made without further configuration.
