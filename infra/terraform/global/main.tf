@@ -26,6 +26,8 @@ module "aws_account_logging" {
   cloudtrail_s3_bucket_id  = "${aws_s3_bucket.global_cloudtrail.id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
+
+  s3_logs_bucket_name = "${var.s3_logs_bucket_name}"
 }
 
 module "log_pruning" {
@@ -136,7 +138,7 @@ module "kubernetes_prune_ebs_snapshots" {
 
 module "ses_domain" {
   source = "../modules/ses_domain"
-  domain = "${var.xyz_root_domain}"
+  domain = "${var.platform_root_domain}"
 
-  aws_route53_zone_id = "${aws_route53_zone.xyz_zone.zone_id}"
+  aws_route53_zone_id = "${aws_route53_zone.platform_zone.zone_id}"
 }
