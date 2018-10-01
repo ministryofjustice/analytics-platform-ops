@@ -8,23 +8,36 @@ You'll need a working [Go](www.golang.org/doc/) environment to build a distribut
 
 For working with the [Go](www.golang.org) runtime in AWS Lambda. See [lambda-go-how-to-create-deployment-package](https://docs.aws.amazon.com/lambda/latest/dg/lambda-go-how-to-create-deployment-package.html)
 
-To Build and Deploy
----------
+To Build
+--------
 
 The Lambda execution environment uses a Linux kernel, so you'll need to build the binary for linux
-```
-GOOS=linux go build main.go 
 
+A good way to do this if you don't have Go installed is to use Docker:
+```
+cd infra/terraform/global/assets/create_etcd_ebs_snapshot/
+docker run -it -v "$(pwd)":/src golang:alpine sh
+```
+This will start a Docker container with Go installed and launch a shell. From
+there you need to install git and the aws client library:
+```
+cd /src
+apk add git
+go get github.com/aws/aws-sdk-go
+```
+Then you can compile the binary using the following command:
+```
+GOOS=linux go build -o create_etcd_ebs_snapshot main.go
 ```
 
-Once you have built a distribution with the command above. Rename the distribution to the same name as `function_name` from your [terraform](https://www.terraform.io/) lambda resource 
-and deploy the lambda function with the [terraform](https://www.terraform.io/) commands below
+To Deploy
+---------
+
+Once you have built a binary/distribution with the command above, deploy the lambda function with the [terraform](https://www.terraform.io/) commands below
 
 __Note__ the commands below assume you are at the __root__ of the repository
 
 ```
-mv infra/terraform/global/assets/create_etcd_ebs_snapshots/main infra/terraform/global/assets/create_etcd_ebs_snapshots/create_etcd_ebs_snapshots
-
 terraform plan -target=module.kubernetes_create_etcd_ebs_snapshots -var-file=infra/terraform/global/assets/create_etcd_ebs_snapshots/vars_create_etcd_ebs_snapshots.tfvars
 
 terraform apply -target=module.kubernetes_create_etcd_ebs_snapshots -var-file=infra/terraform/global/assets/create_etcd_ebs_snapshots/vars_create_etcd_ebs_snapshots.tfvars

@@ -6,8 +6,17 @@
 /infra/terraform/modules/lambda_functions/*.zip
 *.sublime-project
 *.sublime-workspace
+/*.iml
 
 # Python caches and virtual env
 __pycache__
 .cache
 venv
+
+/infra/terraform/global/assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot
+/infra/terraform/global/assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip
+/infra/terraform/global/assets/prune_ebs_snapshots/prune_ebs_snapshots
+/infra/terraform/global/assets/prune_ebs_snapshots/prune_ebs_snapshots.zip
+
+# Node
+node_modules
