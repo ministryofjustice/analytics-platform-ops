@@ -35,7 +35,6 @@ resource "aws_s3_bucket" "nfs_backup" {
 
     expiration {
       days                         = 90
-      expired_object_delete_marker = true
     }
 
     noncurrent_version_transition {
