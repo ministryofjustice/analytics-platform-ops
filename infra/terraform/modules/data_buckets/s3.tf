@@ -5,6 +5,14 @@ resource "aws_s3_bucket" "source" {
   tags {
     Name = "${var.env}-moj-analytics-source"
   }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket" "scratch" {
@@ -13,6 +21,14 @@ resource "aws_s3_bucket" "scratch" {
 
   tags {
     Name = "${var.env}-moj-analytics-scratch"
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
   }
 }
 
