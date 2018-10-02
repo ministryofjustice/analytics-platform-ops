@@ -94,7 +94,8 @@ You need to set the values in `infra/terraform/global/terraform.tfvars`:
 | `es_password` | This is displayed once only, at the point of completing the Elastic Search deployment |
 | `global_cloudtrail_bucket_name` | Choose an S3 bucket name for cloudtrail |
 | `uploads_bucket_name` | Choose an S3 bucket name for uploads |
-| `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs|
+| `s3_logs_bucket_name` | Choose an S3 bucket name for S3 logs |
+| `helm_repo_s3_bucket_name` | Name of S3 bucket containing the helm charts repository |
 
 The checked-in `terraform.tfvars` is for MoJ, so if your platform is for another purpose either edit it in a fork of this repo, or create a separate .tfvars file with all the variable values you wish to override and specify it on the following (global) `terraform plan` and `terraform apply` steps with a parameter like: `-var-file="godobject.tfvars"`.
 
