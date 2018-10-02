@@ -25,3 +25,7 @@ variable "global_cloudtrail_bucket_name" {
 variable "s3_logs_bucket_name" {
   default = "moj-analytics-s3-logs"
 }
+
+variable "helm_repo_s3_bucket_name" {
+  default = "moj-analytics-helm-repo"
+}
