@@ -77,3 +77,11 @@ output "hmpps_prisonss_access_key_id" {
 output "hmpps_prisonss_access_key_secret" {
   value = "${module.hmpps_prisonss_upload_user.access_key_secret}"
 }
+
+output "concourse_update_helm_repo_access_key_id" {
+  value = "${aws_iam_access_key.concourse_update_helm_repo_access_key.id}"
+}
+
+output "concourse_update_helm_repo_access_key_secret" {
+  value = "${aws_iam_access_key.concourse_update_helm_repo_access_key.secret}"
+}
