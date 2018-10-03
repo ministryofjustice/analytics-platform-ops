@@ -125,11 +125,29 @@ aws s3api put-bucket-encryption --bucket $TERRAFORM_STATE_BUCKET_NAME --server-s
 # Enter global Terraform resources directory
 cd infra/terraform/global
 
-# set up remote state backend and pull modules
+# Configure (in .terraform) the remote state and download the required modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
 
-# check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
+# You can check the configured platform backend:
+grep \"key\" -C 1 .terraform/terraform.tfstate
+
+# check the Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
+
+# NB You can usually ignore these actions, which fire every time due to `triggers {force_rebuild = "${timestamp()}"`:
+#    <= module.aws_account_logging.data.archive_file.cloudtrail_zip
+#    <= module.aws_account_logging.data.archive_file.s3logs_zip
+#    ~ module.aws_account_logging.aws_lambda_function.cloudtrail_to_elasticsearch
+#    ~ module.aws_account_logging.aws_lambda_function.s3_logs_to_elasticsearch
+#    -/+ module.aws_account_logging.null_resource.cloudtrail_install_deps (new resource required)
+#    -/+ module.aws_account_logging.null_resource.s3logs_install_deps (new resource required)
+#    <= module.log_pruning.data.archive_file.prune_logs_zip
+#    ~ module.log_pruning.aws_lambda_function.prune_logs
+#    -/+ module.log_pruning.null_resource.prune_logs_deps (new resource required)
+# and you can usually ignore these because of whitespace issues:
+#    ~ module.hmpps_nomis_upload_user.aws_iam_policy.system_user_s3_writeonly
+#    ~ module.hmpps_oasys_upload_user.aws_iam_policy.system_user_s3_writeonly
 
 # create resources
 terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
@@ -164,7 +182,7 @@ Once selected, on the SoftNAS product web page you need to:
 6. Click "Continue to Launch"
 
    * EC2 Instance Type - select a suitable one, considering cost. Record the instance type (e.g. `m5.large`) - you'll use this in your .tfvars file in a moment.
-   * Key pair - create one called "softnas-$ENVNAME" (replacing the $ENVNAME) and save the private key (.pem file) locally
+   * Key pair - create one called "softnas-$ENVNAME" (replacing the $ENVNAME) and save the private key (.pem file) locally. Make this securely available to the platform's admins, so that they can ssh in for maintenance.
 
 7. Click "Launch"
 
@@ -217,17 +235,27 @@ Once selected, on the SoftNAS product web page you need to:
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
+Each environment is a Terraform 'workspace'.
+
+To create a new environment in Terraform:
 ```
 # Enter platform Terraform resources directory
 cd infra/terraform/platform
 
-# Initialize remote state and pull required modules (check the env variable is still set from earlier on)
+# Set this env var to the same value as before, giving the location of the platform's global terraform state
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
+
+# Configure (in .terraform) the remote state and download the required modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
 
 # Store the name of the environment in the environment e.g.
-export ENVNAME=giraffe
+export ENVNAME=alpha
 
-# Create a new workspace - 'workspace' and 'environment' are interchangeable concepts here
+# List current workspaces
+terraform workspace list
+
+# Create the new workspace
 terraform workspace new $ENVNAME
 
 # Create vars file with config values for this environment - refer to existing .tfvars files for reference (or create one using the variable names listed in platform/variables.tf)
@@ -241,30 +269,46 @@ vim vars/$ENVNAME.tfvars
 | `terraform_bucket_name`  | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
 | `terraform_base_state_file`  | Path for global Terraform state (as specified in global/main.tf `backend.s3.key`, e.g. `base/terraform.tfstate`) |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
-| `availability_zones`  | AWS availability zones, e.g. `eu-west-1a, eu-west-1b, eu-west-1c`  |
+| `availability_zones`  | AWS availability zones, e.g. `["eu-west-1a", "eu-west-1b", "eu-west-1c"]`  |
 | `control_panel_api_db_username` | |
 | `control_panel_api_db_password` | |
 | `airflow_db_username` | |
 | `airflow_db_password` | |
+| `ses_ap_email_identity_arn` | e.g. "arn:aws:ses:eu-west-1:1234567890:identity/user@example.com"
 | `softnas_ssh_public_key` | |
 | `softnas_ami_id` | e.g. `ami-22cecec8` |
 | `softnas_instance_type` | e.g. `m4.large` |
 | `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
 | `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
-| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592",
-  "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
+| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592", "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
 
 
 ### Working with an existing environment
-You must initialize your local Terraform environment to work with remote state stored in the S3 bucket created above before continuing.
 
 ```
-# Enter platform resources directory
+# Ensure you're in the platform resources directory
 cd infra/terraform/platform
+```
+If this repo is freshly checked-out you'll need to configure it:
+```
+# Set this env var to the same value as before, giving the location of the platform's global terraform state
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
 
-# Select environment
+# Configure (in .terraform) the remote state and download the required modules
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
+
+# You can check the configured platform backend:
+grep \"key\" -C 1 .terraform/terraform.tfstate
+```
+Select the workspace/environment:
+```
 terraform workspace select $ENVNAME
 ```
+Now you can use commands like `terraform plan` and `terraform apply`.
+
+Note about different backends: if you want to run terraform for another platform, and therefore use a different remote state backend, you should do this in another check-out of this repository.
+
 
 ### Creating AWS resources, or applying changes to existing environment
 
@@ -279,6 +323,9 @@ terraform workspace select $ENVNAME
 
 # Plan and preview changes - you must use the correct .tfvars file for this environment
 terraform plan -var-file=vars/$ENVNAME.tfvars
+
+# NB You can usually ignore this action, which fires every time due whitespace issues:
+#    ~ module.data_buckets.aws_s3_bucket_policy.source
 
 # Apply the above changes
 terraform apply -var-file=vars/$ENVNAME.tfvars
@@ -463,3 +510,10 @@ The two instances can then be accessed on `https://localhost:8443/` and `https:/
 7. Login to the admin UI of `softnas-1` and check the `SnapReplicate` section to confirm that HA setup was successful
 
 The SoftNAS secondary will monitor availability of the primary, and take over primary status if it cannot ping the current primary. Takeover is performed by updating the AWS routing tables to point the VirtualIP address to the current secondary. Refer to the [SoftNAS HA admin guide](https://www.softnas.com/docs/softnas/v3/snapha-html/ha_operations.html) for more info on how to manage replacement of failed instances, and other HA operations.
+
+## What's next
+
+Now you have the infrastructure set-up, next install the charts: https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/README.md
+
+
+Ensure you refer to the READMEs for each chart, for additional setup e.g. [Auth0 setup for cpanel](https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/charts/cpanel/README.md)
