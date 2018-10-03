@@ -124,16 +124,14 @@ aws s3api put-bucket-encryption --bucket $TERRAFORM_STATE_BUCKET_NAME --server-s
 # Enter global Terraform resources directory
 cd infra/terraform/global
 
-# configure to use the remote state backend (this is saved in .terraform/terraform.tfstate) and pull required modules
+# Configure (in .terraform) the remote state and download the required modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
 
-# Note about switching backend:
-#   If you want to switch to run terraform on another platform, and therefore switch remote state backend, you'll need to delete your local .terraform/terraform.tfstate before running the `terraform init -backend-config` command above.
-
-# Just check you're talking the correct backend:
+# You can check the configured platform backend:
 grep \"key\" -C 1 .terraform/terraform.tfstate
 
-# check that Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
+# check the Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 
 # NB You can usually ignore these actions, which fire every time due to `triggers {force_rebuild = "${timestamp()}"`:
@@ -236,30 +234,28 @@ Once selected, on the SoftNAS product web page you need to:
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
-For a new or existing environment:
+Each environment is a Terraform 'workspace'.
+
+To create a new environment in Terraform:
 ```
 # Enter platform Terraform resources directory
 cd infra/terraform/platform
 
-# Save into .terraform the remote state and required modules (check the env variable is still set from earlier on)
+# Set this env var to the same value as before, giving the location of the platform's global terraform state
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
+
+# Configure (in .terraform) the remote state and download the required modules
 terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
-
-# Note about switching backend:
-#   If you want to switch to run terraform on another platform, and therefore switch remote state backend, you'll need to delete your local .terraform/terraform.tfstate before running the `terraform init -backend-config` command above. You don't need to do this if you just select another environment/workspace.
-
-# Just check you're talking the correct backend:
-grep \"key\" -C 1 .terraform/terraform.tfstate
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
 
 # Store the name of the environment in the environment e.g.
-export ENVNAME=giraffe
+export ENVNAME=alpha
 
-# List current workspaces. Note: 'workspace' and 'environment' are interchangeable concepts here.
+# List current workspaces
 terraform workspace list
 
-# If it doesn't exist, create a new workspace
+# Create the new workspace
 terraform workspace new $ENVNAME
-# OR just switch to the existing one
-terraform workspace select $ENVNAME
 
 # Create vars file with config values for this environment - refer to existing .tfvars files for reference (or create one using the variable names listed in platform/variables.tf)
 cp vars/alpha.tfvars vars/$ENVNAME.tfvars
@@ -284,6 +280,33 @@ vim vars/$ENVNAME.tfvars
 | `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
 | `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
 | `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592", "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
+
+
+### Working with an existing environment
+
+```
+# Ensure you're in the platform resources directory
+cd infra/terraform/platform
+```
+If this repo is freshly checked-out you'll need to configure it:
+```
+# Set this env var to the same value as before, giving the location of the platform's global terraform state
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
+
+# Configure (in .terraform) the remote state and download the required modules
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
+
+# You can check the configured platform backend:
+grep \"key\" -C 1 .terraform/terraform.tfstate
+```
+Select the workspace/environment:
+```
+terraform workspace select $ENVNAME
+```
+Now you can use commands like `terraform plan` and `terraform apply`.
+
+Note about different backends: if you want to run terraform for another platform, and therefore use a different remote state backend, you should do this in another check-out of this repository.
 
 
 ### Creating AWS resources, or applying changes to existing environment
