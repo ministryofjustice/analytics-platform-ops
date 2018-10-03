@@ -26,7 +26,7 @@ A combination of [Terraform](https://www.terraform.io) and [Kops](https://github
 
 **[Helm][helm]** is used to manage installation and updates of all Kubernetes resources, including end-user software.
 
-This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely S3 buckets for Terraform and Kops, and a Route53 DNS zone.
+This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely an S3 bucket for Kops and a Route53 DNS zone.
 
 Because both Terraform and Kops create AWS resources in two different phases, the order of execution during environment creation, and separation of responsibilities between the two is important. The current high-level execution plan is:
 
@@ -153,6 +153,7 @@ terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapsh
 terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
+NB If you have macOS and used Homebrew to install python, you'll see this pip install error: `must supply either home or prefix/exec-prefix -- not both` during the terraform planning. In this case, follow this solution: https://stackoverflow.com/a/24357384/1512326
 
 ## Environment setup
 

@@ -43,9 +43,9 @@ resource "aws_s3_bucket_policy" "source" {
     {
       "Sid": "DenyIncorrectEncryptionHeaderInSource",
       "Effect": "Deny",
+      "Principal": "*",
       "Action": "s3:PutObject",
       "Resource": "${aws_s3_bucket.source.arn}/*",
-      "Principal": "*",
       "Condition": {
         "StringNotEquals": {
           "s3:x-amz-server-side-encryption": "AES256"
@@ -55,9 +55,9 @@ resource "aws_s3_bucket_policy" "source" {
     {
       "Sid": "DenyUnEncryptedObjectUploadsInSource",
       "Effect": "Deny",
+      "Principal": "*",
       "Action": "s3:PutObject",
       "Resource": "${aws_s3_bucket.source.arn}/*",
-      "Principal": "*",
       "Condition": {
         "Null": {
           "s3:x-amz-server-side-encryption": true

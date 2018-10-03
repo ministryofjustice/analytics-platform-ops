@@ -51,13 +51,13 @@ module "user_nfs_softnas" {
   dns_zone_domain           = "${module.cluster_dns.dns_zone_domain}"
 }
 
-module "data_backup" {
-  source = "../modules/data_backup"
+# module "data_backup" {
+#   source = "../modules/data_backup"
 
-  env                 = "${terraform.workspace}"
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
-  logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
-}
+#   env                 = "${terraform.workspace}"
+#   k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
+#   logs_bucket_arn     = "${data.terraform_remote_state.base.s3_logs_bucket_name}"
+# }
 
 module "encrypt_scratch_lambda_function" {
   source     = "../modules/lambda_functions"
