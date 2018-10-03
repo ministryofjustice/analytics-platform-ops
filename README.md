@@ -509,3 +509,9 @@ The two instances can then be accessed on `https://localhost:8443/` and `https:/
 7. Login to the admin UI of `softnas-1` and check the `SnapReplicate` section to confirm that HA setup was successful
 
 The SoftNAS secondary will monitor availability of the primary, and take over primary status if it cannot ping the current primary. Takeover is performed by updating the AWS routing tables to point the VirtualIP address to the current secondary. Refer to the [SoftNAS HA admin guide](https://www.softnas.com/docs/softnas/v3/snapha-html/ha_operations.html) for more info on how to manage replacement of failed instances, and other HA operations.
+
+## What's next
+
+Now you have the infrastructure set-up, next install the charts: https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/charts/README.md
+
+Ensure you refer to the READMEs for each chart, for additional setup e.g. [Auth0 setup for cpanel](https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/charts/cpanel/README.md)
