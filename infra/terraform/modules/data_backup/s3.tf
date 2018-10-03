@@ -34,7 +34,7 @@ resource "aws_s3_bucket" "nfs_backup" {
     }
 
     expiration {
-      days                         = 90
+      days = 90
     }
 
     noncurrent_version_transition {
