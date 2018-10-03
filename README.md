@@ -70,8 +70,8 @@ Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They off
 
 'Create deployment' with settings:
 
-    * Provider: AWS
-    * Region: EU (Ireland)
+* Provider: AWS
+* Region: EU (Ireland)
 
 On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
 
@@ -274,13 +274,16 @@ vim vars/$ENVNAME.tfvars
 | `control_panel_api_db_password` | |
 | `airflow_db_username` | |
 | `airflow_db_password` | |
-| `ses_ap_email_identity_arn` | e.g. "arn:aws:ses:eu-west-1:1234567890:identity/user@example.com"
+| `ses_ap_email_identity_arn` | Create an SES email address that AP can use to send emails (SES provides the SMTP) and provide the ARN e.g. "arn:aws:ses:eu-west-1:1234567890:identity/user@example.com"
 | `softnas_ssh_public_key` | |
 | `softnas_ami_id` | e.g. `ami-22cecec8` |
 | `softnas_instance_type` | e.g. `m4.large` |
 | `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
 | `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
-| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592", "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]`|
+| `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592", "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]` |
+| `trusted_entity` | e.g. `["arn:aws:iam::1234567890:role/nodes.alpha.mojanalytics.xyz"]` |
+| `hostedzoneid_arn` | Do: `aws route53 list-hosted-zones` and find your environment's hosted zone e.g. 'alpha.mojanalytics.xyz' and take the Id e.g. "/hostedzone/ZNTPTENPSK7S5" and put it into arn format e.g. `["arn:aws:route53:::hostedzone/ZNTPTENPSK7S5"]` |
+
 
 
 ### Working with an existing environment
