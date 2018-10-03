@@ -3,7 +3,7 @@ data "aws_ami" "softnas" {
 
   filter {
     name   = "name"
-    values = ["SoftNAS Cloud Meter*"]
+    values = ["SoftNAS Cloud 4.0*"]
   }
 
   filter {
