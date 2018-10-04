@@ -76,8 +76,6 @@ Setup a deployment of ElasticSearch using the elastic.co SaaS service. (They off
 On completion, fill in the `es_*` settings in the global `terraform.tfvars` - see below.
 
 
-**You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
-
 ### Global terraform.tfvars
 
 You need to set the values in `infra/terraform/global/terraform.tfvars`:
@@ -131,6 +129,10 @@ terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 
 # You can check the configured platform backend:
 grep \"key\" -C 1 .terraform/terraform.tfstate
+
+# HACK: You need to do this 'terraform apply' before the main 'terraform plan' or you get this error:
+# `module.ses_domain.aws_route53_record.domain_amazonses_dkim_verification_record: aws_route53_record.domain_amazonses_dkim_verification_record: value of 'count' cannot be computed`
+terraform apply -target aws_route53_record.aws_ses_domain_dkim
 
 # check the Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
