@@ -179,22 +179,13 @@ Once selected, on the SoftNAS product web page you need to:
 
    * Region: choose the same as chosen for the rest of your platform (e.g. EU Ireland)
 
+   Now record the AMI id (e.g. `ami-22cecec8`) - you'll use this in your .tfvars file in a moment.
+
 6. Click "Continue to Launch"
 
    * EC2 Instance Type - select a suitable one, considering cost. Record the instance type (e.g. `m5.large`) - you'll use this in your .tfvars file in a moment.
-   * Key pair - create one called "softnas-$ENVNAME" (replacing the $ENVNAME) and save the private key (.pem file) locally. Make this securely available to the platform's admins, so that they can ssh in for maintenance.
 
-7. Click "Launch"
-
-   Record the AMI id (e.g. `ami-22cecec8`) - you'll use this in your .tfvars file in a moment.
-
-8. Extract the public key, to use in your .tfvars file
-
-   ```
-   chmod 400 ~/Downloads/softnas-$ENVNAME.pem
-   ssh-keygen -y -f ~/Downloads/softnas-$ENVNAME.pem
-   ```
-   Record the entire output for your .tfvars file in a moment.
+You can now quit the launch process because terraform will do the launch. The important thing is that you've agreed to the licence and recorded the settings for your .tfvars file, needed in a moment.
 
 #### Auth0
 
