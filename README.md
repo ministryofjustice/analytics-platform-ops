@@ -444,11 +444,20 @@ metadata:
     iam.amazonaws.com/allowed-roles: '["(dev|alpha)_.*"]'
 ```
 
+### Install basic charts
+
+For any AP you need to install a couple of basic charts now:
+
+* init-platform
+* nginx-ingress
+
+For the instructions, see: https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/charts/README.md
+
 ### Ingress DNS setup
 
 Some extra DNS entries need creating for ingress:
 ```
-./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
+./ingress_load_balancer_create_dns.sh $ENV_DOMAIN
 ```
 
 ### Modifying AWS and cluster post-creation
@@ -458,9 +467,9 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
   * `$ terraform plan`
   * `$ terraform apply`
 * To make changes to the cluster, edit Kops cluster specs in place, as unfortunately YAML files can not be passed to the `edit` command. You should however strive to keep your local YAML files in sync with Kops remote files, so that environments can be easily recreated in the future:
-  * `$ kops edit cluster $CLUSTER_NAME`
+  * `$ kops edit cluster $ENV_DOMAIN`
   * Make changes to the cluster spec and save
-  * Apply changes: `$ kops update cluster $CLUSTER_NAME --yes`
+  * Apply changes: `$ kops update cluster $ENV_DOMAIN --yes`
 
 [terraform]: https://www.terraform.io
 [kops]: https://github.com/kubernetes/kops
@@ -509,7 +518,7 @@ The SoftNAS secondary will monitor availability of the primary, and take over pr
 
 ## What's next
 
-Now you have the infrastructure set-up, next install the charts: https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/README.md
+Now you have the infrastructure set-up, next install other charts: https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/README.md
 
 
 Ensure you refer to the READMEs for each chart, for additional setup e.g. [Auth0 setup for cpanel](https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/charts/cpanel/README.md)
