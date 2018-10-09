@@ -351,7 +351,7 @@ cp -R infra/kops/clusters/alpha infra/kops/clusters/$ENVNAME
 3. Set the correct values for your new cluster config:
 ```
 cd infra/terraform/global
-export KOPS_STATE_STORE=s3://`terraform output kops_bucket_name` >/tmp/kops_bucket_name
+export KOPS_STATE_STORE=s3://`terraform output kops_bucket_name`
 
 cd ../../../infra/terraform/platform
 export ENV_DOMAIN=`terraform output -module=cluster_dns dns_zone_domain`
