@@ -427,7 +427,7 @@ metadata:
 
 Some extra DNS entries need creating for ingress:
 ```
-./ingress_load_balancer_create_dns.sh $CLUSTER_NAME
+./ingress_load_balancer_create_dns.sh $ENV_DOMAIN
 ```
 
 ### Modifying AWS and cluster post-creation
@@ -446,6 +446,70 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
 [helm]: https://github.com/kubernetes/helm/
 [kubernetes]: https://kubernetes.io
 [gitcrypt]: https://www.agwa.name/projects/git-crypt/
+
+### Auth0 Applications
+
+In Auth0 you need to create some Applications.
+
+#### kubectl-oidc application
+
+1. Login to https://manage.auth0.com/ and select the tenant for your environment
+2. In the side-bar click "Applications"
+3. Click "Create Application"
+      * Name: kubectl-oidc
+      * Application Type: Regular Web Applications
+4. Click "Save"
+5. Click "Settings" tab
+      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$env.$domain/callback`
+      (replace the $variables)
+      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$env.$domain` (replace the $variables)
+      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$env.$domain` (replace the $variables)
+6. Click "Save changes"
+7. Click "Connections" tab
+8. Switch OFF "Database" and "Google"
+9. In the side-bar click "Connections" then "Social"
+10. If GitHub is not already ON:
+     1. Click GitHub to set it up
+     2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
+        Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
+     3. Check these boxes:
+        * Email address
+        * read:user
+        * read:org
+     4. Click "Save"
+     5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
+     6. Click "Save" and "X" to close the dialog.
+
+The Client ID and Client Secret values will be used in various helm chart configurations.
+
+### Auth0 Rules
+
+Auth0 needs 'rules' installed, to ensure only certain people can log-in, for example.
+
+Find the rules in this repo: https://github.com/ministryofjustice/analytics-platform-auth0
+in the dev or alpha branches. Create a new branch based on these and adapt the following settings in them:
+
+| Setting | Description |
+| ------- | ----------- |
+| `targeted_clients` | The 'Client ID' of the Auth0 application "kubectl-oidc" |
+| `namespace` | Set to: `https://api.$ENV.$DOMAIN/claims/` but replace the variables |
+| `AUTHENTICATOR_LABEL` | The name of the platform, as shown when doing Auth0 MFA |
+| `whitelist` | The GitHub organizations whose members are authorized to access the platform |
+
+You can use the Auth0 web ui to add the rules, or set-up auto deployment like this:
+1. In Auth0 click "Extensions" in the side menu.
+2. Search for and click "GitHub Deployments"
+3. Fill in options, e.g.:
+   * GITHUB_REPOSITORY: ministryofjustice/analytics-platform-auth0
+   * GITHUB_BRANCH: alpha
+   * GITHUB_TOKEN: (create one this from: https://github.com/settings/tokens and select the "repo" scope)
+4. Click "Save"
+5. Click "Installed Extensions" tab, then click "GitHub Integration" and agree to access.
+6. Find the text "A webhook has to be created <$repo>" and open the link a new tab. Note: actually you need to create the webhook yourself!
+7. Click "Add webhook" and copy the three option values from the previous browser tab. Then click "Add webhook".
+8. Click "Deployments" tab and click "Deploy" which should show add a line with Status of "Success".
+9. https://manage.auth0.com/#/rules should now be populated
+
 
 ### NFS server administration
 
