@@ -368,7 +368,7 @@ cd ../../../infra/terraform/platform
 
 5. Plan Kops cluster resource creation:
 
-	```
+  ```
   cd ../../../infra/kops/clusters/$ENVNAME
   kops create -f cluster.yml
   kops create -f bastions.yml
