@@ -1,8 +1,4 @@
 require 'awspec'
-require 'aws-sdk'
-require 'rhcl'
-
-# tfvars = Rhcl.parse(File.open('../vars/kitchen-test.tfvars'))
 
 describe vpc('test-vpc') do
     it { should exist }
