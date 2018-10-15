@@ -1,0 +1,19 @@
+driver:
+  name: terraform
+  variable_files:
+    - vars/kitchen-test.tfvars
+
+provisioner:
+  name: terraform
+
+platforms:
+  - name: aws
+
+verifier:
+  name: awspec
+
+suites:
+- name: default
+  verifier:
+    patterns:
+    - spec/*_spec.rb

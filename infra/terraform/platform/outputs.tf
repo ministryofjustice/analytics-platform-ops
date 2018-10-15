@@ -1,10 +1,10 @@
-output "airflow_db_host" {
-  value = "${module.airflow_db.address}"
-}
+# output "airflow_db_host" {
+#   value = "${module.airflow_db.address}"
+# }
 
-output "airflow_efs_host" {
-  value = "${module.airflow_storage_efs_volume.dns_name}"
-}
+# output "airflow_efs_host" {
+#   value = "${module.airflow_storage_efs_volume.dns_name}"
+# }
 
 output "region" {
   value = "${var.region}"
@@ -54,13 +54,13 @@ output "airflow_db_password" {
   value = "${var.airflow_db_password}"
 }
 
-output "airflow_smtp_username" {
-  value = "${module.airflow_smtp_user.smtp_username}"
-}
+# output "airflow_smtp_username" {
+#   value = "${module.airflow_smtp_user.smtp_username}"
+# }
 
-output "airflow_smtp_password" {
-  value = "${module.airflow_smtp_user.smtp_password}"
-}
+# output "airflow_smtp_password" {
+#   value = "${module.airflow_smtp_user.smtp_password}"
+# }
 
 output "control_panel_api_db_username" {
   value = "${var.control_panel_api_db_username}"
@@ -70,9 +70,9 @@ output "control_panel_api_db_password" {
   value = "${var.control_panel_api_db_password}"
 }
 
-output "control_panel_api_db_host" {
-  value = "${module.control_panel_api.db_host}"
-}
+# output "control_panel_api_db_host" {
+#   value = "${module.control_panel_api.db_host}"
+# }
 
 output "oidc_provider_url" {
   value = "${var.oidc_provider_url}"
