@@ -12,5 +12,5 @@ vpc_cidr = test_vars['vpc_cidr']
 
 describe vpc(vpc_id) do
     it { should exist }
-    its(:cidr_block) { should eq test_vars['vpc_cidr'] }
+    its(:cidr_block) { should eq vpc_cidr }
 end
