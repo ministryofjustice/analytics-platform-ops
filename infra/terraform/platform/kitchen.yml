@@ -16,4 +16,4 @@ suites:
 - name: default
   verifier:
     patterns:
-    - spec/*_spec.rb
+    - test/spec/*_spec.rb
