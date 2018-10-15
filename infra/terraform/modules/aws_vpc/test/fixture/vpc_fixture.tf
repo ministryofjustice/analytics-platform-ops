@@ -10,3 +10,7 @@ module "aws_vpc" {
   cidr               = "192.168.0.0/16"
   availability_zones = ["eu-west-1a"]
 }
+
+output "vpc_id" {
+  value = "${module.aws_vpc.vpc_id}"
+}

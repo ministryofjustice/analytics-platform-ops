@@ -18,6 +18,10 @@ output "terraform_base_state_file" {
   value = "${var.terraform_base_state_file}"
 }
 
+output "vpc_id" {
+  value = "${module.aws_vpc.vpc_id}"
+}
+
 output "vpc_cidr" {
   value = "${var.vpc_cidr}"
 }
