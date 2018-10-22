@@ -1,30 +1,3 @@
-data "aws_ami" "softnas" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["SoftNAS Cloud Meter*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "owner-alias"
-    values = ["aws-marketplace"]
-  }
-
-  # SoftNAS account ID
-  owners = ["679593333241"]
-}
-
 resource "aws_key_pair" "softnas" {
   key_name   = "${var.env}-softnas"
   public_key = "${var.ssh_public_key}"
