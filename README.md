@@ -535,9 +535,11 @@ The two instances can then be accessed on `https://localhost:8443/` and `https:/
 #### NFS share setup
 
 1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
-2. Go to `Storage > Disk Devices` and create partitions on attached disks.
-3. Go to `Storage > Storage Pools` and create a pool called `users` and attach disks. Choose `JBOD` pool type - RAID arrays are redundant given that we are using RAID-backed EBS volumes.
-4. Go to `Storage > Volumes` and create a volume called `homes` using the `users` pool with an NFS export, which should be selected by default.
+2. Registration - you can skip.
+3. Agreement - agree to.
+4. Go to `Storage > Disk Devices` and create partitions on attached disks by clicking `Partition All`
+5. Go to `Storage > Storage Pools` and create a pool called `users` and attach disks. Choose `JBOD` pool type - RAID arrays are redundant given that we are using RAID-backed EBS volumes.
+6. Go to `Storage > Volumes` and create a volume called `homes` using the `users` pool with an NFS export, which should be selected by default.
 
 #### NFS replication and high availability setup
 
