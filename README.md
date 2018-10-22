@@ -224,6 +224,13 @@ You can now quit the launch process because terraform will do the launch. The im
 
           Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
 
+4. Customize login page:
+
+    1. In the side-bar click "Hosted Pages"
+    2. On the Login tab, switch on "Customize Login Page"
+    3. Paste in the html from the [auth0 repo](https://github.com/ministryofjustice/analytics-platform-auth0) in the branch for your environment, in file: `hosted_pages/login.html`
+    4. Click Save
+
 #### Terraform
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
