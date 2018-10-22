@@ -108,3 +108,16 @@ output "nat_gateway_subnets" {
 #   value = "${aws_security_group.inbound_http.id}"
 # }
 
+output "xx_dmz_subnet_maps" {
+  value = "${list(
+    map(
+      "id", aws_subnet.dmz.(count.index).id, 
+      "cidr", aws_subnet.dmz.(count.index).cidr_block,
+      "availabilityZone", aws_subnet.dmz.(count.index).availability_zone
+    )
+  )}"
+}
+
+// output "xx_dmz_subnet_maps" {
+//   value = "${aws}"
+// }
