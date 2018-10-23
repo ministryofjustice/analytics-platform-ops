@@ -338,27 +338,35 @@ Once complete your base AWS resources should be in place
 
 * [kubectl](https://kubernetes.io/docs/user-guide/prereqs/)
 * [Kops](https://github.com/kubernetes/kops)
-* jq
-* yq
+* Python 3.6+
 
-(On macOS you can: `brew install kubectl kops jq yq`)
+(On macOS you can: `brew install kubectl kops python3`)
 
-2. Copy an existing cluster config:
-```
-cp -R infra/kops/clusters/alpha infra/kops/clusters/$ENVNAME
-```
+2. Create a values YAML file for Kops:
+  Most values required by Kops can be obtained from Terraform, but there is currently
+  one exception - the OIDC client ID used for cluster authentication. For this, create
+  a `infra/kops/config/${ENV}/values.yml` file containing:
+  ```
+  OIDC:
+    ClientID: $YOUR_CLIENT_ID
+  ```
 
-3. Set the correct values for your new cluster config:
-```
-cd infra/terraform/global
-export KOPS_STATE_STORE=s3://`terraform output kops_bucket_name`
-export ENV_DOMAIN=`terraform output -module=cluster_dns dns_zone_domain`
-# Get the Client ID from Auth0 "kubectl-oidc" application e.g.
-export KUBECTL_OIDC_CLIENT_ID=P742wMtS4iiA6axtbPd2ygpOa64gZqGD
+3. Generate a Kops values file containing info from Terraform:
+  ```
+  $ cd infra/terraform/kops
+  $ ./tf_output_to_kops_values.py
+  ```
+  This will output a `kops-tf-values.$ENV.json` file in the current directory
 
-cd ../../../infra/terraform/platform
-../../kops/configure.sh $KOPS_STATE_STORE $ENVNAME $ENV_DOMAIN $KUBECTL_OIDC_CLIENT_ID
-```
+3. Create a Kops `ClusterSpec` file from the template and values files:
+  ```
+  $ cd infra/terraform/kops
+  $ kops toolbox template \
+      --template cluster.tmpl.yml \
+      --values kops-tf-values.$ENV.json \
+      --values config/$ENV/values.yaml \
+      --output cluster.$ENV.rendered.yml
+  ```
 
 4. Ensure you've set the Kops state store environment variable (see previous step):
   ```
@@ -370,7 +378,7 @@ cd ../../../infra/terraform/platform
 
   ```
   cd ../../../infra/kops/clusters/$ENVNAME
-  kops create -f cluster.yml
+  kops create -f cluster.$ENV.rendered.yml
   kops create -f bastions.yml
   kops create -f masters.yml
   kops create -f nodes.yml
