@@ -344,8 +344,9 @@ Once complete your base AWS resources should be in place
 
 2. Create a values YAML file for Kops:
   Most values required by Kops can be obtained from Terraform, but there is currently
-  one exception - the OIDC client ID used for cluster authentication. For this, create
-  a `infra/kops/config/${ENV}/values.yml` file containing:
+  one exception - the Auth0 `kubectl-oidc` application's client ID used for cluster 
+  authentication. For this, create a `infra/kops/config/${ENV}/values.yml` file 
+  containing:
   ```
   OIDC:
     ClientID: $YOUR_CLIENT_ID
