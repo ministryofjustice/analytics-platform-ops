@@ -155,6 +155,8 @@ terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapsh
 terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
 ```
 
+NB If you have macOS and used Homebrew to install python, you'll see this pip install error: `must supply either home or prefix/exec-prefix -- not both` during the terraform planning. In this case, follow this solution: https://stackoverflow.com/a/24357384/1512326
+
 
 ## Environment setup
 
