@@ -12,3 +12,12 @@ variable "num_subnets" {}
 variable "performance_mode" {
   default = "generalPurpose"
 }
+
+variable "throughput_mode" {
+  default = "bursting"
+}
+
+# applies when throughput_mode = "provisioned"
+variable "provisioned_throughput_in_mibps" {
+  default = "0"
+}

@@ -38,10 +38,6 @@ output "auth0_ses_secret_key" {
   value = "${aws_iam_access_key.auth0_ses.secret}"
 }
 
-output "softnas_iam_role_arn" {
-  value = "${aws_iam_role.softnas.arn}"
-}
-
 output "s3_logs_bucket_name" {
   value = "${module.aws_account_logging.s3_logs_bucket_name}"
 }

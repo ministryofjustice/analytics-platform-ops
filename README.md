@@ -162,33 +162,6 @@ terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snaps
 
 Give the environment a name - e.g. `dev`. This will be known as $ENVNAME in these instructions.
 
-#### SoftNAS NFS server setup
-
-User network home directories are provided by SoftNAS from AWS Marketplace. There are a few different versions e.g.:
-
-* [SoftNAS from AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01BJC4JI6?qid=1495795249740&sr=0-3&ref_=srh_res_product_title) is "For Lower Compute Requirements".
-* [SoftNAS Cloud Developer Edition 4.0.x](https://aws.amazon.com/marketplace/pp/B06Y5W7TKY?qid=1533814033150&sr=0-4&ref_=srh_res_product_title) is limited to 250GB but the software is **free** - you just pay $0.085/hr for c5.large EC2 machine.
-
-There are about 20 SoftNAS options on AWS Marketplace, with varying cost models etc, so it's worth evaluating which ones suit your purpose.
-
-Once selected, on the SoftNAS product web page you need to:
-
-1. Click "Continue to Subscribe"
-2. Click "Accept terms"
-3. Wait 30 seconds before the flash message appears "Thank you for subscribing to this product!"
-4. Click "Continue to Configuration" (which has also appeared)
-5. Configure:
-
-   * Region: choose the same as chosen for the rest of your platform (e.g. EU Ireland)
-
-   Now record the AMI id (e.g. `ami-22cecec8`) - you'll use this in your .tfvars file in a moment.
-
-6. Click "Continue to Launch"
-
-   * EC2 Instance Type - select a suitable one, considering cost. Record the instance type (e.g. `m5.large`) - you'll use this in your .tfvars file in a moment.
-
-You can now quit the launch process because terraform will do the launch. The important thing is that you've agreed to the licence and recorded the settings for your .tfvars file, needed in a moment.
-
 #### Auth0
 
 1. Create a new tenant:
@@ -268,9 +241,6 @@ vim vars/$ENVNAME.tfvars
 | `airflow_db_username` | |
 | `airflow_db_password` | |
 | `ses_ap_email_identity_arn` | Create an SES email address that AP can use to send emails (SES provides the SMTP) and provide the ARN e.g. "arn:aws:ses:eu-west-1:1234567890:identity/user@example.com"
-| `softnas_ssh_public_key` | |
-| `softnas_ami_id` | e.g. `ami-22cecec8` |
-| `softnas_instance_type` | e.g. `m4.large` |
 | `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
 | `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
 | `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592", "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]` |
@@ -519,45 +489,6 @@ You can use the Auth0 web ui to add the rules, or set-up auto deployment like th
 8. Click "Deployments" tab and click "Deploy" which should show add a line with Status of "Success".
 9. https://manage.auth0.com/#/rules should now be populated
 
-
-### NFS server administration
-
-By default two SoftNAS instances are deployed, to provide data replication and high-availability. This can be changed to a single-server deployment by changing the `user_nfs_softnas.num_instances` Terraform variable to `1`.
-
-NFS server storage volumes are provided by EBS volumes defined in `infra/terraform/modules/user_nfs_softnas/ebs.tf`, and additional volumes can be defined there as necessary. By default two EBS volumes are created for each Terraform resource defined, to mirror storage between both SoftNAS instances.
-
-SoftNAS does not support any form of configuration management, so NFS server setup must be performed manually via the SoftNAS web interface. As SoftNAS is deployed into private subnets, you must use an SSH tunnel to access the admin interface:
-
-`$ ssh -L 8443:softnas-0.dev.mojanalytics.xyz:443 -L 8444:softnas-1.dev.mojanalytics.xyz:443 admin@bastion.dev.mojanalytics.xyz -N`
-
-The two instances can then be accessed on `https://localhost:8443/` and `https://localhost:8444/`.
-
-#### NFS share setup
-
-1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
-2. Go to `Storage > Disk Devices` and create partitions on attached disks.
-3. Go to `Storage > Storage Pools` and create a pool called `users` and attach disks. Choose `JBOD` pool type - RAID arrays are redundant given that we are using RAID-backed EBS volumes.
-4. Go to `Storage > Volumes` and create a volume called `homes` using the `users` pool with an NFS export, which should be selected by default.
-
-#### NFS replication and high availability setup
-
-##### Replication
-1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
-2. Go to `SnapReplicate` settings
-3. Click `Add replication`
-4. Follow the setup wizard, providing the private IP and SoftNAS login details for the `softnas-1` instance when prompted
-5. Login to the admin UI of `softnas-1` and check the `SnapReplicate` section to confirm that replication setup was successful
-
-##### High Availability
-1. Login to the admin UI of the `softnas-0` instance. Default username is `softnas` and the default password is the AWS instance ID.
-2. Go to `SnapReplicate` settings
-3. Click `Add SnapHA`
-4. Enter a contact email address for monitoring alerts
-5. Click `Add SnapHA` again
-6. Follow the setup wizard. The "VirtualIP" the wizard requests is defined in Terraform as `172.16.0.1`. If the wizard complains about invalid AWS credentials, try again - the wizard seems somewhat glitchy at this point
-7. Login to the admin UI of `softnas-1` and check the `SnapReplicate` section to confirm that HA setup was successful
-
-The SoftNAS secondary will monitor availability of the primary, and take over primary status if it cannot ping the current primary. Takeover is performed by updating the AWS routing tables to point the VirtualIP address to the current secondary. Refer to the [SoftNAS HA admin guide](https://www.softnas.com/docs/softnas/v3/snapha-html/ha_operations.html) for more info on how to manage replacement of failed instances, and other HA operations.
 
 ## What's next
 

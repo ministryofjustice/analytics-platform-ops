@@ -26,26 +26,6 @@ output "availability_zones" {
   value = "${var.availability_zones}"
 }
 
-output "softnas_ssh_public_key" {
-  value = "${var.softnas_ssh_public_key}"
-}
-
-output "softnas_num_instances" {
-  value = "${var.softnas_num_instances}"
-}
-
-output "softnas_default_volume_size" {
-  value = "${var.softnas_default_volume_size}"
-}
-
-output "softnas_ami_id" {
-  value = "${var.softnas_ami_id}"
-}
-
-output "softnas_instance_type" {
-  value = "${var.softnas_instance_type}"
-}
-
 output "airflow_db_username" {
   value = "${var.airflow_db_username}"
 }
@@ -84,4 +64,8 @@ output "oidc_client_ids" {
 
 output "oidc_provider_thumbprints" {
   value = "${var.oidc_provider_thumbprints}"
+}
+
+output "user_nfs_dns_name" {
+  value = "${module.user_nfs.dns_name}"
 }

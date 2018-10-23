@@ -35,20 +35,19 @@ module "data_buckets" {
   env = "${terraform.workspace}"
 }
 
-module "user_nfs_softnas" {
-  source = "../modules/user_nfs_softnas"
+module "user_nfs" {
+  source = "../modules/efs_volume"
 
-  num_instances             = 1
-  softnas_ami_id            = "${var.softnas_ami_id}"
-  instance_type             = "${var.softnas_instance_type}"
-  env                       = "${terraform.workspace}"
-  vpc_id                    = "${module.aws_vpc.vpc_id}"
-  node_security_group_id    = "${module.aws_vpc.extra_node_sg_id}"
-  bastion_security_group_id = "${module.aws_vpc.extra_bastion_sg_id}"
-  subnet_ids                = "${module.aws_vpc.storage_subnet_ids}"
-  ssh_public_key            = "${var.softnas_ssh_public_key}"
-  dns_zone_id               = "${module.cluster_dns.dns_zone_id}"
-  dns_zone_domain           = "${module.cluster_dns.dns_zone_domain}"
+  env                    = "${terraform.workspace}"
+  cluster_name           = "${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"
+  vpc_id                 = "${module.aws_vpc.vpc_id}"
+  node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
+  subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
+  availability_zones     = "${var.availability_zones}"
+  performance_mode       = "maxIO"
+
+  # TODO: for better performance, edit the module to switch it to
+  # "new provisioned throughput mode" (and play with the number).
 }
 
 module "data_backup" {
