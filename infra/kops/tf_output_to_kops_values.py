@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 
+
 def flatten_tf_output(d):
     '''
     Convert terraform output JSON to a flat collection of values. e.g:
@@ -22,6 +23,7 @@ def flatten_tf_output(d):
     }
     '''
     return {k: v['value'] for k, v in d.items()}
+
 
 def subnet_attr_lists_to_dicts(subnets):
     '''
@@ -59,18 +61,18 @@ def subnet_attr_lists_to_dicts(subnets):
     '''
     return [
         {'availabilityZone': az, 'cidr': cidr, 'id': sid}
-        for az, cidr, sid in 
-            zip(subnets['availabilityZones'],
-                subnets['cidrs'],
-                subnets['ids'])
+        for az, cidr, sid in zip(subnets['availabilityZones'],
+                                 subnets['cidrs'],
+                                 subnets['ids'])
     ]
+
 
 # Stash current working directory
 cwd = os.getcwd()
 
-# Get path to base terraform directory
+# Get path to base terraform directory
 tf_root_dir = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 
+    os.path.dirname(__file__),
     '../terraform'
 ))
 
@@ -98,12 +100,14 @@ kops_values = {
     'VPC': {
         'id': tf_platform['vpc_id'],
         'cidr': tf_platform['vpc_cidr'],
-        'publicSubnets': subnet_attr_lists_to_dicts(tf_platform['dmz_subnets']),
-        'privateSubnets': subnet_attr_lists_to_dicts(tf_platform['private_subnets'])
+        'publicSubnets': subnet_attr_lists_to_dicts(
+            tf_platform['dmz_subnets']),
+        'privateSubnets': subnet_attr_lists_to_dicts(
+            tf_platform['private_subnets'])
     }
 }
 
-# Get current Terraform workspace name
+# Get current Terraform workspace name
 tf_workspace = subprocess.getoutput("terraform workspace show")
 
 # Output kops values to file
