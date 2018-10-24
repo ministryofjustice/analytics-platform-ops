@@ -5,60 +5,41 @@ import subprocess
 
 
 def flatten_tf_output(d):
-    '''
-    Convert terraform output JSON to a flat collection of values. e.g:
+    """Convert terraform output JSON to a flat dict
 
-    From:
-    {
-        "vpc_cidr": {
-            "sensitive": false,
-            "type": "string",
-            "value": "192.168.0.0/16"
-        }
-    }
-
-    To:
-    {
-        "vpc_cidr": "192.168.0.0/16"
-    }
-    '''
+    >>> flatten_tf_output({
+    ...    'vpc_cidr': {
+    ...        'sensitive': False,
+    ...        'type': 'string',
+    ...        'value': '192.168.0.0/16'
+    ...    }
+    ... })
+    {'vpc_cidr': '192.168.0.0/16'}
+    """
     return {k: v['value'] for k, v in d.items()}
 
 
 def subnet_attr_lists_to_dicts(subnets):
-    '''
-    Transpose Terraform dict-of-lists to a list of dicts. e.g:
+    """Transpose Terraform dict-of-lists to a list of dicts. e.g:
 
-    From:
-    {
-        "availabilityZones": [
-            "eu-west-1a",
-            "eu-west-1b"
-        ],
-        "cidrs": [
-            "192.168.10.0/24",
-            "192.168.14.0/24"
-        ],
-        "ids": [
-            "subnet-7d72600b",
-            "subnet-7c376924"
-        ]
-    }
-
-    To:
-    [
-        {
-            "availabilityZone": "eu-west-1a",
-            "cidr": "192.168.10.0/24",
-            "id": "subnet-7d72600b"
-        },
-        {
-            "availabilityZone": "eu-west-1b",
-            "cidr": "192.168.14.0/24",
-            "id": "subnet-7c376924"
-        }
-    ]
-    '''
+    >>> subnet_attr_lists_to_dicts({
+    ...     'availabilityZones': [
+    ...         'eu-west-1a',
+    ...         'eu-west-1b'
+    ...     ],
+    ...     'cidrs': [
+    ...         '192.168.10.0/24',
+    ...         '192.168.14.0/24'
+    ...     ],
+    ...     'ids': [
+    ...         'subnet-7d72600b',
+    ...         'subnet-7c376924'
+    ...     ]
+    ... })
+    [{'availabilityZone': 'eu-west-1a', 'cidr': '192.168.10.0/24', 'id': \
+'subnet-7d72600b'}, {'availabilityZone': 'eu-west-1b', 'cidr': \
+'192.168.14.0/24', 'id': 'subnet-7c376924'}]
+    """
     return [
         {'availabilityZone': az, 'cidr': cidr, 'id': sid}
         for az, cidr, sid in zip(subnets['availabilityZones'],
@@ -114,3 +95,8 @@ tf_workspace = subprocess.getoutput("terraform workspace show")
 os.chdir(cwd)
 with open(f'kops-tf-values.{tf_workspace}.json', 'w') as f:
     f.write(json.dumps(kops_values, sort_keys=True, indent=4))
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
