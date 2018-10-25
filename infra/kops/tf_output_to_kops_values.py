@@ -2,6 +2,13 @@
 import os
 import json
 import subprocess
+import argparse
+
+
+CWD = os.path.abspath(os.path.dirname(__file__))
+TF_BASE_DIR = os.path.abspath(os.path.join(
+    CWD, '../terraform'
+))
 
 
 def flatten_tf_output(d):
@@ -20,7 +27,7 @@ def flatten_tf_output(d):
 
 
 def subnet_attr_lists_to_dicts(subnets):
-    """Transpose Terraform dict-of-lists to a list of dicts. e.g:
+    """Transpose Terraform dict of lists to a list of dicts. e.g:
 
     >>> subnet_attr_lists_to_dicts({
     ...     'availabilityZones': [
@@ -48,55 +55,65 @@ def subnet_attr_lists_to_dicts(subnets):
     ]
 
 
-# Stash current working directory
-cwd = os.getcwd()
+def get_tf_resource_dir(tf_resources):
+    return os.path.abspath(os.path.join(TF_BASE_DIR, tf_resources))
 
-# Get path to base terraform directory
-tf_root_dir = os.path.abspath(os.path.join(
-    os.path.dirname(__file__),
-    '../terraform'
-))
 
-# Get Terraform outputs for 'global' resources
-os.chdir(os.path.join(tf_root_dir, 'global'))
-tf_global = flatten_tf_output(
-    json.loads(
-        subprocess.getoutput("terraform output -json")))
+def get_tf_output(tf_resources):
+    os.chdir(get_tf_resource_dir(tf_resources))
+    return flatten_tf_output(
+        json.loads(
+            subprocess.getoutput("terraform output -json")))
 
-# Get Terraform outputs for 'platform' resources
-os.chdir(os.path.join(tf_root_dir, 'platform'))
-tf_platform = flatten_tf_output(
-    json.loads(
-        subprocess.getoutput("terraform output -json")))
 
-# Build kops values
-kops_values = {
-    'kopsStateBucket': tf_global['kops_bucket_name'],
-    'clusterDNSName': tf_platform['dns_zone_domain'],
-    'DNSZone': tf_platform['dns_zone_id'],
-    'availabilityZones': tf_platform['availability_zones'],
-    'OIDC': {
-        'IssuerURL': tf_platform['oidc_provider_url'],
-    },
-    'VPC': {
-        'id': tf_platform['vpc_id'],
-        'cidr': tf_platform['vpc_cidr'],
-        'publicSubnets': subnet_attr_lists_to_dicts(
-            tf_platform['dmz_subnets']),
-        'privateSubnets': subnet_attr_lists_to_dicts(
-            tf_platform['private_subnets'])
+def get_terraform_workspace():
+    os.chdir(get_tf_resource_dir('platform'))
+    return subprocess.getoutput("terraform workspace show")
+
+
+def build_kops_values(global_resources, platform_resources):
+    """Build data dict for use by Kops template
+    """
+    return {
+        'kopsStateBucket': global_resources['kops_bucket_name'],
+        'clusterDNSName': platform_resources['dns_zone_domain'],
+        'DNSZone': platform_resources['dns_zone_id'],
+        'availabilityZones': platform_resources['availability_zones'],
+        'OIDC': {
+            'IssuerURL': platform_resources['oidc_provider_url'],
+        },
+        'VPC': {
+            'id': platform_resources['vpc_id'],
+            'cidr': platform_resources['vpc_cidr'],
+            'publicSubnets': subnet_attr_lists_to_dicts(
+                platform_resources['dmz_subnets']),
+            'privateSubnets': subnet_attr_lists_to_dicts(
+                platform_resources['private_subnets'])
+        }
     }
-}
 
-# Get current Terraform workspace name
-tf_workspace = subprocess.getoutput("terraform workspace show")
 
-# Output kops values to file
-os.chdir(cwd)
-with open(f'kops-tf-values.{tf_workspace}.json', 'w') as f:
-    f.write(json.dumps(kops_values, sort_keys=True, indent=4))
+# Create command line args
+parser = argparse.ArgumentParser(description='Generate kops values JSON file')
+parser.add_argument('--workspace', default=get_terraform_workspace(),
+                    help=('Terraform workspace name ' +
+                          '(default: current workspace)'))
+parser.add_argument('--test', action='store_true', help='Run tests')
+args = parser.parse_args()
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    if args.test:
+        import doctest
+        doctest.testmod(verbose=True)
+    else:
+        # Build kops values dict
+        print(f'Building kops values for {args.workspace} workspace')
+        kops_values = build_kops_values(
+            get_tf_output('global'), get_tf_output('platform'))
+
+        # Output kops values to file
+        out = f'{CWD}/kops-tf-values.{args.workspace}.json'
+        with open(out, 'w') as f:
+            f.write(json.dumps(kops_values, sort_keys=True, indent=4))
+            print(f'Kops values written to {out}')
