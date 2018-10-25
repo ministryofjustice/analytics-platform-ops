@@ -32,6 +32,10 @@ variable "softnas_instance_type" {
   default = "m4.large"
 }
 
+variable "softnas_volume_size" {
+  default = "10" # GB
+}
+
 variable "control_panel_api_db_username" {}
 variable "control_panel_api_db_password" {}
 
