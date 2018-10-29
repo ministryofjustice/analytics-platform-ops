@@ -491,12 +491,12 @@ In Auth0 you need to create some Applications.
 
 The Client ID and Client Secret values will be used in various helm chart configurations.
 
-### Auth0 Rules
+### Auth0 Rules & Hosted Pages
 
-Auth0 needs 'rules' installed, to ensure only certain people can log-in, for example.
+Auth0 needs 'rules' installed, to ensure only certain people can log-in, for example. We also use the 'Hosted pages' feature to customize the login page. Both are continuously deployed with the same setup, as follows.
 
 Find the rules in this repo: https://github.com/ministryofjustice/analytics-platform-auth0
-in the dev or alpha branches. Create a new branch based on these and adapt the following settings in them:
+in the dev or alpha branches. Create a new branch (or fork it if another organization) and adapt the following settings in them:
 
 | Setting | Description |
 | ------- | ----------- |
