@@ -488,6 +488,9 @@ In Auth0 you need to create some Applications.
      4. Click "Save"
      5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
      6. Click "Save" and "X" to close the dialog.
+11. Set the apps that Google can be used sign in to:
+     1. Still in "Connections" | "Social", click "Google" then "Applications"
+     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
 
 The Client ID and Client Secret values will be used in various helm chart configurations.
 
