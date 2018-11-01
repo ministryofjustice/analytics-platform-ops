@@ -401,13 +401,13 @@ The admin credentials for this cluster needs copying from S3 bucket $KOPS_STATE_
 ```
 $ kops export kubecfg $ENV_DOMAIN
 ```
-People who have not gone through the custer set-up can get access: e.g.
+The developers did not do the cluster set-up (above) can get their kube config the same way, but they need some info from you. For example you can send them something like this:
 ```
-# You need an AWS account with access to the $KOPS_STATE_STORE bucket.
+# You need an AWS user account with access to the S3 bucket named in the KOPS_STATE_STORE environment variable below.
 # Now configure the aws cli:
 aws configure
 # Now you can install the cluster's kube config:
-export KOPS_STATE_STORE=s3://kops.data-science.org.uk
+export KOPS_STATE_STORE=s3://kops.accelerator.data-science.org
 kops export kubecfg accelerator.data-science.org.uk
 ```
 
