@@ -391,9 +391,25 @@ cd ../../../infra/terraform/platform
 
 
 ### Verify cluster creation
-1. `$ kubectl cluster-info`
+`$ kubectl cluster-info`
 
 If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
+
+### kube config
+
+The admin credentials for this cluster needs copying from S3 bucket $KOPS_STATE_STORE to your local disk (`~/.kube/config` by default). This allows you to run kubectl and helm:
+```
+$ kops export kubecfg $ENV_DOMAIN
+```
+People who have not gone through the custer set-up can get access: e.g.
+```
+# You need an AWS account with access to the $KOPS_STATE_STORE bucket.
+# Now configure the aws cli:
+aws configure
+# Now you can install the cluster's kube config:
+export KOPS_STATE_STORE=s3://kops.data-science.org.uk
+kops export kubecfg accelerator.data-science.org.uk
+```
 
 ### Helm setup
 
