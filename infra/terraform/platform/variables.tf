@@ -58,3 +58,23 @@ variable "oidc_provider_thumbprints" {
 variable "idp_saml_domain" {}
 variable "idp_saml_signon_url" {}
 variable "idp_saml_logout_url" {}
+
+variable "trusted_entity" {
+  type        = "list"
+  description = "Cert-Manager: Trusted entity ARN to assume the instance role"
+}
+
+variable "hostedzoneid_arn" {
+  type        = "list"
+  description = "Cert-Manager: ARN of the hosted zone to perform the DNS01 challenge"
+}
+
+variable "instance_role_name" {
+  type        = "list"
+  description = "The Instance Role to attach the policy to"
+}
+
+variable "asg_arn" {
+  type        = "list"
+  description = "Cluster-AutoScaler: ARN of Kubernetes worker nodes autoscaling group"
+}
