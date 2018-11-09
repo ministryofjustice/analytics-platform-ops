@@ -206,8 +206,8 @@ You can now quit the launch process because terraform will do the launch. The im
          * Application Type: Regular Web Applications
     3. Click "Save"
     4. Click "Settings"
-         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
-         * Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
+         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$ENVNAME.$domain/callback` (replace the $variables)
+         * Allowed Web Origins: `https://aws.services.$ENVNAME.$domain` (replace the $variables)
     5. Click "Save changes"
 
     Record the Domain and Client ID values - you'll use them in your .tfvars file in a moment.
@@ -357,16 +357,16 @@ Once complete your base AWS resources should be in place
   $ cd infra/terraform/kops
   $ ./tf_output_to_kops_values.py
   ```
-  This will output a `kops-tf-values.$ENV.json` file in the current directory
+  This will output a `kops-tf-values.$ENVNAME.json` file in the current directory
 
 3. Create a Kops `ClusterSpec` file from the template and values files:
   ```
   $ cd infra/terraform/kops
   $ kops toolbox template \
       --template cluster.tmpl.yml \
-      --values kops-tf-values.$ENV.json \
-      --values config/$ENV/values.yaml \
-      --output cluster.$ENV.rendered.yml
+      --values kops-tf-values.$ENVNAME.json \
+      --values config/$ENVNAME/values.yaml \
+      --output cluster.$ENVNAME.rendered.yml
   ```
 
 4. Ensure you've set the Kops state store environment variable (see previous step):
@@ -379,7 +379,7 @@ Once complete your base AWS resources should be in place
 
   ```
   cd ../../../infra/kops/clusters/$ENVNAME
-  kops create -f cluster.$ENV.rendered.yml
+  kops create -f cluster.$ENVNAME.rendered.yml
   kops create -f bastions.yml
   kops create -f masters.yml
   kops create -f nodes.yml
@@ -494,10 +494,10 @@ In Auth0 you need to create some Applications.
       * Application Type: Regular Web Applications
 4. Click "Save"
 5. Click "Settings" tab
-      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$env.$domain/callback`
+      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$ENVNAME.$domain/callback`
       (replace the $variables)
-      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$env.$domain` (replace the $variables)
-      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$env.$domain` (replace the $variables)
+      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
+      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
 6. Click "Save changes"
 7. Click "Connections" tab
 8. Switch OFF "Database" and "Google"
@@ -529,7 +529,7 @@ in the dev or alpha branches. Create a new branch (or fork it if another organiz
 | Setting | Description |
 | ------- | ----------- |
 | `targeted_clients` | The 'Client ID' of the Auth0 application "kubectl-oidc" |
-| `namespace` | Set to: `https://api.$ENV.$DOMAIN/claims/` but replace the variables |
+| `namespace` | Set to: `https://api.$ENVNAME.$DOMAIN/claims/` but replace the variables |
 | `AUTHENTICATOR_LABEL` | The name of the platform, as shown when doing Auth0 MFA |
 | `whitelist` | The GitHub organizations whose members are authorized to access the platform |
 
