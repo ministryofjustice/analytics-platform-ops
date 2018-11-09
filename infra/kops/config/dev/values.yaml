@@ -1,2 +1,19 @@
 OIDC:
   ClientID: p4L2qRcSgWyqHjoHanJ4QyhWL1iX612i
+
+instanceGroups:
+  image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-03-11
+
+  masters:
+    machineType: t2.medium
+
+  nodes:
+    machineType: r4.xlarge
+    rootVolumeSize: 100
+    maxSize: 6
+    minSize: 6
+
+  bastions:
+    machineType: t2.micro
+    maxSize: 1
+    minSize: 1
