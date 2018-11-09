@@ -343,55 +343,84 @@ Once complete your base AWS resources should be in place
 (On macOS you can: `brew install kubectl kops python3`)
 
 2. Create a values YAML file for Kops:
-  Most values required by Kops can be obtained from Terraform, but there is currently
-  one exception - the Auth0 `kubectl-oidc` application's client ID used for cluster 
-  authentication. For this, create a `infra/kops/config/${ENV}/values.yml` file 
-  containing:
+  Most information required by Kops can be obtained from Terraform, with the exception of 
+  authentication information, cluster size, and instance machine image. This information 
+  must be supplied as a YAML file with the following structure, as 
+  `infra/kops/config/$ENVNAME.yaml`:
+
   ```
   OIDC:
-    ClientID: $YOUR_CLIENT_ID
+    ClientID: ""
+
+  instanceGroups:
+    image: ""
+
+    masters:
+      machineType: ""
+
+    nodes:
+      machineType: ""
+      rootVolumeSize: ""
+      maxSize: ""
+      minSize: ""
+
+    bastions:
+      machineType: ""
+      maxSize: ""
+      minSize: ""
   ```
 
-3. Generate a Kops values file containing info from Terraform:
+  | Key                  | Value                                                    |
+  |----------------------|----------------------------------------------------------|
+  | OIDC.ClientID        | OIDC client ID from the `kubectl-oidc` Auth0 application |
+  | instanceGroups.image | kops AMI ID matching the [kops channel and Kubernetes version](https://github.com/kubernetes/kops/blob/master/channels/stable) in use, e.g. `kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17` |
+  | masters.machineType  | EC2 instance type for master nodes, e.g. `m4.xlarge` |
+  | nodes.machineType    | EC2 instance type for worker nodes, e.g. `m4.xlarge` |
+  | nodes.rootVolumeSize | nodes' root disk size, in GB, e.g. `100` |
+  | nodes.maxSize        | max number of nodes to deploy |
+  | nodes.minSize        | min number of nodes to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
+  | bastions.machineType | EC2 instance type for SSH bastions, e.g. `t2.micro` |
+  | bastions.maxSize     | max number of bastions to deploy |
+  | bastions.minSize     | min number of bastions to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
+
+3. Generate a Kops values file containing additional info from Terraform:
   ```
   $ cd infra/kops
   $ ./tf_output_to_kops_values.py
   ```
   This will output a `kops-tf-values.$ENVNAME.json` file in the current directory
 
-3. Create a Kops `ClusterSpec` file from the template and values files:
+4. Create a file containing Kops `ClusterSpec` and `InstanceGroup` resources from the template and values files:
   ```
   $ kops toolbox template \
       --template cluster.tmpl.yml \
       --values kops-tf-values.$ENVNAME.json \
-      --values config/$ENVNAME/values.yaml \
+      --values config/$ENVNAME.yaml \
       --output cluster.$ENVNAME.rendered.yml
   ```
 
-4. Set the Kops state store S3 bucket environment variable (see previous step):
+5. Set the Kops state store S3 bucket environment variable (see previous step):
   ```
   $ cd ../terraform/global
   $ exports KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
   ```
 
-5. Plan Kops cluster resource creation:
+6. Plan Kops cluster resource creation:
 
   ```
   cd ../../kops/clusters/$ENVNAME
   kops create -f cluster.$ENVNAME.rendered.yml
-  kops create -f bastions.yml
-  kops create -f masters.yml
-  kops create -f nodes.yml
   ```
 
-5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
+7. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
 
-6. Add the .pub key to Kops cluster:
+8. Add the .pub key to Kops cluster:
   ```
   kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
   ```
   ($ENV_DOMAIN was set recently, and matches the cluster name in cluster.yml)
-7. Plan and create cluster:
+
+9. Plan and create cluster:
 
   ```
   kops update cluster $ENV_DOMAIN
