@@ -370,18 +370,18 @@ Once complete your base AWS resources should be in place
       minSize: ""
   ```
 
-  | Key                  | Value                                                    |
-  |----------------------|----------------------------------------------------------|
-  | OIDC.ClientID        | OIDC client ID from the `kubectl-oidc` Auth0 application |
-  | instanceGroups.image | kops AMI ID matching the [kops channel and Kubernetes version](https://github.com/kubernetes/kops/blob/master/channels/stable) in use, e.g. `kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17` |
-  | masters.machineType  | EC2 instance type for master nodes, e.g. `m4.xlarge` |
-  | nodes.machineType    | EC2 instance type for worker nodes, e.g. `m4.xlarge` |
-  | nodes.rootVolumeSize | nodes' root disk size, in GB, e.g. `100` |
-  | nodes.maxSize        | max number of nodes to deploy |
-  | nodes.minSize        | min number of nodes to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
-  | bastions.machineType | EC2 instance type for SSH bastions, e.g. `t2.micro` |
-  | bastions.maxSize     | max number of bastions to deploy |
-  | bastions.minSize     | min number of bastions to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
+  | Key                    | Value                                                    |
+  |------------------------|----------------------------------------------------------|
+  | `OIDC.ClientID`        | OIDC client ID from the `kubectl-oidc` Auth0 application |
+  | `instanceGroups.image` | kops AMI ID matching the [kops channel and Kubernetes version](https://github.com/kubernetes/kops/blob/master/channels/stable) in use, e.g. `kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17` |
+  | `masters.machineType`  | EC2 instance type for master nodes, e.g. `m4.xlarge` |
+  | `nodes.machineType`    | EC2 instance type for worker nodes, e.g. `m4.xlarge` |
+  | `nodes.rootVolumeSize` | nodes' root disk size, in GB, e.g. `100` |
+  | `nodes.maxSize`        | max number of nodes to deploy |
+  | `nodes.minSize`        | min number of nodes to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
+  | `bastions.machineType` | EC2 instance type for SSH bastions, e.g. `t2.micro` |
+  | `bastions.maxSize`     | max number of bastions to deploy |
+  | `bastions.minSize`     | min number of bastions to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
 
 3. Generate a Kops values file containing additional info from Terraform:
   ```
