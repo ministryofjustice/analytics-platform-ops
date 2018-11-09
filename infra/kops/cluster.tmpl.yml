@@ -91,3 +91,69 @@ spec:
       type: Public
     masters: private
     nodes: private
+{{- range .availabilityZones }}
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.clusterDNSName }}
+  name: master-{{ . }}
+spec:
+  additionalSecurityGroups:
+  - {{ $.extraSecurityGroups.masters }}
+  associatePublicIp: false
+  image: {{ $.instanceGroups.image }}
+  machineType: {{ $.instanceGroups.masters.machineType }}
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+  - {{ . }}
+{{- end }}
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.clusterDNSName }}
+  name: nodes
+spec:
+  additionalSecurityGroups:
+  - {{ $.extraSecurityGroups.nodes }}
+  associatePublicIp: false
+  image: {{ $.instanceGroups.image }}
+  machineType: {{ $.instanceGroups.nodes.machineType }}
+  maxSize: {{ $.instanceGroups.nodes.maxSize }}
+  minSize: {{ $.instanceGroups.nodes.minSize }}
+  role: Node
+  rootVolumeSize: {{ $.instanceGroups.nodes.rootVolumeSize }}
+  subnets:
+  {{- range .availabilityZones }}
+  - {{ . }}
+  {{- end}}
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.clusterDNSName }}
+  name: bastions
+spec:
+  additionalSecurityGroups:
+  - {{ $.extraSecurityGroups.bastions }}
+  image: {{ $.instanceGroups.image }}
+  machineType: {{ $.instanceGroups.bastions.machineType }}
+  maxSize: {{ $.instanceGroups.bastions.maxSize }}
+  minSize: {{ $.instanceGroups.bastions.minSize }}
+  role: Bastion
+  subnets:
+  {{- range .availabilityZones }}
+  - dmz-{{ . }}
+  {{- end}}
