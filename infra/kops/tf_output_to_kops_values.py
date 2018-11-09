@@ -89,6 +89,11 @@ def build_kops_values(global_resources, platform_resources):
                 platform_resources['dmz_subnets']),
             'privateSubnets': subnet_attr_lists_to_dicts(
                 platform_resources['private_subnets'])
+        },
+        'extraSecurityGroups': {
+            'masters': platform_resources['extra_master_sg_id'],
+            'nodes': platform_resources['extra_node_sg_id'],
+            'bastions': platform_resources['extra_bastion_sg_id'],
         }
     }
 
