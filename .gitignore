@@ -20,3 +20,7 @@ venv
 
 # Node
 node_modules
+
+# Kops templating intermediary files
+/infra/kops/*.rendered.yml
+/infra/kops/kops-tf-values*
