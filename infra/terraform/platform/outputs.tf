@@ -105,3 +105,15 @@ output "dmz_subnets" {
 output "private_subnets" {
   value = "${module.aws_vpc.private_subnets}"
 }
+
+output "extra_bastion_sg_id" {
+  value = "${module.aws_vpc.extra_bastion_sg_id}"
+}
+
+output "extra_master_sg_id" {
+  value = "${module.aws_vpc.extra_master_sg_id}"
+}
+
+output "extra_node_sg_id" {
+  value = "${module.aws_vpc.extra_node_sg_id}"
+}
