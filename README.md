@@ -354,14 +354,14 @@ Once complete your base AWS resources should be in place
 
 3. Generate a Kops values file containing info from Terraform:
   ```
-  $ cd infra/terraform/kops
+  $ cd infra/kops
   $ ./tf_output_to_kops_values.py
   ```
   This will output a `kops-tf-values.$ENVNAME.json` file in the current directory
 
 3. Create a Kops `ClusterSpec` file from the template and values files:
   ```
-  $ cd infra/terraform/kops
+  $ cd infra/kops
   $ kops toolbox template \
       --template cluster.tmpl.yml \
       --values kops-tf-values.$ENVNAME.json \
