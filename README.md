@@ -361,7 +361,6 @@ Once complete your base AWS resources should be in place
 
 3. Create a Kops `ClusterSpec` file from the template and values files:
   ```
-  $ cd infra/kops
   $ kops toolbox template \
       --template cluster.tmpl.yml \
       --values kops-tf-values.$ENVNAME.json \
@@ -369,16 +368,16 @@ Once complete your base AWS resources should be in place
       --output cluster.$ENVNAME.rendered.yml
   ```
 
-4. Ensure you've set the Kops state store environment variable (see previous step):
+4. Set the Kops state store S3 bucket environment variable (see previous step):
   ```
-  $ echo $KOPS_STATE_STORE
-  s3://kops.analytics.justice.gov.uk
+  $ cd ../terraform/global
+  $ exports KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
   ```
 
 5. Plan Kops cluster resource creation:
 
   ```
-  cd ../../../infra/kops/clusters/$ENVNAME
+  cd ../../kops/clusters/$ENVNAME
   kops create -f cluster.$ENVNAME.rendered.yml
   kops create -f bastions.yml
   kops create -f masters.yml
@@ -386,6 +385,7 @@ Once complete your base AWS resources should be in place
   ```
 
 5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
+
 6. Add the .pub key to Kops cluster:
   ```
   kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
