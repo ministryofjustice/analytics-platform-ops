@@ -73,7 +73,7 @@ spec:
   {{- range .VPC.publicSubnets }}
   - id: {{.id}}
     cidr: {{.cidr}}
-    name: {{.availabilityZone}}
+    name: dmz-{{.availabilityZone}}
     zone: {{.availabilityZone}}
     type: Utility
   {{- end}}
