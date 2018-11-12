@@ -1,2 +1,2 @@
-certifi==2016.8.8
+certifi
 elasticsearch>=5.0.0,<6.0.0
