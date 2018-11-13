@@ -2,8 +2,6 @@ OIDC:
   ClientID: oUb1V330oXKyMpTagAYDzWDY10U4ffWF
 
 instanceGroups:
-  image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-03-11
-
   masters:
     machineType: m4.xlarge
 
