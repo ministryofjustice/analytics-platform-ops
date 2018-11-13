@@ -93,8 +93,8 @@ spec:
       type: Public
     masters: private
     nodes: private
-{{- range .availabilityZones }}
 
+{{- range .availabilityZones }}
 ---
 
 apiVersion: kops/v1alpha2
@@ -114,6 +114,7 @@ spec:
   role: Master
   subnets:
   - {{ . }}
+
 {{- end }}
 
 ---
