@@ -353,8 +353,6 @@ Once complete your base AWS resources should be in place
     ClientID: ""
 
   instanceGroups:
-    image: ""
-
     masters:
       machineType: ""
 
@@ -373,7 +371,6 @@ Once complete your base AWS resources should be in place
   | Key                    | Value                                                    |
   |------------------------|----------------------------------------------------------|
   | `OIDC.ClientID`        | OIDC client ID from the `kubectl-oidc` Auth0 application |
-  | `instanceGroups.image` | kops AMI ID matching the [kops channel and Kubernetes version](https://github.com/kubernetes/kops/blob/master/channels/stable) in use, e.g. `kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17` |
   | `masters.machineType`  | EC2 instance type for master nodes, e.g. `m4.xlarge` |
   | `nodes.machineType`    | EC2 instance type for worker nodes, e.g. `m4.xlarge` |
   | `nodes.rootVolumeSize` | nodes' root disk size, in GB, e.g. `100` |
