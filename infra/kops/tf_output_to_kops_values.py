@@ -61,9 +61,9 @@ def get_tf_resource_dir(tf_resources):
 
 def get_tf_output(tf_resources):
     os.chdir(get_tf_resource_dir(tf_resources))
-    return flatten_tf_output(
-        json.loads(
-            subprocess.getoutput("terraform output -json")))
+    exitcode, output = subprocess.getstatusoutput("terraform output -json")
+    assert exitcode == 0, output
+    return flatten_tf_output(json.loads(output))
 
 
 def get_terraform_workspace():
