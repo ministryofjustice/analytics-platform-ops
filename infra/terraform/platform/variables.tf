@@ -54,13 +54,3 @@ variable "oidc_client_ids" {
 variable "oidc_provider_thumbprints" {
   type = "list"
 }
-
-variable "trusted_entity" {
-  type        = "list"
-  description = "Cert-Manager: Trusted entity ARN to assume the instance role"
-}
-
-variable "hostedzoneid_arn" {
-  type        = "list"
-  description = "Cert-Manager: ARN of the hosted zone to perform the DNS01 challenge"
-}

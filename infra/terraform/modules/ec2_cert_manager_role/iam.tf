@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "policy" {
   statement {
     effect    = "Allow"
     actions   = ["route53:ChangeResourceRecordSets"]
-    resources = ["${var.hostedzoneid_arn}"]
+    resources = ["arn:aws:route53:::hostedzone/${var.hosted_zone_id}"]
   }
 }
 
