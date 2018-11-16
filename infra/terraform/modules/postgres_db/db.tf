@@ -15,7 +15,7 @@ resource "aws_db_instance" "db" {
   db_subnet_group_name   = "${aws_db_subnet_group.subnet.name}"
   vpc_security_group_ids = ["${aws_security_group.sg.*.id}"]
 
-  skip_final_snapshot     = false
+  skip_final_snapshot     = true
   backup_retention_period = 35
   backup_window           = "22:00-23:59"
   maintenance_window      = "Sun:06:00-Sun:08:00"
