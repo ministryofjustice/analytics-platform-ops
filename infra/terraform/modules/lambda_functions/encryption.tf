@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "encrypt_s3_object_assumerole" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
 
@@ -44,37 +44,41 @@ data "aws_iam_policy_document" "encrypt_s3_object_assumerole" {
 
 # Role running the lambda function
 resource "aws_iam_role" "encrypt_s3_object_role" {
-  name = "${var.env}_${var.bucket_id}_lambda"
+  name               = "${var.env}_${var.bucket_id}_lambda"
   assume_role_policy = "${data.aws_iam_policy_document.encrypt_s3_object_assumerole.json}"
 }
 
 # S3 object encryption policy
 data "aws_iam_policy_document" "encrypt_s3_object" {
-    statement {
-      sid = "CanEncryptS3Objects",
-      effect = "Allow"
-      actions = [
-        "s3:GetObject",
-        "s3:PutObject"
-      ]
-      resources = [
-        "${var.bucket_arn}/*"
-      ]
-    }
+  statement {
+    sid    = "CanEncryptS3Objects"
+    effect = "Allow"
 
-    statement {
-      sid = "CanLog"
-      effect = "Allow"
-      actions = [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogStreams"
-      ]
-      resources = [
-        "arn:aws:logs:*:*:*"
-      ]
-    }
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${var.bucket_arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "CanLog"
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+    ]
+
+    resources = [
+      "arn:aws:logs:*:*:*",
+    ]
+  }
 }
 
 # Policies for the 'encrypt_s3_object_role' role
