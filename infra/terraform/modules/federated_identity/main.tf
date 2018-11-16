@@ -10,3 +10,7 @@ variable "oidc_client_ids" {
 variable "oidc_provider_thumbprints" {
   type = "list"
 }
+
+variable "saml_domain" {}
+variable "saml_signon_url" {}
+variable "saml_logout_url" {}
