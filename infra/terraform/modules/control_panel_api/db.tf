@@ -29,6 +29,6 @@ resource "aws_db_instance" "control_panel_db" {
   vpc_security_group_ids  = ["${aws_security_group.control_panel_db.*.id}"]
   backup_retention_period = 35
   backup_window           = "22:00-23:59"
-  skip_final_snapshot     = false
+  skip_final_snapshot     = true
   maintenance_window      = "Sat:01:00-Sat:03:00"
 }
