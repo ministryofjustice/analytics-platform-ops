@@ -3,9 +3,8 @@ variable "trusted_entity" {
   description = "Trusted entity ARN to assume the instance role"
 }
 
-variable "hostedzoneid_arn" {
-  type        = "list"
-  description = "ARN of the hosted zone to perform the DNS01 challenge"
+variable "hosted_zone_id" {
+  description = "ID of the hosted zone to perform the DNS01 challenge"
 }
 
 variable "role_name" {}

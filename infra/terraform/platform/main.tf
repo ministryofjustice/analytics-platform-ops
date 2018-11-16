@@ -132,10 +132,11 @@ module "airflow_smtp_user" {
 }
 
 module "cert_manager" {
-  source           = "../modules/ec2_cert_manager_role"
-  role_name        = "${terraform.workspace}-cert-manager"
-  trusted_entity   = ["${var.trusted_entity}"]
-  hostedzoneid_arn = ["${var.hostedzoneid_arn}"]
+  source = "../modules/ec2_cert_manager_role"
+
+  role_name      = "${terraform.workspace}-cert-manager"
+  trusted_entity = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.base.platform_root_domain}"]
+  hosted_zone_id = "${module.cluster_dns.dns_zone_id}"
 }
 
 resource "aws_iam_policy" "read-user-roles-inline-policies" {
