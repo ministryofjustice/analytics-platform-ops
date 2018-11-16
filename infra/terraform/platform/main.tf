@@ -80,11 +80,15 @@ module "container_registry" {
 }
 
 module "federated_identity" {
-  source                    = "../modules/federated_identity"
+  source = "../modules/federated_identity"
+
   env                       = "${terraform.workspace}"
   oidc_provider_url         = "${var.oidc_provider_url}"
   oidc_client_ids           = ["${var.oidc_client_ids}"]
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
+  saml_domain               = "${var.idp_saml_domain}"
+  saml_signon_url           = "${var.idp_saml_signon_url}"
+  saml_logout_url           = "${var.idp_saml_logout_url}"
 }
 
 module "control_panel_api" {
