@@ -1,6 +1,16 @@
+data "template_file" "saml_metadata" {
+  template = "${file("${path.module}/saml/idp-metadata.xml")}"
+
+  vars {
+    saml_domain     = "${var.saml_domain}"
+    saml_signon_url = "${var.saml_signon_url}"
+    saml_logout_url = "${var.saml_logout_url}"
+  }
+}
+
 resource "aws_iam_saml_provider" "idp" {
   name                   = "${var.env}-idp"
-  saml_metadata_document = "${file("${path.module}/saml/idp-metadata.xml")}"
+  saml_metadata_document = "${data.template_file.saml_metadata.rendered}"
 }
 
 output "saml_provider_arn" {
