@@ -443,7 +443,6 @@ Once complete your base AWS resources should be in place
 6. Plan Kops cluster resource creation:
 
   ```
-  cd ../../kops/clusters/$ENVNAME
   kops create -f cluster.$ENVNAME.rendered.yml
   ```
 
