@@ -1,6 +1,6 @@
 resource "aws_route53_record" "softnas" {
   zone_id = "${var.dns_zone_id}"
-  name    = "softnas-${count.index}.${var.dns_zone_domain}"
+  name    = "${var.name_identifier}-${count.index}.${var.dns_zone_domain}"
   type    = "A"
   ttl     = "30"
   records = ["${element(aws_instance.softnas.*.private_ip, count.index)}"]
@@ -10,7 +10,7 @@ resource "aws_route53_record" "softnas" {
 
 resource "aws_route53_record" "nfs_mountpoint" {
   zone_id = "${var.dns_zone_id}"
-  name    = "nfs.${var.dns_zone_domain}"
+  name    = "${var.nfs_dns_prefix}.${var.dns_zone_domain}"
   type    = "A"
   ttl     = "30"
 
