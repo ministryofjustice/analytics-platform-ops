@@ -1,10 +1,10 @@
 resource "aws_key_pair" "softnas" {
-  key_name   = "${var.env}-softnas"
+  key_name   = "${var.env}-${var.name_identifier}"
   public_key = "${var.ssh_public_key}"
 }
 
 resource "aws_security_group" "softnas" {
-  name        = "${var.env}-softnas"
+  name        = "${var.env}-${var.name_identifier}"
   description = "Allow NFS from cluster and HTTP from SSH bastions"
   vpc_id      = "${var.vpc_id}"
 
@@ -69,7 +69,7 @@ resource "aws_network_interface" "softnas_eth0" {
   count = "${var.num_instances}"
 
   tags {
-    Name = "${var.env}-softnas-${count.index}-eth0"
+    Name = "${var.env}-${var.name_identifier}-${count.index}-eth0"
   }
 }
 
@@ -83,7 +83,7 @@ resource "aws_network_interface" "softnas_eth1" {
   count = "${var.num_instances}"
 
   tags {
-    Name = "${var.env}-softnas-${count.index}-eth1"
+    Name = "${var.env}-${var.name_identifier}-${count.index}-eth1"
   }
 }
 
@@ -106,6 +106,6 @@ resource "aws_instance" "softnas" {
   }
 
   tags {
-    Name = "${var.env}-softnas-${count.index}"
+    Name = "${var.env}-${var.name_identifier}-${count.index}"
   }
 }

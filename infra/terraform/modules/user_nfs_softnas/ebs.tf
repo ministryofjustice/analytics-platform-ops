@@ -14,7 +14,7 @@ resource "aws_ebs_volume" "softnas_vol1" {
   count = "${var.num_instances}"
 
   tags {
-    Name = "${var.env}-softnas-vol1"
+    Name = "${var.env}-${var.name_identifier}-vol1"
   }
 }
 

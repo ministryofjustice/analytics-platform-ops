@@ -6,6 +6,16 @@ variable "node_security_group_id" {}
 variable "bastion_security_group_id" {}
 variable "ssh_public_key" {}
 
+variable "name_identifier" {
+  default     = "softnas"
+  description = "Will be interpolated into resource names, e.g. EBS volume 'softnas' -> 'dev-softnas-vol1'"
+}
+
+variable "nfs_dns_prefix" {
+  default     = "nfs"
+  description = "First part of NFS DNS record, e.g. 'nfs' -> 'nfs.dev.mojanalytics.xyz'"
+}
+
 variable "subnet_ids" {
   type = "list"
 }
