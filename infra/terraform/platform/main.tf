@@ -38,7 +38,7 @@ module "data_buckets" {
 module "user_nfs_softnas" {
   source = "../modules/user_nfs_softnas"
 
-  num_instances             = 1
+  num_instances             = "${var.softnas_num_instances}"
   softnas_ami_id            = "${var.softnas_ami_id}"
   instance_type             = "${var.softnas_instance_type}"
   default_volume_size       = "${var.softnas_volume_size}"
