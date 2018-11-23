@@ -12,8 +12,12 @@ locals {
 }
 
 resource "aws_subnet" "dmz" {
-  vpc_id            = "${aws_vpc.main.id}"
-  cidr_block        = "${element(var.dmz_cidr_blocks, count.index)}"
+  vpc_id = "${aws_vpc.main.id}"
+
+  # with VPC CIDR of 192.168.0.0/16 and three AZs, returns:
+  # 192.168.0.0/24, 192.168.4.0/24, 192.168.8.0/24
+  cidr_block = "${cidrsubnet(var.cidr, 8, count.index * 4)}"
+
   availability_zone = "${element(var.availability_zones, count.index)}"
   count             = "${length(var.availability_zones)}"
 
@@ -34,8 +38,12 @@ resource "aws_route_table_association" "dmz" {
 }
 
 resource "aws_subnet" "private" {
-  vpc_id            = "${aws_vpc.main.id}"
-  cidr_block        = "${element(var.private_cidr_blocks, count.index)}"
+  vpc_id = "${aws_vpc.main.id}"
+
+  # with VPC CIDR of 192.168.0.0/16 and three AZs, returns:
+  # 192.168.10.0/24, 192.168.14.0/24, 192.168.18.0/24
+  cidr_block = "${cidrsubnet(var.cidr, 8, count.index * 4 + 10)}"
+
   availability_zone = "${element(var.availability_zones, count.index)}"
   count             = "${length(var.availability_zones)}"
 
@@ -56,8 +64,12 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_subnet" "storage" {
-  vpc_id            = "${aws_vpc.main.id}"
-  cidr_block        = "${element(var.storage_cidr_blocks, count.index)}"
+  vpc_id = "${aws_vpc.main.id}"
+
+  # with VPC CIDR of 192.168.0.0/16 and three AZs, returns:
+  # 192.168.20.0/24, 192.168.24.0/24, 192.168.28.0/24
+  cidr_block = "${cidrsubnet(var.cidr, 8, count.index * 4 + 20)}"
+
   availability_zone = "${element(var.availability_zones, count.index)}"
   count             = "${length(var.availability_zones)}"
 
