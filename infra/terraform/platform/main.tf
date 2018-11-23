@@ -165,3 +165,10 @@ resource "aws_iam_policy" "read-user-roles-inline-policies" {
 }
 EOF
 }
+
+module "cluster_autoscaler" {
+  source             = "../modules/ec2_cluster_autoscaler_policy"
+  policy_name        = "${terraform.workspace}-cluster-autoscaler"
+  instance_role_name = ["${var.instance_role_name}"]
+  asg_arn            = ["${var.asg_arn}"]
+}

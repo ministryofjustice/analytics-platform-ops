@@ -224,6 +224,44 @@ You can now quit the launch process because terraform will do the launch. The im
 
           Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
 
+##### Auth0 Applications
+
+In Auth0 you need to create some Applications.
+
+###### kubectl-oidc application
+
+1. Login to https://manage.auth0.com/ and select the tenant for your environment
+2. In the side-bar click "Applications"
+3. Click "Create Application"
+      * Name: kubectl-oidc
+      * Application Type: Regular Web Applications
+4. Click "Save"
+5. Click "Settings" tab
+      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$ENVNAME.$domain/callback`
+      (replace the $variables)
+      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
+      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
+6. Click "Save changes"
+7. Click "Connections" tab
+8. Switch OFF "Database" and "Google"
+9. In the side-bar click "Connections" then "Social"
+10. If GitHub is not already ON:
+     1. Click GitHub to set it up
+     2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
+        Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
+     3. Check these boxes:
+        * Email address
+        * read:user
+        * read:org
+     4. Click "Save"
+     5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
+     6. Click "Save" and "X" to close the dialog.
+11. Set the apps that Google can be used sign in to:
+     1. Still in "Connections" | "Social", click "Google" then "Applications"
+     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
+
+The Client ID and Client Secret values will be used in various helm chart configurations.
+
 #### Terraform
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
@@ -399,13 +437,12 @@ Once complete your base AWS resources should be in place
 5. Set the Kops state store S3 bucket environment variable (see previous step):
   ```
   $ cd ../terraform/global
-  $ exports KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
+  $ export KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
   ```
 
 6. Plan Kops cluster resource creation:
 
   ```
-  cd ../../kops/clusters/$ENVNAME
   kops create -f cluster.$ENVNAME.rendered.yml
   ```
 
@@ -415,7 +452,7 @@ Once complete your base AWS resources should be in place
   ```
   kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
   ```
-  ($ENV_DOMAIN was set recently, and matches the cluster name in cluster.yml)
+  Where `$ENV_DOMAIN` is the full DNS name of the cluster, including the base domain, e.g. `dev.mojanalytics.xyz`.
 
 9. Plan and create cluster:
 
@@ -506,44 +543,6 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
 [helm]: https://github.com/kubernetes/helm/
 [kubernetes]: https://kubernetes.io
 [gitcrypt]: https://www.agwa.name/projects/git-crypt/
-
-### Auth0 Applications
-
-In Auth0 you need to create some Applications.
-
-#### kubectl-oidc application
-
-1. Login to https://manage.auth0.com/ and select the tenant for your environment
-2. In the side-bar click "Applications"
-3. Click "Create Application"
-      * Name: kubectl-oidc
-      * Application Type: Regular Web Applications
-4. Click "Save"
-5. Click "Settings" tab
-      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$ENVNAME.$domain/callback`
-      (replace the $variables)
-      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
-      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
-6. Click "Save changes"
-7. Click "Connections" tab
-8. Switch OFF "Database" and "Google"
-9. In the side-bar click "Connections" then "Social"
-10. If GitHub is not already ON:
-     1. Click GitHub to set it up
-     2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
-        Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
-     3. Check these boxes:
-        * Email address
-        * read:user
-        * read:org
-     4. Click "Save"
-     5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
-     6. Click "Save" and "X" to close the dialog.
-11. Set the apps that Google can be used sign in to:
-     1. Still in "Connections" | "Social", click "Google" then "Applications"
-     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
-
-The Client ID and Client Secret values will be used in various helm chart configurations.
 
 ### Auth0 Rules & Hosted Pages
 
