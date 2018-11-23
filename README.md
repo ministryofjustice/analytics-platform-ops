@@ -452,7 +452,7 @@ Once complete your base AWS resources should be in place
   ```
   kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
   ```
-  ($ENV_DOMAIN was set recently, and matches the cluster name in cluster.yml)
+  Where `$ENV_DOMAIN` is the full DNS name of the cluster, including the base domain, e.g. `dev.mojanalytics.xyz`.
 
 9. Plan and create cluster:
 
