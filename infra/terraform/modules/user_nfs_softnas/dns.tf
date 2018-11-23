@@ -1,6 +1,6 @@
 resource "aws_route53_record" "softnas" {
   zone_id = "${var.dns_zone_id}"
-  name    = "softnas-${count.index}.${var.dns_zone_domain}"
+  name    = "${var.name_identifier}-${count.index}.${var.dns_zone_domain}"
   type    = "A"
   ttl     = "30"
   records = ["${element(aws_instance.softnas.*.private_ip, count.index)}"]
