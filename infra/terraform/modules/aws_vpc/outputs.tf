@@ -23,7 +23,7 @@ output "storage_subnet_ids" {
 }
 
 output "storage_cidr_blocks" {
-  value = "${var.storage_cidr_blocks}"
+  value = ["${aws_subnet.storage.*.cidr_block}"]
 }
 
 output "dmz_subnet_cidrs" {
@@ -56,7 +56,7 @@ output "nat_gateway_subnets" {
 
 output "dmz_subnets" {
   value = "${map(
-    "ids", aws_subnet.dmz.*.id, 
+    "ids", aws_subnet.dmz.*.id,
     "cidrs", aws_subnet.dmz.*.cidr_block,
     "availabilityZones", aws_subnet.dmz.*.availability_zone
   )}"
@@ -64,7 +64,7 @@ output "dmz_subnets" {
 
 output "private_subnets" {
   value = "${map(
-    "ids", aws_subnet.private.*.id, 
+    "ids", aws_subnet.private.*.id,
     "cidrs", aws_subnet.private.*.cidr_block,
     "availabilityZones", aws_subnet.private.*.availability_zone
   )}"
