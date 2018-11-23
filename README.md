@@ -399,7 +399,7 @@ Once complete your base AWS resources should be in place
 5. Set the Kops state store S3 bucket environment variable (see previous step):
   ```
   $ cd ../terraform/global
-  $ exports KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
+  $ export KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
   ```
 
 6. Plan Kops cluster resource creation:
