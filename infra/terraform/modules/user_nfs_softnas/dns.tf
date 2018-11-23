@@ -10,7 +10,7 @@ resource "aws_route53_record" "softnas" {
 
 resource "aws_route53_record" "nfs_mountpoint" {
   zone_id = "${var.dns_zone_id}"
-  name    = "nfs.${var.dns_zone_domain}"
+  name    = "${var.nfs_dns_prefix}.${var.dns_zone_domain}"
   type    = "A"
   ttl     = "30"
 
