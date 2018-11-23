@@ -206,8 +206,8 @@ You can now quit the launch process because terraform will do the launch. The im
          * Application Type: Regular Web Applications
     3. Click "Save"
     4. Click "Settings"
-         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$env.$domain/callback` (replace the $variables)
-         * Allowed Web Origins: `https://aws.services.$env.$domain` (replace the $variables)
+         * Allowed Callback URLs: `https://signin.aws.amazon.com/saml, https://aws.services.$ENVNAME.$domain/callback` (replace the $variables)
+         * Allowed Web Origins: `https://aws.services.$ENVNAME.$domain` (replace the $variables)
     5. Click "Save changes"
 
     Record the Domain and Client ID values - you'll use them in your .tfvars file in a moment.
@@ -223,6 +223,44 @@ You can now quit the launch process because terraform will do the launch. The im
     7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
 
           Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
+
+##### Auth0 Applications
+
+In Auth0 you need to create some Applications.
+
+###### kubectl-oidc application
+
+1. Login to https://manage.auth0.com/ and select the tenant for your environment
+2. In the side-bar click "Applications"
+3. Click "Create Application"
+      * Name: kubectl-oidc
+      * Application Type: Regular Web Applications
+4. Click "Save"
+5. Click "Settings" tab
+      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$ENVNAME.$domain/callback`
+      (replace the $variables)
+      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
+      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
+6. Click "Save changes"
+7. Click "Connections" tab
+8. Switch OFF "Database" and "Google"
+9. In the side-bar click "Connections" then "Social"
+10. If GitHub is not already ON:
+     1. Click GitHub to set it up
+     2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
+        Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
+     3. Check these boxes:
+        * Email address
+        * read:user
+        * read:org
+     4. Click "Save"
+     5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
+     6. Click "Save" and "X" to close the dialog.
+11. Set the apps that Google can be used sign in to:
+     1. Still in "Connections" | "Social", click "Google" then "Applications"
+     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
+
+The Client ID and Client Secret values will be used in various helm chart configurations.
 
 #### Terraform
 
@@ -338,51 +376,85 @@ Once complete your base AWS resources should be in place
 
 * [kubectl](https://kubernetes.io/docs/user-guide/prereqs/)
 * [Kops](https://github.com/kubernetes/kops)
-* jq
-* yq
+* Python 3.6+
 
-(On macOS you can: `brew install kubectl kops jq yq`)
+(On macOS you can: `brew install kubectl kops python3`)
 
-2. Copy an existing cluster config:
-```
-cp -R infra/kops/clusters/alpha infra/kops/clusters/$ENVNAME
-```
-
-3. Set the correct values for your new cluster config:
-```
-cd infra/terraform/global
-export KOPS_STATE_STORE=s3://`terraform output kops_bucket_name`
-export ENV_DOMAIN=`terraform output -module=cluster_dns dns_zone_domain`
-# Get the Client ID from Auth0 "kubectl-oidc" application e.g.
-export KUBECTL_OIDC_CLIENT_ID=P742wMtS4iiA6axtbPd2ygpOa64gZqGD
-
-cd ../../../infra/terraform/platform
-../../kops/configure.sh $KOPS_STATE_STORE $ENVNAME $ENV_DOMAIN $KUBECTL_OIDC_CLIENT_ID
-```
-
-4. Ensure you've set the Kops state store environment variable (see previous step):
-  ```
-  $ echo $KOPS_STATE_STORE
-  s3://kops.analytics.justice.gov.uk
-  ```
-
-5. Plan Kops cluster resource creation:
+2. Create a values YAML file for Kops:
+  Most information required by Kops can be obtained from Terraform, with the exception of 
+  authentication information, cluster size, and instance machine image. This information 
+  must be supplied as a YAML file with the following structure, as 
+  `infra/kops/config/$ENVNAME.yaml`:
 
   ```
-  cd ../../../infra/kops/clusters/$ENVNAME
-  kops create -f cluster.yml
-  kops create -f bastions.yml
-  kops create -f masters.yml
-  kops create -f nodes.yml
+  OIDC:
+    ClientID: ""
+
+  instanceGroups:
+    masters:
+      machineType: ""
+
+    nodes:
+      machineType: ""
+      rootVolumeSize: ""
+      maxSize: ""
+      minSize: ""
+
+    bastions:
+      machineType: ""
+      maxSize: ""
+      minSize: ""
   ```
 
-5. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
-6. Add the .pub key to Kops cluster:
+  | Key                    | Value                                                    |
+  |------------------------|----------------------------------------------------------|
+  | `OIDC.ClientID`        | OIDC client ID from the `kubectl-oidc` Auth0 application |
+  | `masters.machineType`  | EC2 instance type for master nodes, e.g. `m4.xlarge` |
+  | `nodes.machineType`    | EC2 instance type for worker nodes, e.g. `m4.xlarge` |
+  | `nodes.rootVolumeSize` | nodes' root disk size, in GB, e.g. `100` |
+  | `nodes.maxSize`        | max number of nodes to deploy |
+  | `nodes.minSize`        | min number of nodes to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
+  | `bastions.machineType` | EC2 instance type for SSH bastions, e.g. `t2.micro` |
+  | `bastions.maxSize`     | max number of bastions to deploy |
+  | `bastions.minSize`     | min number of bastions to deploy. Specify the same value for `minSize` and `maxSize` to maintain a fixed size |
+
+3. Generate a Kops values file containing additional info from Terraform:
+  ```
+  $ cd infra/kops
+  $ ./tf_output_to_kops_values.py
+  ```
+  This will output a `kops-tf-values.$ENVNAME.json` file in the current directory
+
+4. Create a file containing Kops `ClusterSpec` and `InstanceGroup` resources from the template and values files:
+  ```
+  $ kops toolbox template \
+      --template cluster.tmpl.yml \
+      --values kops-tf-values.$ENVNAME.json \
+      --values config/$ENVNAME.yaml \
+      --output cluster.$ENVNAME.rendered.yml
+  ```
+
+5. Set the Kops state store S3 bucket environment variable (see previous step):
+  ```
+  $ cd ../terraform/global
+  $ export KOPS_STATE_STORE=s3://$(terraform output kops_bucket_name)
+  ```
+
+6. Plan Kops cluster resource creation:
+
+  ```
+  kops create -f cluster.$ENVNAME.rendered.yml
+  ```
+
+7. Create SSH keys: `$ ssh-keygen -t rsa -b 4096`
+
+8. Add the .pub key to Kops cluster:
   ```
   kops create secret --name $ENV_DOMAIN sshpublickey admin -i PATH_TO_PUBLIC_KEY
   ```
-  ($ENV_DOMAIN was set recently, and matches the cluster name in cluster.yml)
-7. Plan and create cluster:
+  Where `$ENV_DOMAIN` is the full DNS name of the cluster, including the base domain, e.g. `dev.mojanalytics.xyz`.
+
+9. Plan and create cluster:
 
   ```
   kops update cluster $ENV_DOMAIN
@@ -472,44 +544,6 @@ Once all of the above has been carried out, both Terraform and Kops state bucket
 [kubernetes]: https://kubernetes.io
 [gitcrypt]: https://www.agwa.name/projects/git-crypt/
 
-### Auth0 Applications
-
-In Auth0 you need to create some Applications.
-
-#### kubectl-oidc application
-
-1. Login to https://manage.auth0.com/ and select the tenant for your environment
-2. In the side-bar click "Applications"
-3. Click "Create Application"
-      * Name: kubectl-oidc
-      * Application Type: Regular Web Applications
-4. Click "Save"
-5. Click "Settings" tab
-      * Allowed Callback URLs: `http://localhost:3000/callback, https://cpanel-master.services.$env.$domain/callback`
-      (replace the $variables)
-      * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$env.$domain` (replace the $variables)
-      * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$env.$domain` (replace the $variables)
-6. Click "Save changes"
-7. Click "Connections" tab
-8. Switch OFF "Database" and "Google"
-9. In the side-bar click "Connections" then "Social"
-10. If GitHub is not already ON:
-     1. Click GitHub to set it up
-     2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
-        Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
-     3. Check these boxes:
-        * Email address
-        * read:user
-        * read:org
-     4. Click "Save"
-     5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
-     6. Click "Save" and "X" to close the dialog.
-11. Set the apps that Google can be used sign in to:
-     1. Still in "Connections" | "Social", click "Google" then "Applications"
-     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
-
-The Client ID and Client Secret values will be used in various helm chart configurations.
-
 ### Auth0 Rules & Hosted Pages
 
 Auth0 needs 'rules' installed, to ensure only certain people can log-in, for example. We also use the 'Hosted pages' feature to customize the login page. Both are continuously deployed with the same setup, as follows.
@@ -520,7 +554,7 @@ in the dev or alpha branches. Create a new branch (or fork it if another organiz
 | Setting | Description |
 | ------- | ----------- |
 | `targeted_clients` | The 'Client ID' of the Auth0 application "kubectl-oidc" |
-| `namespace` | Set to: `https://api.$ENV.$DOMAIN/claims/` but replace the variables |
+| `namespace` | Set to: `https://api.$ENVNAME.$DOMAIN/claims/` but replace the variables |
 | `AUTHENTICATOR_LABEL` | The name of the platform, as shown when doing Auth0 MFA |
 | `whitelist` | The GitHub organizations whose members are authorized to access the platform |
 
