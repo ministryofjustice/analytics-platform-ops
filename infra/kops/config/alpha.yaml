@@ -1,0 +1,17 @@
+OIDC:
+  ClientID: oUb1V330oXKyMpTagAYDzWDY10U4ffWF
+
+instanceGroups:
+  masters:
+    machineType: m4.xlarge
+
+  nodes:
+    machineType: r4.xlarge
+    rootVolumeSize: 100
+    maxSize: 18
+    minSize: 18
+
+  bastions:
+    machineType: t2.micro
+    maxSize: 1
+    minSize: 1

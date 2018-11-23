@@ -10,7 +10,7 @@ resource "aws_lambda_function" "encrypt_s3_object" {
   description      = "Encrypt S3 objects using AWS' server side encryption"
   filename         = "/tmp/encrypt_s3_object.zip"
   source_code_hash = "${data.archive_file.encrypt_s3_object_zip.output_base64sha256}"
-  function_name    = "${var.env}_encrypt_${var.bucket_id}_s3_objects"
+  function_name    = "${var.env}_encrypt_${var.bucket_id}"
   role             = "${aws_iam_role.encrypt_s3_object_role.arn}"
   handler          = "index.handler"
   runtime          = "nodejs4.3"
@@ -28,62 +28,65 @@ resource "aws_s3_bucket_notification" "object_created" {
   }
 }
 
+# Lambda role assumerole policy
+data "aws_iam_policy_document" "encrypt_s3_object_assumerole" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    effect = "Allow"
+  }
+}
+
 # Role running the lambda function
 resource "aws_iam_role" "encrypt_s3_object_role" {
-  name = "${var.env}_encrypt_${var.bucket_id}_s3_objects_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
+  name               = "${var.env}_${var.bucket_id}_lambda"
+  assume_role_policy = "${data.aws_iam_policy_document.encrypt_s3_object_assumerole.json}"
 }
-EOF
+
+# S3 object encryption policy
+data "aws_iam_policy_document" "encrypt_s3_object" {
+  statement {
+    sid    = "CanEncryptS3Objects"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${var.bucket_arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "CanLog"
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+    ]
+
+    resources = [
+      "arn:aws:logs:*:*:*",
+    ]
+  }
 }
 
 # Policies for the 'encrypt_s3_object_role' role
 resource "aws_iam_role_policy" "encrypt_s3_object_role_policy" {
-  name = "${var.env}_encrypt_${var.bucket_id}_s3_objects_role_policy"
+  name = "${var.env}_encrypt_${var.bucket_id}"
   role = "${aws_iam_role.encrypt_s3_object_role.id}"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "CanEncryptS3Objects",
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "${var.bucket_arn}/*"
-      ]
-    },
-    {
-      "Sid": "CanLog",
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogStreams"
-      ],
-      "Resource": [
-        "arn:aws:logs:*:*:*"
-      ]
-    }
-  ]
-}
-EOF
+  policy = "${data.aws_iam_policy_document.encrypt_s3_object.json}"
 }
 
 # Permission to invoke the lambda function
