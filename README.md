@@ -132,7 +132,7 @@ grep \"key\" -C 1 .terraform/terraform.tfstate
 
 # HACK: You need to do this 'terraform apply' before the main 'terraform plan' or you get this error:
 # `module.ses_domain.aws_route53_record.domain_amazonses_dkim_verification_record: aws_route53_record.domain_amazonses_dkim_verification_record: value of 'count' cannot be computed`
-terraform apply -target aws_route53_record.aws_ses_domain_dkim
+terraform apply -target aws_ses_domain_dkim.domain_verification
 
 # check the Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
 terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
