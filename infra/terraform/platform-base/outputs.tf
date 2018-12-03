@@ -18,6 +18,10 @@ output "vpc_cidr" {
   value = "${var.vpc_cidr}"
 }
 
+output "availability_zones" {
+  value = "${var.availability_zones}"
+}
+
 output "dns_zone_domain" {
   value = "${module.cluster_dns.dns_zone_domain}"
 }
@@ -44,4 +48,16 @@ output "extra_master_sg_id" {
 
 output "extra_node_sg_id" {
   value = "${module.aws_vpc.extra_node_sg_id}"
+}
+
+output "oidc_provider_url" {
+  value = "${var.oidc_provider_url}"
+}
+
+output "oidc_client_ids" {
+  value = "${var.oidc_client_ids}"
+}
+
+output "oidc_provider_thumbprints" {
+  value = "${var.oidc_provider_thumbprints}"
 }

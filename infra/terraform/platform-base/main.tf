@@ -28,3 +28,16 @@ module "cluster_dns" {
   root_zone_domain = "${data.terraform_remote_state.base.platform_root_domain}"
   root_zone_id     = "${data.terraform_remote_state.base.platform_dns_zone_id}"
 }
+
+module "federated_identity" {
+  source = "../modules/federated_identity"
+
+  env                       = "${terraform.workspace}"
+  oidc_provider_url         = "${var.oidc_provider_url}"
+  oidc_client_ids           = ["${var.oidc_client_ids}"]
+  oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
+  saml_domain               = "${var.idp_saml_domain}"
+  saml_signon_url           = "${var.idp_saml_signon_url}"
+  saml_logout_url           = "${var.idp_saml_logout_url}"
+  saml_x509_cert            = "${var.idp_saml_x509_cert}"
+}

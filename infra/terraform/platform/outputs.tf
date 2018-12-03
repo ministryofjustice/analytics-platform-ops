@@ -69,15 +69,3 @@ output "control_panel_api_db_password" {
 output "control_panel_api_db_host" {
   value = "${module.control_panel_api.db_host}"
 }
-
-output "oidc_provider_url" {
-  value = "${var.oidc_provider_url}"
-}
-
-output "oidc_client_ids" {
-  value = "${var.oidc_client_ids}"
-}
-
-output "oidc_provider_thumbprints" {
-  value = "${var.oidc_provider_thumbprints}"
-}
