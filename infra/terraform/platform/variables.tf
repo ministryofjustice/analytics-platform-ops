@@ -8,12 +8,6 @@ variable "terraform_base_state_file" {
   default = "base/terraform.tfstate"
 }
 
-variable "vpc_cidr" {}
-
-variable "availability_zones" {
-  type = "list"
-}
-
 variable "softnas_ssh_public_key" {}
 
 variable "softnas_num_instances" {
