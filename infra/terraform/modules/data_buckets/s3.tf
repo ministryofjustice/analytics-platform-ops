@@ -32,39 +32,70 @@ resource "aws_s3_bucket" "scratch" {
   }
 }
 
+data "aws_iam_policy_document" "source_bucket" {
+  statement {
+    sid    = "DenyIncorrectEncryptionHeaderInSource"
+    effect = "Deny"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.source.arn}/*",
+    ]
+
+    principals {
+      type = "*"
+
+      identifiers = [
+        "*",
+      ]
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption"
+
+      values = [
+        "AES256",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "DenyUnEncryptedObjectUploadsInSource"
+    effect = "Deny"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.source.arn}/*",
+    ]
+
+    principals {
+      type = "*"
+
+      identifiers = [
+        "*",
+      ]
+    }
+
+    condition {
+      test     = "Null"
+      variable = "s3:x-amz-server-side-encryption"
+
+      values = [
+        "true",
+      ]
+    }
+  }
+}
+
 # Data in the 'source' bucket must be encrypted
 resource "aws_s3_bucket_policy" "source" {
   bucket = "${aws_s3_bucket.source.id}"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "DenyIncorrectEncryptionHeaderInSource",
-      "Effect": "Deny",
-      "Action": "s3:PutObject",
-      "Resource": "${aws_s3_bucket.source.arn}/*",
-      "Principal": "*",
-      "Condition": {
-        "StringNotEquals": {
-          "s3:x-amz-server-side-encryption": "AES256"
-        }
-      }
-    },
-    {
-      "Sid": "DenyUnEncryptedObjectUploadsInSource",
-      "Effect": "Deny",
-      "Action": "s3:PutObject",
-      "Resource": "${aws_s3_bucket.source.arn}/*",
-      "Principal": "*",
-      "Condition": {
-        "Null": {
-          "s3:x-amz-server-side-encryption": true
-        }
-      }
-    }
-  ]
-}
-EOF
+  policy = "${data.aws_iam_policy_document.source_bucket.json}"
 }
