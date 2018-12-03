@@ -89,6 +89,7 @@ module "federated_identity" {
   saml_domain               = "${var.idp_saml_domain}"
   saml_signon_url           = "${var.idp_saml_signon_url}"
   saml_logout_url           = "${var.idp_saml_logout_url}"
+  saml_x509_cert            = "${var.idp_saml_x509_cert}"
 }
 
 module "control_panel_api" {

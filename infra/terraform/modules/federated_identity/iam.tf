@@ -5,6 +5,7 @@ data "template_file" "saml_metadata" {
     saml_domain     = "${var.saml_domain}"
     saml_signon_url = "${var.saml_signon_url}"
     saml_logout_url = "${var.saml_logout_url}"
+    saml_x509_cert  = "${var.saml_x509_cert}"
   }
 }
 
