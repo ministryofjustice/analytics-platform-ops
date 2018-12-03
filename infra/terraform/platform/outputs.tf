@@ -117,3 +117,7 @@ output "extra_master_sg_id" {
 output "extra_node_sg_id" {
   value = "${module.aws_vpc.extra_node_sg_id}"
 }
+
+output "concourse_db_endpoint" {
+  value = "${module.concourse_db.endpoint}"
+}

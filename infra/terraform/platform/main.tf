@@ -172,3 +172,17 @@ module "cluster_autoscaler" {
   instance_role_name = ["${var.instance_role_name}"]
   asg_arn            = ["${var.asg_arn}"]
 }
+
+module "concourse_db" {
+  source = "../modules/postgres_db"
+
+  instance_name  = "${terraform.workspace}-concourse"
+  instance_class = "${var.concourse_db_instance_class}"
+  db_name        = "atc"                                # Air Traffic Control: https://github.com/concourse/atc
+  username       = "${var.concourse_db_username}"
+  password       = "${var.concourse_db_password}"
+
+  vpc_id                 = "${module.aws_vpc.vpc_id}"
+  node_security_group_id = "${module.aws_vpc.extra_node_sg_id}"
+  subnet_ids             = "${module.aws_vpc.storage_subnet_ids}"
+}

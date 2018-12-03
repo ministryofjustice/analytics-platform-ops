@@ -68,3 +68,13 @@ variable "asg_arn" {
   type        = "list"
   description = "Cluster-AutoScaler: ARN of Kubernetes worker nodes autoscaling group"
 }
+
+variable "concourse_db_username" {
+  default = "concourse"
+}
+
+variable "concourse_db_password" {}
+
+variable "concourse_db_instance_class" {
+  default = "db.t2.small"
+}

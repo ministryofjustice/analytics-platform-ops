@@ -35,6 +35,10 @@ resource "aws_security_group" "sg" {
     protocol        = "tcp"
     security_groups = ["${var.node_security_group_id}"]
   }
+
+  tags {
+    Name = "${var.instance_name}"
+  }
 }
 
 resource "aws_db_subnet_group" "subnet" {
