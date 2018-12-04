@@ -4,7 +4,7 @@ variable "region" {
 
 variable "terraform_bucket_name" {}
 
-variable "terraform_base_state_file" {
+variable "terraform_global_state_file" {
   default = "base/terraform.tfstate"
 }
 
