@@ -14,12 +14,8 @@ output "terraform_bucket_name" {
   value = "${var.terraform_bucket_name}"
 }
 
-output "terraform_base_state_file" {
-  value = "${var.terraform_base_state_file}"
-}
-
-output "availability_zones" {
-  value = "${var.availability_zones}"
+output "terraform_global_state_file" {
+  value = "${var.terraform_global_state_file}"
 }
 
 output "softnas_ssh_public_key" {
