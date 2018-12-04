@@ -4,11 +4,7 @@
     "index.refresh_interval": "5s"
   },
   "mappings": {
-    "_default_": {
-      "_all": {
-        "enabled": false,
-        "omit_norms": true
-      },
+    "cloudtrail-log": {
       "dynamic_templates": [
         {
           "date_fields": {
@@ -25,7 +21,7 @@
             "match": "*",
             "match_mapping_type": "object",
             "mapping": {
-              "type": "geo_point",
+              "type": "object",
               "doc_values": true
             }
           }
@@ -40,7 +36,6 @@
           "type": "text"
         },
         "geoip": {
-          "type": "object",
           "dynamic": true,
           "properties": {
             "ip": {
