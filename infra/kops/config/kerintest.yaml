@@ -1,0 +1,17 @@
+OIDC:
+  ClientID: c6q0KcsL4Kj70T97whsrSarwuYP65353
+
+instanceGroups:
+  masters:
+    machineType: t2.medium
+
+  nodes:
+    machineType: t2.medium
+    rootVolumeSize: 100
+    maxSize: 2
+    minSize: 2
+
+  bastions:
+    machineType: t2.micro
+    maxSize: 1
+    minSize: 1
