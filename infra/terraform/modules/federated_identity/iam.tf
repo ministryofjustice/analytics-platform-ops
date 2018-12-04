@@ -10,7 +10,7 @@ data "template_file" "saml_metadata" {
 }
 
 resource "aws_iam_saml_provider" "idp" {
-  name                   = "${var.env}-idp"
+  name                   = "${var.env}-auth0"
   saml_metadata_document = "${data.template_file.saml_metadata.rendered}"
 }
 
