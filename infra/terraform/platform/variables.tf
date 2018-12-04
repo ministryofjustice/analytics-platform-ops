@@ -37,13 +37,3 @@ variable "airflow_db_username" {}
 variable "airflow_db_password" {}
 
 variable "ses_ap_email_identity_arn" {}
-
-variable "instance_role_name" {
-  type        = "list"
-  description = "The Instance Role to attach the policy to"
-}
-
-variable "asg_arn" {
-  type        = "list"
-  description = "Cluster-AutoScaler: ARN of Kubernetes worker nodes autoscaling group"
-}
