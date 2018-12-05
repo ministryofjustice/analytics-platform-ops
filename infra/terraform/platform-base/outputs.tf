@@ -66,8 +66,8 @@ output "oidc_provider_url" {
   value = "${var.oidc_provider_url}"
 }
 
-output "oidc_client_ids" {
-  value = "${var.oidc_client_ids}"
+output "oidc_client_id" {
+  value = "${var.oidc_client_id}"
 }
 
 output "oidc_provider_thumbprints" {

@@ -34,7 +34,7 @@ module "federated_identity" {
 
   env                       = "${terraform.workspace}"
   oidc_provider_url         = "${var.oidc_provider_url}"
-  oidc_client_ids           = ["${var.oidc_client_ids}"]
+  oidc_client_id            = "${var.oidc_client_id}"
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
   saml_domain               = "${var.idp_saml_domain}"
   saml_signon_url           = "${var.idp_saml_signon_url}"
