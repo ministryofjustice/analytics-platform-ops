@@ -6,8 +6,8 @@ output "terraform_bucket_name" {
   value = "${var.terraform_bucket_name}"
 }
 
-output "terraform_base_state_file" {
-  value = "${var.terraform_base_state_file}"
+output "terraform_global_state_file" {
+  value = "${var.terraform_global_state_file}"
 }
 
 output "vpc_id" {
