@@ -1,6 +1,3 @@
-OIDC:
-  ClientID: oUb1V330oXKyMpTagAYDzWDY10U4ffWF
-
 instanceGroups:
   masters:
     machineType: m4.xlarge

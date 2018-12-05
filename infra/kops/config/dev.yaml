@@ -1,6 +1,3 @@
-OIDC:
-  ClientID: p4L2qRcSgWyqHjoHanJ4QyhWL1iX612i
-
 instanceGroups:
   masters:
     machineType: t2.medium

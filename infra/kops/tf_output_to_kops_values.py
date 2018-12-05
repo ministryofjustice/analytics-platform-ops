@@ -81,6 +81,7 @@ def build_kops_values(global_resources, platform_resources):
         'availabilityZones': platform_resources['availability_zones'],
         'OIDC': {
             'IssuerURL': platform_resources['oidc_provider_url'],
+            'ClientID': platform_resources['oidc_client_id'],
         },
         'VPC': {
             'id': platform_resources['vpc_id'],
