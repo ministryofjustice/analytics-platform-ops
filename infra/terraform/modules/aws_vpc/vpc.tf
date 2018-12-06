@@ -18,6 +18,8 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_eip" "private_gw" {
   vpc   = true
   count = "${length(var.availability_zones)}"
+
+  tags = "${map("Name", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
 
 resource "aws_nat_gateway" "private_gw" {
@@ -25,4 +27,6 @@ resource "aws_nat_gateway" "private_gw" {
   subnet_id     = "${element(aws_subnet.dmz.*.id, count.index)}"
   depends_on    = ["aws_internet_gateway.igw"]
   count         = "${length(var.availability_zones)}"
+
+  tags = "${map("Name", "${var.name}", "kubernetes.io/cluster/${var.name}", "shared")}"
 }
