@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "policy" {
       "autoscaling:TerminateInstanceInAutoScalingGroup",
     ]
 
-    resources = ["${var.asg_arn}"]
+    resources = ["${data.aws_autoscaling_groups.nodes.arns}"]
   }
 }
 

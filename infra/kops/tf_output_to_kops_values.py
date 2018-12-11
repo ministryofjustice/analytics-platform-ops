@@ -67,7 +67,7 @@ def get_tf_output(tf_resources):
 
 
 def get_terraform_workspace():
-    os.chdir(get_tf_resource_dir('platform'))
+    os.chdir(get_tf_resource_dir('platform-base'))
     return subprocess.getoutput("terraform workspace show")
 
 
@@ -81,6 +81,7 @@ def build_kops_values(global_resources, platform_resources):
         'availabilityZones': platform_resources['availability_zones'],
         'OIDC': {
             'IssuerURL': platform_resources['oidc_provider_url'],
+            'ClientID': platform_resources['oidc_client_id'],
         },
         'VPC': {
             'id': platform_resources['vpc_id'],
@@ -115,7 +116,7 @@ if __name__ == "__main__":
         # Build kops values dict
         print(f'Building kops values for {args.workspace} workspace')
         kops_values = build_kops_values(
-            get_tf_output('global'), get_tf_output('platform'))
+            get_tf_output('global'), get_tf_output('platform-base'))
 
         # Output kops values to file
         out = f'{CWD}/kops-tf-values.{args.workspace}.json'

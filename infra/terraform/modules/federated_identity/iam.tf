@@ -20,7 +20,7 @@ output "saml_provider_arn" {
 
 resource "aws_iam_openid_connect_provider" "idp" {
   url             = "${var.oidc_provider_url}"
-  client_id_list  = ["${var.oidc_client_ids}"]
+  client_id_list  = ["${var.oidc_client_id}"]
   thumbprint_list = ["${var.oidc_provider_thumbprints}"]
 }
 
