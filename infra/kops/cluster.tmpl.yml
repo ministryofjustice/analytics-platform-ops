@@ -1,4 +1,4 @@
-{{- $kubernetesVersion := "1.10.5" }}
+{{- $kubernetesVersion := "1.10.11" }}
 {{- $instanceGroupImage := "kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17" }}
 apiVersion: kops/v1alpha2
 kind: Cluster
