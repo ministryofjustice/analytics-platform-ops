@@ -221,8 +221,7 @@ You can now quit the launch process because terraform will do the launch. The im
     5. Click "Save"
     6. Click tab "Usage"
     7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
-
-          Save the file to the repo as: `infra/terraform/modules/federated_identity/saml/${env}-auth0-metadata.xml`
+    8. Refer to `platform-base` Terraform instructions below for information on configuring Terraform to use SAML signon
 
 ##### Auth0 Applications
 
@@ -266,12 +265,21 @@ The Client ID and Client Secret values will be used in various helm chart config
 
 **You must have valid AWS credentials in [`~/.aws/credentials`](http://docs.aws.amazon.com/amazonswf/latest/awsrbflowguide/set-up-creds.html)**
 
+Terraform resources are split into two resource sets / state objects:
+
+1. `platform-base` - essential requirements for kops/kubernetes
+2. `platform` - everything else
+
+This split allows kops to provision a Kubernetes cluster after `platform-base` and before `platform` resources are created, so that `platform` resources can reference AWS resources created by kops and Kubernetes, such as node IAM roles.
+
+##### `platform-base` Terraform
+
 Each environment is a Terraform 'workspace'.
 
 To create a new environment in Terraform:
 ```
-# Enter platform Terraform resources directory
-cd infra/terraform/platform
+# Enter platform-base Terraform resources directory
+cd infra/terraform/platform-base
 
 # Set this env var to the same value as before, giving the location of the platform's global terraform state
 export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
@@ -281,7 +289,7 @@ terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
 # Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
 
 # Store the name of the environment in the environment e.g.
-export ENVNAME=alpha
+export ENVNAME=mytestenv
 
 # List current workspaces
 terraform workspace list
@@ -298,79 +306,22 @@ vim vars/$ENVNAME.tfvars
 | ------------- | ------------- |
 | `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
 | `terraform_bucket_name`  | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
-| `terraform_base_state_file`  | Path for global Terraform state (as specified in global/main.tf `backend.s3.key`, e.g. `base/terraform.tfstate`) |
 | `vpc_cidr`  | IP range for cluster, e.g. `192.168.0.0/16`  |
-| `availability_zones`  | AWS availability zones, e.g. `["eu-west-1a", "eu-west-1b", "eu-west-1c"]`  |
-| `control_panel_api_db_username` | |
-| `control_panel_api_db_password` | |
-| `airflow_db_username` | |
-| `airflow_db_password` | |
-| `ses_ap_email_identity_arn` | Create an SES email address that AP can use to send emails (SES provides the SMTP) and provide the ARN e.g. "arn:aws:ses:eu-west-1:1234567890:identity/user@example.com"
-| `softnas_ssh_public_key` | |
-| `softnas_ami_id` | e.g. `ami-22cecec8` |
-| `softnas_instance_type` | e.g. `m4.large` |
+| `availability_zones`  | AWS availability zones, e.g. `["eu-west-1a", "eu-west-1b", "eu-west-1c"]`. At present three AZs must be used  |
 | `oidc_provider_url` | In Auth0 look in the Application called 'AWS' for its domain and manually make it into a URL e.g. `https://dev-analytics-moj.eu.auth0.com/` |
-| `oidc_client_ids` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `[ "Npai3Y", ]` |
+| `oidc_client_id` | In Auth0 look in the Application called 'AWS' for its Client ID. e.g. `0H27Ouhl...` |
 | `oidc_provider_thumbprints` | Use Auth0's thumbprints, which are: `["6ef423e5272b2347200970d1cd9d1a72beabc592", "9e99a48a9960b14926bb7f3b02e22da2b0ab7280",]` |
-| `trusted_entity` | e.g. `["arn:aws:iam::1234567890:role/nodes.alpha.mojanalytics.xyz"]` |
-| `hostedzoneid_arn` | Do: `aws route53 list-hosted-zones` and find your environment's hosted zone e.g. 'alpha.mojanalytics.xyz' and take the Id e.g. "/hostedzone/ZNTPTENPSK7S5" and put it into arn format e.g. `["arn:aws:route53:::hostedzone/ZNTPTENPSK7S5"]` |
-
-
-
-### Working with an existing environment
+| `idp_saml_domain` | Auth0 tenant domain, minus `http://`, e.g. `dev-analytics-moj.eu.auth0.com` |
+| `idp_saml_signon_url` | value of `<SingleSignOnService>` in SAML metadata XML, e.g. `https://dev-analytics-moj.eu.auth0.com/samlp/c6q0KcsL4Kj70T97whsrSarwuYP65353` |
+| `idp_saml_logout_url` | value of `<SingleLogoutService>` in SAML metadata XML, e.g. `https://dev-analytics-moj.eu.auth0.com/samlp/c6q0KcsL4Kj70T97whsrSarwuYP65353` |
+| `idp_saml_x509_cert` | value of `<X509Certificate>` in SAML metadata XML, e.g. `MIIDEzCCAfugA...` |
 
 ```
-# Ensure you're in the platform resources directory
-cd infra/terraform/platform
-```
-If this repo is freshly checked-out you'll need to configure it:
-```
-# Set this env var to the same value as before, giving the location of the platform's global terraform state
-export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
-
-# Configure (in .terraform) the remote state and download the required modules
-terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
-# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
-
-# You can check the configured platform backend:
-grep \"key\" -C 1 .terraform/terraform.tfstate
-```
-Select the workspace/environment:
-```
-terraform workspace select $ENVNAME
-```
-Now you can use commands like `terraform plan` and `terraform apply`.
-
-Note about different backends: if you want to run terraform for another platform, and therefore use a different remote state backend, you should do this in another check-out of this repository.
-
-
-### Creating AWS resources, or applying changes to existing environment
-
-Once remote Terraform state has been configured you can now apply changes to existing environments, or create a new environment:
-
-```
-# Enter platform resources directory
-cd infra/terraform/platform
-
-# Select environment
-terraform workspace select $ENVNAME
-
-# Plan and preview changes - you must use the correct .tfvars file for this environment
-terraform plan -var-file=vars/$ENVNAME.tfvars
-
-# NB You can usually ignore this action, which fires every time due whitespace issues:
-#    ~ module.data_buckets.aws_s3_bucket_policy.source
-
-# Apply the above changes
+# Create Terraform resources
 terraform apply -var-file=vars/$ENVNAME.tfvars
 ```
 
-Note:
-
-Once complete your base AWS resources should be in place
-
-
-### Create Kubernetes cluster
+##### Create Kubernetes cluster
 
 1. Install tools (if you've not already):
 
@@ -381,15 +332,10 @@ Once complete your base AWS resources should be in place
 (On macOS you can: `brew install kubectl kops python3`)
 
 2. Create a values YAML file for Kops:
-  Most information required by Kops can be obtained from Terraform, with the exception of 
-  authentication information, cluster size, and instance machine image. This information 
-  must be supplied as a YAML file with the following structure, as 
+  Most information required by Kops can be obtained from Terraform, with the exception of cluster size and instance machine image. This information must be supplied as a YAML file with the following structure, as 
   `infra/kops/config/$ENVNAME.yaml`:
 
   ```
-  OIDC:
-    ClientID: ""
-
   instanceGroups:
     masters:
       machineType: ""
@@ -408,7 +354,6 @@ Once complete your base AWS resources should be in place
 
   | Key                    | Value                                                    |
   |------------------------|----------------------------------------------------------|
-  | `OIDC.ClientID`        | OIDC client ID from the `kubectl-oidc` Auth0 application |
   | `masters.machineType`  | EC2 instance type for master nodes, e.g. `m4.xlarge` |
   | `nodes.machineType`    | EC2 instance type for worker nodes, e.g. `m4.xlarge` |
   | `nodes.rootVolumeSize` | nodes' root disk size, in GB, e.g. `100` |
@@ -465,7 +410,7 @@ Once complete your base AWS resources should be in place
 ### Verify cluster creation
 `$ kubectl cluster-info`
 
-If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready.
+If kubectl is unable to connect, the cluster is still starting, so wait a few minutes and try again; Terraform also creates new DNS entries, so you may need to flush your DNS cache. Once `cluster-info` returns Kubernetes master and KubeDNS your cluster is ready and you can proceed to create remaining Terraform `platform` resources.
 
 ### kube config
 
@@ -482,6 +427,99 @@ aws configure
 export KOPS_STATE_STORE=s3://kops.accelerator.data-science.org
 kops export kubecfg accelerator.data-science.org.uk
 ```
+
+##### `platform` Terraform
+
+`platform` Terraform resources must be created *after* kops has successfully deployed a Kubernetes cluster.
+
+Each environment is a Terraform 'workspace'. The workspace name for `platform-base` and `platform` resources **MUST** match.
+
+To complete new environment setup in Terraform:
+```
+# Enter platform Terraform resources directory
+cd infra/terraform/platform
+
+# Store the name of the environment in the environment e.g.
+export ENVNAME=mytestenv
+
+# Create the new workspace
+terraform workspace new $ENVNAME
+
+# Create vars file with config values for this environment - refer to existing .tfvars files for reference (or create one using the variable names listed in platform/variables.tf)
+cp vars/alpha.tfvars vars/$ENVNAME.tfvars
+vim vars/$ENVNAME.tfvars
+```
+
+| Variable  | Value |
+| ------------- | ------------- |
+| `region`  | AWS region. This must be a region that supports all AWS services created in `infra/terraform/modules`, e.g. `eu-west-1`  |
+| `terraform_bucket_name`  | S3 bucket name for Terraform state (=$TERRAFORM_STATE_BUCKET_NAME) |
+| `control_panel_api_db_username` | |
+| `control_panel_api_db_password` | |
+| `airflow_db_username` | |
+| `airflow_db_password` | |
+| `ses_ap_email_identity_arn` | Create an SES email address that AP can use to send emails (SES provides the SMTP) and provide the ARN e.g. "arn:aws:ses:eu-west-1:1234567890:identity/user@example.com"
+| `softnas_ssh_public_key` | |
+| `softnas_ami_id` | e.g. `ami-22cecec8` |
+| `softnas_instance_type` | e.g. `m4.large` |
+| `softnas_num_instances` | valid values are `1` for a non-HA deployment or `2` for HA |
+
+```
+# Create Terraform resources
+terraform apply -var-file=vars/$ENVNAME.tfvars
+```
+
+### Working with an existing environment
+
+```
+# Ensure you're in the platform resources directory
+cd infra/terraform/platform
+```
+If this repo is freshly checked-out you'll need to configure it:
+```
+# Set this env var to the same value as before, giving the location of the platform's global terraform state
+export TERRAFORM_STATE_BUCKET_NAME=global-terraform-state.example.com
+
+# Configure (in .terraform) the remote state and download the required modules
+terraform init -backend-config "bucket=$TERRAFORM_STATE_BUCKET_NAME"
+# Note: if you configure the wrong backend, you'll need to delete your `.terraform` before running this again.
+
+# You can check the configured platform backend:
+grep \"key\" -C 1 .terraform/terraform.tfstate
+```
+Select the workspace/environment:
+```
+terraform workspace select $ENVNAME
+```
+Now you can use commands like `terraform plan` and `terraform apply`.
+
+Note about different backends: if you want to run terraform for another platform, and therefore use a different remote state backend, you should do this in another check-out of this repository.
+
+
+### Creating AWS resources, or applying changes to existing environment
+
+Once remote Terraform state has been configured you can now apply changes to existing environments, or create a new environment:
+
+```
+# Enter platform resources directory
+cd infra/terraform/platform
+
+# Select environment
+terraform workspace select $ENVNAME
+
+# Plan and preview changes - you must use the correct .tfvars file for this environment
+terraform plan -var-file=vars/$ENVNAME.tfvars
+
+# NB You can usually ignore this action, which fires every time due whitespace issues:
+#    ~ module.data_buckets.aws_s3_bucket_policy.source
+
+# Apply the above changes
+terraform apply -var-file=vars/$ENVNAME.tfvars
+```
+
+Note:
+
+Once complete your base AWS resources should be in place
 
 ### Helm setup
 
