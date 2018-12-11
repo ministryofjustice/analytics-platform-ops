@@ -1,12 +1,12 @@
 instanceGroups:
   masters:
-    machineType: m4.xlarge
+    machineType: t2.medium
 
   nodes:
-    machineType: r4.xlarge
+    machineType: t2.medium
     rootVolumeSize: 100
-    maxSize: 18
-    minSize: 18
+    maxSize: 2
+    minSize: 2
 
   bastions:
     machineType: t2.micro
