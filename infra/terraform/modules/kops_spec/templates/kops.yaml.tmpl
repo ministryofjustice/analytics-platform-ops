@@ -1,0 +1,142 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: ${cluster_dns_name}
+spec:
+  additionalPolicies:
+    node: |
+      [
+        {
+          "Action": [
+            "sts:AssumeRole"
+          ],
+          "Effect": "Allow",
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ecr:DescribeImages",
+            "ecr:InitiateLayerUpload",
+            "ecr:UploadLayerPart",
+            "ecr:CompleteLayerUpload",
+            "ecr:PutImage",
+            "ecr:CreateRepository"
+          ],
+          "Resource": "*"
+        }
+      ]
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://{{.kopsStateBucket}}/{{.clusterDNSName}}
+  dnsZone: ${cluster_dns_zone}
+  etcdClusters:
+  - name: main
+    etcdMembers:
+${etcd_main_members}
+  - name: events
+    etcdMembers:
+${etcd_events_members}
+  iam:
+    legacy: true
+  kubeAPIServer:
+    oidcClientID: {{.OIDC.ClientID}}
+    oidcGroupsClaim: https://api.{{.clusterDNSName}}/claims/groups
+    oidcIssuerURL: {{.OIDC.IssuerURL}}
+    oidcUsernameClaim: nickname
+    runtimeConfig:
+      batch/v2alpha1: "true"
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: {{$kubernetesVersion}}
+  masterInternalName: api.internal.{{.clusterDNSName}}
+  masterPublicName: api.{{.clusterDNSName}}
+  networkCIDR: {{.VPC.cidr}}
+  networkID: {{.VPC.id}}
+  networking:
+    calico: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+${public_subnets}
+${private_subnets}
+  topology:
+    bastion:
+      bastionPublicName: bastion.{{.clusterDNSName}}
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+
+{{- range .availabilityZones }}
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.clusterDNSName }}
+  name: master-{{ . }}
+spec:
+  additionalSecurityGroups:
+  - {{ $.extraSecurityGroups.masters }}
+  associatePublicIp: false
+  image: {{ $instanceGroupImage }}
+  machineType: {{ $.instanceGroups.masters.machineType }}
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+  - {{ . }}
+
+{{- end }}
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.clusterDNSName }}
+  name: nodes
+spec:
+  additionalSecurityGroups:
+  - {{ $.extraSecurityGroups.nodes }}
+  associatePublicIp: false
+  image: {{ $instanceGroupImage }}
+  machineType: {{ $.instanceGroups.nodes.machineType }}
+  maxSize: {{ $.instanceGroups.nodes.maxSize }}
+  minSize: {{ $.instanceGroups.nodes.minSize }}
+  role: Node
+  rootVolumeSize: {{ $.instanceGroups.nodes.rootVolumeSize }}
+  subnets:
+  {{- range .availabilityZones }}
+  - {{ . }}
+  {{- end}}
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.clusterDNSName }}
+  name: bastions
+spec:
+  additionalSecurityGroups:
+  - {{ $.extraSecurityGroups.bastions }}
+  image: {{ $instanceGroupImage }}
+  machineType: {{ $.instanceGroups.bastions.machineType }}
+  maxSize: {{ $.instanceGroups.bastions.maxSize }}
+  minSize: {{ $.instanceGroups.bastions.minSize }}
+  role: Bastion
+  subnets:
+  {{- range .availabilityZones }}
+  - dmz-{{ . }}
+  {{- end}}
