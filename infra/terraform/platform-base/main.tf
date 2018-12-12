@@ -41,3 +41,19 @@ module "federated_identity" {
   saml_logout_url           = "${var.idp_saml_logout_url}"
   saml_x509_cert            = "${var.idp_saml_x509_cert}"
 }
+
+module "kops_spec" {
+  source = "../modules/kops_spec"
+
+  cluster_dns_name   = "${module.cluster_dns.dns_zone_domain}"
+  cluster_dns_zone   = "${module.cluster_dns.dns_zone_id}"
+  availability_zones = ["${module.aws_vpc.availability_zones}"]
+
+  public_subnet_ids                = ["${module.aws_vpc.dmz_subnet_ids}"]
+  public_subnet_cidr_blocks        = ["${module.aws_vpc.dmz_subnet_cidr_blocks}"]
+  public_subnet_availability_zones = ["${module.aws_vpc.dmz_subnet_availability_zones}"]
+
+  private_subnet_ids                = ["${module.aws_vpc.private_subnet_ids}"]
+  private_subnet_cidr_blocks        = ["${module.aws_vpc.private_subnet_cidr_blocks}"]
+  private_subnet_availability_zones = ["${module.aws_vpc.private_subnet_availability_zones}"]
+}
