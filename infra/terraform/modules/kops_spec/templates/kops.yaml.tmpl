@@ -74,29 +74,8 @@ ${private_subnets}
     masters: private
     nodes: private
 
-{{- range .availabilityZones }}
 ---
-
-apiVersion: kops/v1alpha2
-kind: InstanceGroup
-metadata:
-  labels:
-    kops.k8s.io/cluster: {{ $.clusterDNSName }}
-  name: master-{{ . }}
-spec:
-  additionalSecurityGroups:
-  - {{ $.extraSecurityGroups.masters }}
-  associatePublicIp: false
-  image: {{ $instanceGroupImage }}
-  machineType: {{ $.instanceGroups.masters.machineType }}
-  maxSize: 1
-  minSize: 1
-  role: Master
-  subnets:
-  - {{ . }}
-
-{{- end }}
-
+${master_instancegroups}
 ---
 
 apiVersion: kops/v1alpha2
