@@ -10,14 +10,6 @@ output "availability_zones" {
   value = ["${var.availability_zones}"]
 }
 
-output "dmz_subnet_ids" {
-  value = ["${aws_subnet.dmz.*.id}"]
-}
-
-output "private_subnet_ids" {
-  value = ["${aws_subnet.private.*.id}"]
-}
-
 output "storage_subnet_ids" {
   value = ["${aws_subnet.storage.*.id}"]
 }
@@ -54,12 +46,36 @@ output "nat_gateway_subnets" {
   value = "${zipmap(aws_nat_gateway.private_gw.*.subnet_id, aws_nat_gateway.private_gw.*.id)}"
 }
 
+output "dmz_subnet_ids" {
+  value = ["${aws_subnet.dmz.*.id}"]
+}
+
+output "dmz_subnet_cidr_blocks" {
+  value = ["${aws_subnet.dmz.*.cidr_block}"]
+}
+
+output "dmz_subnet_availability_zones" {
+  value = ["${aws_subnet.dmz.*.availability_zone}"]
+}
+
 output "dmz_subnets" {
   value = "${map(
     "ids", aws_subnet.dmz.*.id,
     "cidrs", aws_subnet.dmz.*.cidr_block,
     "availabilityZones", aws_subnet.dmz.*.availability_zone
   )}"
+}
+
+output "private_subnet_ids" {
+  value = ["${aws_subnet.private.*.id}"]
+}
+
+output "private_subnet_cidr_blocks" {
+  value = ["${aws_subnet.private.*.cidr_block}"]
+}
+
+output "private_subnet_availability_zones" {
+  value = ["${aws_subnet.private.*.availability_zone}"]
 }
 
 output "private_subnets" {
