@@ -67,20 +67,24 @@ module "kops_spec" {
 
   instancegroup_image = "kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17"
 
-  masters_extra_sg_id  = "${module.aws_vpc.extra_master_sg_id}"
-  masters_machine_type = "t2.medium"
+  masters_extra_sg_id      = "${module.aws_vpc.extra_master_sg_id}"
+  masters_machine_type     = "t2.medium"
+  masters_root_volume_size = 64
 
   nodes_extra_sg_id            = "${module.aws_vpc.extra_node_sg_id}"
   nodes_machine_type           = "t2.medium"
   nodes_instancegroup_max_size = 1
   nodes_instancegroup_min_size = 1
+  nodes_root_volume_size       = 100
 
   highmem_nodes_machine_type           = "t2.medium"
   highmem_nodes_instancegroup_max_size = 1
   highmem_nodes_instancegroup_min_size = 1
+  highmem_nodes_root_volume_size       = 100
 
   bastions_extra_sg_id            = "${module.aws_vpc.extra_bastion_sg_id}"
   bastions_machine_type           = "t2.micro"
   bastions_instancegroup_max_size = 1
   bastions_instancegroup_min_size = 1
+  bastions_root_volume_size       = 32
 }

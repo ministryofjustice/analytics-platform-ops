@@ -44,6 +44,7 @@ data "template_file" "master_instancegroup" {
     additional_security_group = "${var.masters_extra_sg_id}"
     image                     = "${var.instancegroup_image}"
     machine_type              = "${var.masters_machine_type}"
+    root_volume_size          = "${var.masters_root_volume_size}"
     max_size                  = 1
     min_size                  = 1
     subnets                   = "  - ${element(var.availability_zones, count.index)}"
@@ -60,6 +61,7 @@ data "template_file" "nodes_instancegroup" {
     additional_security_group = "${var.nodes_extra_sg_id}"
     image                     = "${var.instancegroup_image}"
     machine_type              = "${var.nodes_machine_type}"
+    root_volume_size          = "${var.nodes_root_volume_size}"
     max_size                  = "${var.nodes_instancegroup_max_size}"
     min_size                  = "${var.nodes_instancegroup_max_size}"
     subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
@@ -76,6 +78,7 @@ data "template_file" "highmem_nodes_instancegroup" {
     additional_security_group = "${var.nodes_extra_sg_id}"
     image                     = "${var.instancegroup_image}"
     machine_type              = "${var.highmem_nodes_machine_type}"
+    root_volume_size          = "${var.highmem_nodes_root_volume_size}"
     max_size                  = "${var.highmem_nodes_instancegroup_max_size}"
     min_size                  = "${var.highmem_nodes_instancegroup_max_size}"
     subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
@@ -92,6 +95,7 @@ data "template_file" "bastions_instancegroup" {
     additional_security_group = "${var.bastions_extra_sg_id}"
     image                     = "${var.instancegroup_image}"
     machine_type              = "${var.bastions_machine_type}"
+    root_volume_size          = "${var.bastions_root_volume_size}"
     max_size                  = "${var.bastions_instancegroup_max_size}"
     min_size                  = "${var.bastions_instancegroup_max_size}"
     subnets                   = "  - ${join("\n  - ", var.public_subnet_availability_zones)}"

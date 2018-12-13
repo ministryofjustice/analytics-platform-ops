@@ -30,21 +30,27 @@ variable "private_subnet_availability_zones" {
 }
 
 variable "instancegroup_image" {}
+
 variable "masters_extra_sg_id" {}
 variable "masters_machine_type" {}
+variable "masters_root_volume_size" {}
+
 variable "nodes_extra_sg_id" {}
 variable "nodes_machine_type" {}
 variable "nodes_instancegroup_max_size" {}
 variable "nodes_instancegroup_min_size" {}
+variable "nodes_root_volume_size" {}
 
 variable "highmem_nodes_machine_type" {}
 variable "highmem_nodes_instancegroup_max_size" {}
 variable "highmem_nodes_instancegroup_min_size" {}
+variable "highmem_nodes_root_volume_size" {}
 
 variable "bastions_extra_sg_id" {}
 variable "bastions_machine_type" {}
 variable "bastions_instancegroup_max_size" {}
 variable "bastions_instancegroup_min_size" {}
+variable "bastions_root_volume_size" {}
 
 variable "kops_state_bucket" {}
 variable "oidc_client_id" {}
