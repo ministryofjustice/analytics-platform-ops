@@ -70,4 +70,9 @@ module "kops_spec" {
   highmem_nodes_machine_type = "t2.medium"
   highmem_nodes_instancegroup_max_size = 1
   highmem_nodes_instancegroup_min_size = 1
+
+  bastions_extra_sg_id = "${module.aws_vpc.extra_bastion_sg_id}"
+  bastions_machine_type = "t2.micro"
+  bastions_instancegroup_max_size = 1
+  bastions_instancegroup_min_size = 1
 }
