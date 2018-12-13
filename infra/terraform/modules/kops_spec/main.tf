@@ -48,8 +48,8 @@ data "template_file" "master_instancegroup" {
     max_size                  = 1
     min_size                  = 1
     subnets                   = "  - ${element(var.availability_zones, count.index)}"
-    taints = "[]"
-    node_labels = "{}"
+    taints                    = "[]"
+    node_labels               = "{}"
   }
 }
 
@@ -67,8 +67,8 @@ data "template_file" "nodes_instancegroup" {
     max_size                  = "${var.nodes_instancegroup_max_size}"
     min_size                  = "${var.nodes_instancegroup_max_size}"
     subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
-    taints = "[]"
-    node_labels = "{}"
+    taints                    = "[]"
+    node_labels               = "{}"
   }
 }
 
@@ -86,8 +86,8 @@ data "template_file" "highmem_nodes_instancegroup" {
     max_size                  = "${var.highmem_nodes_instancegroup_max_size}"
     min_size                  = "${var.highmem_nodes_instancegroup_max_size}"
     subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
-    taints = "\n  - dedicated=highmem:NoSchedule"
-    node_labels = "\n    node-role.kubernetes.io/highmem: \"\""
+    taints                    = "\n  - dedicated=highmem:NoSchedule"
+    node_labels               = "\n    node-role.kubernetes.io/highmem: \"\""
   }
 }
 
@@ -105,8 +105,8 @@ data "template_file" "bastions_instancegroup" {
     max_size                  = "${var.bastions_instancegroup_max_size}"
     min_size                  = "${var.bastions_instancegroup_max_size}"
     subnets                   = "  - ${join("\n  - ", var.public_subnet_availability_zones)}"
-    taints = "[]"
-    node_labels = "{}"
+    taints                    = "[]"
+    node_labels               = "{}"
   }
 }
 
