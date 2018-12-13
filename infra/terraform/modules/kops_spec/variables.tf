@@ -36,3 +36,7 @@ variable "nodes_extra_sg_id" {}
 variable "nodes_machine_type" {}
 variable "nodes_instancegroup_max_size" {}
 variable "nodes_instancegroup_min_size" {}
+
+variable "highmem_nodes_machine_type" {}
+variable "highmem_nodes_instancegroup_max_size" {}
+variable "highmem_nodes_instancegroup_min_size" {}

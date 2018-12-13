@@ -79,22 +79,4 @@ ${master_instancegroups}
 ---
 ${nodes_instancegroup}
 ---
-
-apiVersion: kops/v1alpha2
-kind: InstanceGroup
-metadata:
-  labels:
-    kops.k8s.io/cluster: {{ $.clusterDNSName }}
-  name: bastions
-spec:
-  additionalSecurityGroups:
-  - {{ $.extraSecurityGroups.bastions }}
-  image: {{ $instanceGroupImage }}
-  machineType: {{ $.instanceGroups.bastions.machineType }}
-  maxSize: {{ $.instanceGroups.bastions.maxSize }}
-  minSize: {{ $.instanceGroups.bastions.minSize }}
-  role: Bastion
-  subnets:
-  {{- range .availabilityZones }}
-  - dmz-{{ . }}
-  {{- end}}
+${highmem_nodes_instancegroup}

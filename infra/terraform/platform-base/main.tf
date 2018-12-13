@@ -66,4 +66,8 @@ module "kops_spec" {
   nodes_machine_type = "t2.medium"
   nodes_instancegroup_max_size = 1
   nodes_instancegroup_min_size = 1
+
+  highmem_nodes_machine_type = "t2.medium"
+  highmem_nodes_instancegroup_max_size = 1
+  highmem_nodes_instancegroup_min_size = 1
 }
