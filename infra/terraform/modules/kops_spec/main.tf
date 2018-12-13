@@ -114,12 +114,12 @@ data "template_file" "kops" {
     cluster_dns_name = "${var.cluster_dns_name}"
     cluster_dns_zone = "${var.cluster_dns_zone}"
 
-    kops_state_bucket  = "${var.kops_state_bucket}"
-    oidc_client_id     = "${var.oidc_client_id}"
-    oidc_issuer_url    = "${var.oidc_issuer_url}"
-    kubernetes_version = "${var.kubernetes_version}"
-    vpc_id             = "${var.vpc_id}"
-    vpc_cidr           = "${var.vpc_cidr}"
+    kops_state_bucket = "${var.kops_state_bucket}"
+    oidc_client_id    = "${var.oidc_client_id}"
+    oidc_issuer_url   = "${var.oidc_issuer_url}"
+    k8s_version       = "${var.k8s_version}"
+    vpc_id            = "${var.vpc_id}"
+    vpc_cidr          = "${var.vpc_cidr}"
 
     etcd_main_members   = "${join("", data.template_file.etcd_member.*.rendered)}"
     etcd_events_members = "${join("", data.template_file.etcd_member.*.rendered)}"

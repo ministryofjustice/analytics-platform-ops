@@ -53,7 +53,7 @@ ${etcd_events_members}
       batch/v2alpha1: "true"
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: ${kubernetes_version}
+  kubernetesVersion: ${k8s_version}
   masterInternalName: api.internal.${cluster_dns_name}
   masterPublicName: api.${cluster_dns_name}
   networkCIDR: ${vpc_cidr}

@@ -45,7 +45,7 @@ module "federated_identity" {
 module "kops_spec" {
   source = "../modules/kops_spec"
 
-  kubernetes_version = "1.10.11"
+  k8s_version = "${var.k8s_version}"
 
   kops_state_bucket = "${data.terraform_remote_state.global.kops_bucket_name}"
 
@@ -65,26 +65,26 @@ module "kops_spec" {
   oidc_client_id  = "${var.oidc_client_id}"
   oidc_issuer_url = "${var.oidc_provider_url}"
 
-  instancegroup_image = "kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17"
+  instancegroup_image = "${var.k8s_instancegroup_image}"
 
   masters_extra_sg_id      = "${module.aws_vpc.extra_master_sg_id}"
-  masters_machine_type     = "t2.medium"
-  masters_root_volume_size = 64
+  masters_machine_type     = "${var.k8s_masters_machine_type}"
+  masters_root_volume_size = "${var.k8s_masters_root_volume_size}"
 
   nodes_extra_sg_id            = "${module.aws_vpc.extra_node_sg_id}"
-  nodes_machine_type           = "t2.medium"
-  nodes_instancegroup_max_size = 1
-  nodes_instancegroup_min_size = 1
-  nodes_root_volume_size       = 100
+  nodes_machine_type           = "${var.k8s_nodes_machine_type}"
+  nodes_instancegroup_min_size = "${var.k8s_nodes_instancegroup_min_size}"
+  nodes_instancegroup_max_size = "${var.k8s_nodes_instancegroup_max_size}"
+  nodes_root_volume_size       = "${var.k8s_nodes_root_volume_size}"
 
-  highmem_nodes_machine_type           = "t2.medium"
-  highmem_nodes_instancegroup_max_size = 1
-  highmem_nodes_instancegroup_min_size = 1
-  highmem_nodes_root_volume_size       = 100
+  highmem_nodes_machine_type           = "${var.k8s_highmem_nodes_machine_type}"
+  highmem_nodes_instancegroup_min_size = "${var.k8s_highmem_nodes_instancegroup_min_size}"
+  highmem_nodes_instancegroup_max_size = "${var.k8s_highmem_nodes_instancegroup_max_size}"
+  highmem_nodes_root_volume_size       = "${var.k8s_highmem_nodes_root_volume_size}"
 
   bastions_extra_sg_id            = "${module.aws_vpc.extra_bastion_sg_id}"
-  bastions_machine_type           = "t2.micro"
-  bastions_instancegroup_max_size = 1
-  bastions_instancegroup_min_size = 1
-  bastions_root_volume_size       = 32
+  bastions_machine_type           = "${var.k8s_bastions_machine_type}"
+  bastions_instancegroup_min_size = "${var.k8s_bastions_instancegroup_min_size}"
+  bastions_instancegroup_max_size = "${var.k8s_bastions_instancegroup_max_size}"
+  bastions_root_volume_size       = "${var.k8s_bastions_root_volume_size}"
 }

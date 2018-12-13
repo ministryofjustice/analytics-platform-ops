@@ -55,6 +55,6 @@ variable "bastions_root_volume_size" {}
 variable "kops_state_bucket" {}
 variable "oidc_client_id" {}
 variable "oidc_issuer_url" {}
-variable "kubernetes_version" {}
+variable "k8s_version" {}
 variable "vpc_id" {}
 variable "vpc_cidr" {}
