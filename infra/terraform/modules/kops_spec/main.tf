@@ -9,7 +9,7 @@ data "template_file" "etcd_member" {
 
 data "template_file" "public_subnet" {
   template = "${file("${path.module}/templates/subnet.snippet.tmpl")}"
-  count = "${length(var.public_subnet_availability_zones)}"
+  count    = "${length(var.public_subnet_availability_zones)}"
 
   vars {
     subnet_type              = "Utility"
@@ -116,9 +116,9 @@ data "template_file" "kops" {
     public_subnets  = "${join("", data.template_file.public_subnet.*.rendered)}"
     private_subnets = "${join("", data.template_file.private_subnet.*.rendered)}"
 
-    master_instancegroups = "${join("\n---\n", data.template_file.master_instancegroup.*.rendered)}"
-    nodes_instancegroup = "${data.template_file.nodes_instancegroup.rendered}"
+    master_instancegroups       = "${join("\n---\n", data.template_file.master_instancegroup.*.rendered)}"
+    nodes_instancegroup         = "${data.template_file.nodes_instancegroup.rendered}"
     highmem_nodes_instancegroup = "${data.template_file.highmem_nodes_instancegroup.rendered}"
-    bastions_instancegroup = "${data.template_file.bastions_instancegroup.rendered}"
+    bastions_instancegroup      = "${data.template_file.bastions_instancegroup.rendered}"
   }
 }
