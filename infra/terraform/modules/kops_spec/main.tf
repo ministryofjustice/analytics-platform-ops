@@ -110,11 +110,6 @@ data "template_file" "bastions_instancegroup" {
   }
 }
 
-resource "local_file" "kops" {
-  content  = "${data.template_file.kops.rendered}"
-  filename = "../../kops/${terraform.workspace}.yaml"
-}
-
 data "template_file" "kops" {
   template = "${file("${path.module}/templates/kops.yaml.tmpl")}"
 
