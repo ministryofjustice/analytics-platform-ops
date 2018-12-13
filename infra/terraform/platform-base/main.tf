@@ -45,17 +45,25 @@ module "federated_identity" {
 module "kops_spec" {
   source = "../modules/kops_spec"
 
-  cluster_dns_name   = "${module.cluster_dns.dns_zone_domain}"
-  cluster_dns_zone   = "${module.cluster_dns.dns_zone_id}"
-  availability_zones = ["${module.aws_vpc.availability_zones}"]
+  kubernetes_version = "1.10.11"
 
-  public_subnet_ids                = ["${module.aws_vpc.dmz_subnet_ids}"]
-  public_subnet_cidr_blocks        = ["${module.aws_vpc.dmz_subnet_cidr_blocks}"]
-  public_subnet_availability_zones = ["${module.aws_vpc.dmz_subnet_availability_zones}"]
+  kops_state_bucket = "${data.terraform_remote_state.global.kops_bucket_name}"
 
+  vpc_id                            = "${module.aws_vpc.vpc_id}"
+  vpc_cidr                          = "${module.aws_vpc.cidr}"
+  availability_zones                = ["${module.aws_vpc.availability_zones}"]
+  public_subnet_ids                 = ["${module.aws_vpc.dmz_subnet_ids}"]
+  public_subnet_cidr_blocks         = ["${module.aws_vpc.dmz_subnet_cidr_blocks}"]
+  public_subnet_availability_zones  = ["${module.aws_vpc.dmz_subnet_availability_zones}"]
   private_subnet_ids                = ["${module.aws_vpc.private_subnet_ids}"]
   private_subnet_cidr_blocks        = ["${module.aws_vpc.private_subnet_cidr_blocks}"]
   private_subnet_availability_zones = ["${module.aws_vpc.private_subnet_availability_zones}"]
+
+  cluster_dns_name = "${module.cluster_dns.dns_zone_domain}"
+  cluster_dns_zone = "${module.cluster_dns.dns_zone_id}"
+
+  oidc_client_id  = "${var.oidc_client_id}"
+  oidc_issuer_url = "${var.oidc_provider_url}"
 
   instancegroup_image = "kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17"
 
@@ -75,11 +83,4 @@ module "kops_spec" {
   bastions_machine_type           = "t2.micro"
   bastions_instancegroup_max_size = 1
   bastions_instancegroup_min_size = 1
-
-  kops_state_bucket  = "${data.terraform_remote_state.global.kops_bucket_name}"
-  oidc_client_id     = "${var.oidc_client_id}"
-  oidc_issuer_url    = "${var.oidc_provider_url}"
-  kubernetes_version = "1.10.11"
-  vpc_id             = "${module.aws_vpc.vpc_id}"
-  vpc_cidr           = "${module.aws_vpc.cidr}"
 }
