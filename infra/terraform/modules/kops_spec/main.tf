@@ -9,11 +9,7 @@ data "template_file" "etcd_member" {
 
 data "template_file" "public_subnet" {
   template = "${file("${path.module}/templates/subnet.snippet.tmpl")}"
-
-  # Using AZs for count here instead of public_subnet_ids (or other subnet property)
-  # due to limitations on using length() with computed module outputs. See:
-  # https://github.com/hashicorp/terraform/issues/12570
-  count = "${length(var.availability_zones)}"
+  count = "${length(var.public_subnet_availability_zones)}"
 
   vars {
     subnet_type              = "Utility"
@@ -26,7 +22,7 @@ data "template_file" "public_subnet" {
 
 data "template_file" "private_subnet" {
   template = "${file("${path.module}/templates/subnet.snippet.tmpl")}"
-  count    = "${length(var.availability_zones)}"
+  count    = "${length(var.private_subnet_availability_zones)}"
 
   vars {
     subnet_type              = "Private"
@@ -39,7 +35,7 @@ data "template_file" "private_subnet" {
 
 data "template_file" "master_instancegroup" {
   template = "${file("${path.module}/templates/instancegroup.snippet.tmpl")}"
-  count    = "${length(var.availability_zones)}"
+  count    = "${length(var.private_subnet_availability_zones)}"
 
   vars {
     role                      = "Master"
