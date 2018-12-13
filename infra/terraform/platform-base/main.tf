@@ -75,4 +75,11 @@ module "kops_spec" {
   bastions_machine_type           = "t2.micro"
   bastions_instancegroup_max_size = 1
   bastions_instancegroup_min_size = 1
+
+  kops_state_bucket  = "${data.terraform_remote_state.global.kops_bucket_name}"
+  oidc_client_id     = "${var.oidc_client_id}"
+  oidc_issuer_url    = "${var.oidc_provider_url}"
+  kubernetes_version = "1.10.11"
+  vpc_id             = "${module.aws_vpc.vpc_id}"
+  vpc_cidr           = "${module.aws_vpc.cidr}"
 }

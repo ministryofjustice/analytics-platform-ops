@@ -45,3 +45,10 @@ variable "bastions_extra_sg_id" {}
 variable "bastions_machine_type" {}
 variable "bastions_instancegroup_max_size" {}
 variable "bastions_instancegroup_min_size" {}
+
+variable "kops_state_bucket" {}
+variable "oidc_client_id" {}
+variable "oidc_issuer_url" {}
+variable "kubernetes_version" {}
+variable "vpc_id" {}
+variable "vpc_cidr" {}

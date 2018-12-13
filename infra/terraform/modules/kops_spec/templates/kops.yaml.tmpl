@@ -33,7 +33,7 @@ spec:
     rbac: {}
   channel: stable
   cloudProvider: aws
-  configBase: s3://{{.kopsStateBucket}}/{{.clusterDNSName}}
+  configBase: s3://${kops_state_bucket}/${cluster_dns_name}
   dnsZone: ${cluster_dns_zone}
   etcdClusters:
   - name: main
@@ -45,19 +45,19 @@ ${etcd_events_members}
   iam:
     legacy: true
   kubeAPIServer:
-    oidcClientID: {{.OIDC.ClientID}}
-    oidcGroupsClaim: https://api.{{.clusterDNSName}}/claims/groups
-    oidcIssuerURL: {{.OIDC.IssuerURL}}
+    oidcClientID: ${oidc_client_id}
+    oidcGroupsClaim: https://api.${cluster_dns_name}/claims/groups
+    oidcIssuerURL: ${oidc_issuer_url}
     oidcUsernameClaim: nickname
     runtimeConfig:
       batch/v2alpha1: "true"
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: {{$kubernetesVersion}}
-  masterInternalName: api.internal.{{.clusterDNSName}}
-  masterPublicName: api.{{.clusterDNSName}}
-  networkCIDR: {{.VPC.cidr}}
-  networkID: {{.VPC.id}}
+  kubernetesVersion: ${kubernetes_version}
+  masterInternalName: api.internal.${cluster_dns_name}
+  masterPublicName: api.${cluster_dns_name}
+  networkCIDR: ${vpc_cidr}
+  networkID: ${vpc_id}
   networking:
     calico: {}
   nonMasqueradeCIDR: 100.64.0.0/10
@@ -68,7 +68,7 @@ ${public_subnets}
 ${private_subnets}
   topology:
     bastion:
-      bastionPublicName: bastion.{{.clusterDNSName}}
+      bastionPublicName: bastion.${cluster_dns_name}
     dns:
       type: Public
     masters: private
