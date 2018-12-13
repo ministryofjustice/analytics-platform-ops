@@ -77,28 +77,7 @@ ${private_subnets}
 ---
 ${master_instancegroups}
 ---
-
-apiVersion: kops/v1alpha2
-kind: InstanceGroup
-metadata:
-  labels:
-    kops.k8s.io/cluster: {{ $.clusterDNSName }}
-  name: nodes
-spec:
-  additionalSecurityGroups:
-  - {{ $.extraSecurityGroups.nodes }}
-  associatePublicIp: false
-  image: {{ $instanceGroupImage }}
-  machineType: {{ $.instanceGroups.nodes.machineType }}
-  maxSize: {{ $.instanceGroups.nodes.maxSize }}
-  minSize: {{ $.instanceGroups.nodes.minSize }}
-  role: Node
-  rootVolumeSize: {{ $.instanceGroups.nodes.rootVolumeSize }}
-  subnets:
-  {{- range .availabilityZones }}
-  - {{ . }}
-  {{- end}}
-
+${nodes_instancegroup}
 ---
 
 apiVersion: kops/v1alpha2

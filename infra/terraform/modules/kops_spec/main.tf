@@ -50,6 +50,22 @@ data "template_file" "master_instancegroup" {
   }
 }
 
+data "template_file" "nodes_instancegroup" {
+  template = "${file("${path.module}/templates/instancegroup.snippet.tmpl")}"
+
+  vars {
+    role                      = "Node"
+    name                      = "nodes"
+    cluster_dns_name          = "${var.cluster_dns_name}"
+    additional_security_group = "${var.nodes_extra_sg_id}"
+    image                     = "${var.instancegroup_image}"
+    machine_type              = "${var.nodes_machine_type}"
+    max_size                  = "${var.nodes_instancegroup_max_size}"
+    min_size                  = "${var.nodes_instancegroup_max_size}"
+    subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
+  }
+}
+
 resource "local_file" "kops" {
   content  = "${data.template_file.kops.rendered}"
   filename = "../../kops/${terraform.workspace}.yaml"

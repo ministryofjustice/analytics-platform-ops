@@ -57,7 +57,13 @@ module "kops_spec" {
   private_subnet_cidr_blocks        = ["${module.aws_vpc.private_subnet_cidr_blocks}"]
   private_subnet_availability_zones = ["${module.aws_vpc.private_subnet_availability_zones}"]
 
-  masters_extra_sg_id  = "${module.aws_vpc.extra_master_sg_id}"
   instancegroup_image  = "kope.io/k8s-1.10-debian-jessie-amd64-hvm-ebs-2018-08-17"
+
+  masters_extra_sg_id  = "${module.aws_vpc.extra_master_sg_id}"
   masters_machine_type = "t2.medium"
+
+  nodes_extra_sg_id    = "${module.aws_vpc.extra_node_sg_id}"
+  nodes_machine_type = "t2.medium"
+  nodes_instancegroup_max_size = 1
+  nodes_instancegroup_min_size = 1
 }
