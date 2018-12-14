@@ -1,0 +1,84 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: ${cluster_dns_name}
+spec:
+  additionalPolicies:
+    node: |
+      [
+        {
+          "Action": [
+            "sts:AssumeRole"
+          ],
+          "Effect": "Allow",
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ecr:DescribeImages",
+            "ecr:InitiateLayerUpload",
+            "ecr:UploadLayerPart",
+            "ecr:CompleteLayerUpload",
+            "ecr:PutImage",
+            "ecr:CreateRepository"
+          ],
+          "Resource": "*"
+        }
+      ]
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://${kops_state_bucket}/${cluster_dns_name}
+  dnsZone: ${cluster_dns_zone}
+  etcdClusters:
+  - name: main
+    etcdMembers:
+${etcd_main_members}
+  - name: events
+    etcdMembers:
+${etcd_events_members}
+  iam:
+    legacy: true
+  kubeAPIServer:
+    oidcClientID: ${oidc_client_id}
+    oidcGroupsClaim: https://api.${cluster_dns_name}/claims/groups
+    oidcIssuerURL: ${oidc_issuer_url}
+    oidcUsernameClaim: nickname
+    runtimeConfig:
+      batch/v2alpha1: "true"
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: ${k8s_version}
+  masterInternalName: api.internal.${cluster_dns_name}
+  masterPublicName: api.${cluster_dns_name}
+  networkCIDR: ${vpc_cidr}
+  networkID: ${vpc_id}
+  networking:
+    calico: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+${public_subnets}
+${private_subnets}
+  topology:
+    bastion:
+      bastionPublicName: bastion.${cluster_dns_name}
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+
+---
+${master_instancegroups}
+---
+${nodes_instancegroup}
+---
+${highmem_nodes_instancegroup}
+---
+${bastions_instancegroup}
