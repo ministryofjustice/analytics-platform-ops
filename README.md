@@ -13,7 +13,7 @@ Contact robin.linacre@digital.justice.gov.uk if you're in government and interes
 Install:
 
   * [Terraform][terraform]
-  * [Kops][kops]
+  * [Kops v1.11+][kops]
   * [git-crypt][gitcrypt]
 
 ## Infrastructure Overview
