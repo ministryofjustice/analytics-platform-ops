@@ -73,3 +73,7 @@ output "oidc_client_id" {
 output "oidc_provider_thumbprints" {
   value = "${var.oidc_provider_thumbprints}"
 }
+
+output "kops_spec" {
+  value = "${module.kops_spec.kops_spec}"
+}
