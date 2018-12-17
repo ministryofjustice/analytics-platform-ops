@@ -8,7 +8,7 @@ terraform {
 
 provider "aws" {
   region  = "${var.region}"
-  version = "~> 1.15"
+  version = "~> 1.51.0"
 }
 
 data "aws_caller_identity" "current" {}
@@ -28,6 +28,10 @@ module "aws_account_logging" {
   account_id = "${data.aws_caller_identity.current.account_id}"
 
   s3_logs_bucket_name = "${var.s3_logs_bucket_name}"
+
+  vpcflowlogs_s3_bucket_name = "${var.vpcflowlogs_s3_bucket_name}"
+
+  vpc_id = "${var.vpc_id}"
 }
 
 module "log_pruning" {

@@ -35,3 +35,31 @@ resource "aws_s3_bucket" "s3_logs" {
     }
   }
 }
+
+resource "aws_s3_bucket" "vpcflowlogs_bucket" {
+  bucket = "${var.vpcflowlogs_s3_bucket_name}"
+
+  lifecycle_rule {
+    enabled                                = true
+    id                                     = "logs-transition"
+    abort_incomplete_multipart_upload_days = 7
+
+    transition {
+      storage_class = "STANDARD_IA"
+      days          = 30
+    }
+
+    transition {
+      storage_class = "GLACIER"
+      days          = 60
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+
+  tags {
+    Name = "moj-analytics-vpcflowlogs"
+  }
+}
