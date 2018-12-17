@@ -51,13 +51,13 @@ module "kops_spec" {
 
   vpc_id                            = "${module.aws_vpc.vpc_id}"
   vpc_cidr                          = "${module.aws_vpc.cidr}"
-  availability_zones                = ["${module.aws_vpc.availability_zones}"]
-  public_subnet_ids                 = ["${module.aws_vpc.dmz_subnet_ids}"]
-  public_subnet_cidr_blocks         = ["${module.aws_vpc.dmz_subnet_cidr_blocks}"]
-  public_subnet_availability_zones  = ["${module.aws_vpc.dmz_subnet_availability_zones}"]
-  private_subnet_ids                = ["${module.aws_vpc.private_subnet_ids}"]
-  private_subnet_cidr_blocks        = ["${module.aws_vpc.private_subnet_cidr_blocks}"]
-  private_subnet_availability_zones = ["${module.aws_vpc.private_subnet_availability_zones}"]
+  availability_zones                = ["${var.k8s_availability_zones}"]
+  public_subnet_ids                 = ["${slice(module.aws_vpc.dmz_subnet_ids, 0, length(var.k8s_availability_zones))}"]
+  public_subnet_cidr_blocks         = ["${slice(module.aws_vpc.dmz_subnet_cidr_blocks, 0, length(var.k8s_availability_zones))}"]
+  public_subnet_availability_zones  = ["${slice(module.aws_vpc.dmz_subnet_availability_zones, 0, length(var.k8s_availability_zones))}"]
+  private_subnet_ids                = ["${slice(module.aws_vpc.private_subnet_ids, 0, length(var.k8s_availability_zones))}"]
+  private_subnet_cidr_blocks        = ["${slice(module.aws_vpc.private_subnet_cidr_blocks, 0, length(var.k8s_availability_zones))}"]
+  private_subnet_availability_zones = ["${slice(module.aws_vpc.private_subnet_availability_zones, 0, length(var.k8s_availability_zones))}"]
 
   cluster_dns_name = "${module.cluster_dns.dns_zone_domain}"
   cluster_dns_zone = "${module.cluster_dns.dns_zone_id}"
