@@ -86,7 +86,7 @@ module "kubernetes_etcd_ebs_snapshot" {
   handler               = "create_etcd_ebs_snapshot"
   source_code_hash      = "${data.archive_file.kubernetes_etcd_ebs_snapshot_code.output_base64sha256}"
   lamda_policy          = "${data.template_file.lambda_create_snapshot_policy.rendered}"
-  environment_variables = "${var.environment_variables}"
+  environment_variables = "${var.create_etcd_ebs_snapshot_env_vars}"
 }
 
 // Prune snapshots -->
@@ -109,7 +109,7 @@ module "kubernetes_prune_ebs_snapshots" {
   handler               = "prune_ebs_snapshots"
   source_code_hash      = "${data.archive_file.kubernetes_prune_ebs_snapshots_code.output_base64sha256}"
   lamda_policy          = "${data.template_file.lambda_prune_ebs_snapshots_policy.rendered}"
-  environment_variables = "${var.environment_variables}"
+  environment_variables = "${var.prune_etcd_ebs_snapshot_env_vars}"
 }
 
 module "ses_domain" {

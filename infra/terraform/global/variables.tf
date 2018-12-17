@@ -28,3 +28,20 @@ variable "s3_logs_bucket_name" {
 variable "helm_repo_s3_bucket_name" {
   default = "moj-analytics-helm-repo"
 }
+
+variable "create_etcd_ebs_snapshot_env_vars" {
+  default = {
+    TAG_KEY            = "etcd"
+    TAG_VALUE          = "1"
+    INSTANCE_TAG_KEY   = "k8s.io/role/master"
+    INSTANCE_TAG_VALUE = "1"
+  }
+}
+
+variable "prune_etcd_ebs_snapshot_env_vars" {
+  default = {
+    SNAPSHOT_TAG_KEY   = "etcd"
+    SNAPSHOT_TAG_VALUE = "1"
+    DAYS_OLD           = "14"
+  }
+}
