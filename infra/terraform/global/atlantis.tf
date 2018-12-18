@@ -2,15 +2,16 @@
 # Atlantis module not calculating our aws_route53_zone.global
 # resource as a dependency at plan time
 data "aws_route53_zone" "global" {
-  name         = "${aws_route53_zone.global.name}"
+  name = "${aws_route53_zone.global.name}"
+
   depends_on = [
     "aws_route53_zone.global",
-    "aws_route53_record.global_ns"
+    "aws_route53_record.global_ns",
   ]
 }
 
 module "atlantis" {
-  source = "terraform-aws-modules/atlantis/aws"
+  source  = "terraform-aws-modules/atlantis/aws"
   version = "1.5.1"
 
   name = "atlantis"
