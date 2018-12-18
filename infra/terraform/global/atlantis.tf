@@ -25,5 +25,15 @@ module "atlantis" {
 
   atlantis_github_user       = "mojanalytics"
   atlantis_github_user_token = "${var.atlantis_github_user_token}"
-  atlantis_repo_whitelist    = ["github.com/ministryofjustice/analytics-platform-ops"]
+
+  atlantis_repo_whitelist = [
+    "github.com/ministryofjustice/analytics-platform-atlantis-example",
+  ]
+
+  github_organization = "ministryofjustice"
+  github_token        = "${var.atlantis_github_user_token}"
+
+  github_repo_names = [
+    "analytics-platform-atlantis-example",
+  ]
 }
