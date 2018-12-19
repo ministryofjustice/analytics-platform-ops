@@ -45,3 +45,30 @@ variable "prune_etcd_ebs_snapshot_env_vars" {
     DAYS_OLD           = "14"
   }
 }
+
+variable "atlantis_vpc_cidr_block" {
+  default = "10.0.0.0/16"
+}
+
+variable "atlantis_vpc_availability_zones" {
+  default = [
+    "eu-west-1a",
+    "eu-west-1b",
+  ]
+}
+
+variable "atlantis_vpc_private_subnets_cidr_blocks" {
+  default = [
+    "10.0.1.0/24",
+    "10.0.2.0/24",
+  ]
+}
+
+variable "atlantis_vpc_public_subnets_cidr_blocks" {
+  default = [
+    "10.0.101.0/24",
+    "10.0.102.0/24",
+  ]
+}
+
+variable "atlantis_github_user_token" {}
