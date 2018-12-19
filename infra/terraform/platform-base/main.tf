@@ -29,12 +29,25 @@ module "cluster_dns" {
   root_zone_id     = "${data.terraform_remote_state.global.platform_dns_zone_id}"
 }
 
+module "auth0" {
+  source = "../modules/auth0"
+
+  auth0_api_client_id          = "${var.auth0_api_client_id}"
+  auth0_api_client_secret      = "${var.auth0_api_client_secret}"
+  auth0_tenant_domain          = "${var.oidc_provider_domain}"
+  aws_account_id               = "${var.aws_account_id}"
+  env                          = "${terraform.workspace}"
+  github_oauth_client_id       = "${var.github_oauth_client_id}"
+  github_oauth_client_secret   = "${var.github_oauth_client_secret}"
+  root_domain                  = "${data.terraform_remote_state.global.platform_root_domain}"
+}
+
 module "federated_identity" {
   source = "../modules/federated_identity"
 
   env                       = "${terraform.workspace}"
-  oidc_provider_url         = "${var.oidc_provider_url}"
-  oidc_client_id            = "${var.oidc_client_id}"
+  oidc_provider_url         = "https://${var.oidc_provider_domain}/"
+  oidc_client_id            = "${module.auth0.aws_client_id}"
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
   saml_domain               = "${var.idp_saml_domain}"
   saml_signon_url           = "${var.idp_saml_signon_url}"
@@ -62,8 +75,8 @@ module "kops_spec" {
   cluster_dns_name = "${module.cluster_dns.dns_zone_domain}"
   cluster_dns_zone = "${module.cluster_dns.dns_zone_id}"
 
-  oidc_client_id  = "${var.oidc_client_id}"
-  oidc_issuer_url = "${var.oidc_provider_url}"
+  oidc_client_id  = "${module.auth0.aws_client_id}"
+  oidc_issuer_url = "https://${var.oidc_provider_domain}/"
 
   instancegroup_image = "${var.k8s_instancegroup_image}"
 

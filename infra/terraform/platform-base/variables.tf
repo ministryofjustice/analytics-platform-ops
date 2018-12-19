@@ -19,10 +19,7 @@ variable "availability_zones" {
   ]
 }
 
-# Auth0 tenant URLs MUST end with a trailing slash
-variable "oidc_provider_url" {}
-
-variable "oidc_client_id" {}
+variable "oidc_provider_domain" {}
 
 variable "oidc_provider_thumbprints" {
   type = "list"
@@ -99,3 +96,11 @@ variable "k8s_bastions_instancegroup_min_size" {
 variable "k8s_bastions_instancegroup_max_size" {
   default = 1
 }
+
+variable "github_oauth_client_id" {}
+variable "github_oauth_client_secret" {}
+
+variable "auth0_api_client_id" {}
+variable "auth0_api_client_secret" {}
+
+variable "aws_account_id" {}

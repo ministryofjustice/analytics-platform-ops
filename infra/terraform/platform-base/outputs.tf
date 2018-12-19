@@ -63,11 +63,11 @@ output "extra_node_sg_id" {
 }
 
 output "oidc_provider_url" {
-  value = "${var.oidc_provider_url}"
+  value = "https://${var.oidc_provider_domain}/"
 }
 
 output "oidc_client_id" {
-  value = "${var.oidc_client_id}"
+  value = "${module.auth0.aws_client_id}"
 }
 
 output "oidc_provider_thumbprints" {
