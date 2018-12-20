@@ -28,6 +28,22 @@ data "aws_iam_policy_document" "atlantis_terraform" {
       resources = ["arn:aws:s3:::${var.terraform_state_bucket_name}/*"]
       effect = "Allow"
   }
+
+  statement {
+      actions = [
+          "s3:CreateBucket"
+      ]
+      resources = ["arn:aws:s3:::*"]
+      effect = "Allow"
+  }
+
+  statement {
+      actions = [
+          "s3:DeleteBucket"
+      ]
+      resources = ["arn:aws:s3:::${var.test_bucket_name}"]
+      effect = "Allow"
+  }
 }
 
 resource "aws_iam_policy" "atlantis_terraform" {

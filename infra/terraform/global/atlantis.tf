@@ -56,4 +56,5 @@ module "atlantis_iam_role" {
 
   atlantis_ecs_role_arn = "${module.atlantis.task_role_arn}"
   terraform_state_bucket_name = "mojap-atlantis-terraform-test"
+  test_bucket_name = "mojap-atlantis-test-bucket"
 }
