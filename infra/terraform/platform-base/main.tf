@@ -32,14 +32,19 @@ module "cluster_dns" {
 module "auth0" {
   source = "../modules/auth0"
 
-  auth0_api_client_id          = "${var.auth0_api_client_id}"
-  auth0_api_client_secret      = "${var.auth0_api_client_secret}"
-  auth0_tenant_domain          = "${var.oidc_provider_domain}"
-  aws_account_id               = "${var.aws_account_id}"
-  env                          = "${terraform.workspace}"
-  github_oauth_client_id       = "${var.github_oauth_client_id}"
-  github_oauth_client_secret   = "${var.github_oauth_client_secret}"
-  root_domain                  = "${data.terraform_remote_state.global.platform_root_domain}"
+  env                        = "${terraform.workspace}"
+  auth0_api_client_id        = "${var.auth0_api_client_id}"
+  auth0_api_client_secret    = "${var.auth0_api_client_secret}"
+  auth0_rules                = "${var.auth0_rules}"
+  auth0_rules_config         = "${var.auth0_rules_config}"
+  auth0_tenant_domain        = "${var.oidc_provider_domain}"
+  aws_account_id             = "${var.aws_account_id}"
+  github_oauth_client_id     = "${var.github_oauth_client_id}"
+  github_oauth_client_secret = "${var.github_oauth_client_secret}"
+  github_orgs                = "${var.github_orgs}"
+  google_domains             = "${var.google_domains}"
+  mfa_disabled_ip_ranges     = "${var.mfa_disabled_ip_ranges}"
+  root_domain                = "${data.terraform_remote_state.global.platform_root_domain}"
 }
 
 module "federated_identity" {

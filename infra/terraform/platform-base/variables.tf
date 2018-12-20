@@ -100,7 +100,62 @@ variable "k8s_bastions_instancegroup_max_size" {
 variable "github_oauth_client_id" {}
 variable "github_oauth_client_secret" {}
 
+variable "github_orgs" {
+  type = "list"
+
+  default = [
+    "moj-analytical-services",
+  ]
+}
+
+variable "google_domains" {
+  type = "list"
+
+  default = [
+    "digital.justice.gov.uk",
+  ]
+}
+
 variable "auth0_api_client_id" {}
 variable "auth0_api_client_secret" {}
 
+variable "auth0_rules" {
+  type = "list"
+
+  default = [
+    "auth0-authorization-extension",
+    "aws-saml-role-mapping",
+    "whitelist-google-domains",
+    "whitelist-github-orgs",
+    "Multifactor-Google-Authenticator-Do-Not-Rename",
+    "add-group-claim-to-token",
+    "lowercase-user-nickname",
+  ]
+}
+
+variable "auth0_rules_config" {
+  type    = "map"
+  default = {}
+}
+
 variable "aws_account_id" {}
+
+variable "mfa_disabled_ip_ranges" {
+  type = "list"
+
+  default = [
+    "157.203.176.138/31",
+    "157.203.176.140/32",
+    "157.203.177.190/31",
+    "157.203.177.192/32",
+    "212.137.36.224/32",
+    "62.25.109.192/32",
+    "195.92.38.16/28",
+    "81.134.202.29/32",
+    "195.59.75.0/24",
+    "194.33.192.0/25",
+    "194.33.193.0/25",
+    "194.33.196.0/25",
+    "194.33.197.0/25",
+  ]
+}
