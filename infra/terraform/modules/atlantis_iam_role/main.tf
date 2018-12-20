@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "atlantis_terraform" {
 
   statement {
       actions = [
-          "s3:DeleteBucket"
+          "s3:*"
       ]
       resources = ["arn:aws:s3:::${var.test_bucket_name}"]
       effect = "Allow"
