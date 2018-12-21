@@ -2,42 +2,40 @@
  * This rule is managed by Terraform, DO NOT EDIT!
  */
 function (user, context, callback) {
-
-  var targeted_clients = [
+  const githubIdentity = _.find(user.identities, {connection: 'github'});
+  const targeted_clients = [
     configuration.KUBECTL_OIDC_CLIENT_ID,
-  ].indexOf(context.clientID) !== -1;
+  ];
 
-  var github_identity = _.find(user.identities, {connection: 'github'});
-
-  if (github_identity && targeted_clients) {
-    // For custom claims, you must define a namespace for oidc compliance.
-    // See https://auth0.com/docs/api-auth/tutorials/adoption/scope-custom-claims
-    var namespace = configuration.OIDC_CLAIMS_NAMESPACE;
-    var options = {
-      url: 'https://api.github.com/user/teams',
-      headers: {
-        'Authorization': 'token ' + github_identity.access_token,
-        'User-Agent': 'request'
-      }
-    };
-
-    var request = require('request');
-    request(options, function (error, response, body) {
-      if (response.statusCode !== 200) {
-        return callback(new Error('Error retrieving teams from github: ' + body || error));
-
-      } else {
-        var git_teams = JSON.parse(body).map(function (team) {
-          return team.slug;
-        });
-
-        // Add the namespaced claims to ID token
-        context.idToken[namespace + "groups"] = git_teams;
-      }
-
-      return callback(null, user, context);
-    });
-  } else {
+  if (!githubIdentity || !targeted_clients.includes(context.clientID)) {
     return callback(null, user, context);
   }
+
+  fetchTeams(githubIdentity.access_token)
+    .then(teams => {
+      context.idToken[claim('groups')] = teams.map(t => t.slug);
+    })
+    .catch(err => {
+      return callback(new Error(`Error retrieving teams from Github: ${error}`));
+    });
+
+  function fetchTeams(accessToken) {
+    const request = require('request-promise');
+    return request({
+      uri: "https://api.github.com/user/teams",
+      headers: {
+        "Authorization": `token ${accessToken}`,
+        "User-Agent": "request",
+      },
+      json: true,
+    });
+  }
+
+  // For custom claims, you must define a namespace for oidc compliance.
+  // See https://auth0.com/docs/api-auth/tutorials/adoption/scope-custom-claims
+  function claim(s) {
+    return `${configuration.OIDC_CLAIMS_NAMESPACE}${s}`;
+  }
+
+  return callback(null, user, context);
 }
