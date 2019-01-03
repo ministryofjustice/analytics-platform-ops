@@ -16,6 +16,9 @@ module "atlantis" {
 
   name = "atlantis"
 
+  atlantis_image = "quay.io/mojanalytics/atlantis:master"
+  allow_repo_config = "true"
+
   cidr            = "${var.atlantis_vpc_cidr_block}"
   azs             = ["${var.atlantis_vpc_availability_zones}"]
   private_subnets = ["${var.atlantis_vpc_private_subnets_cidr_blocks}"]
