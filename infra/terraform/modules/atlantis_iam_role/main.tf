@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 # Some awful nonsense to get the Atlantis ECS role name from its ARN.
 # The Atlantis module outputs the role ARN, but Terraform resources
 # take the role name as an argument, not ARN
@@ -41,9 +43,30 @@ data "aws_iam_policy_document" "atlantis_terraform" {
       actions = [
           "s3:*"
       ]
-      resources = ["arn:aws:s3:::${var.test_bucket_name}"]
+      resources = ["arn:aws:s3:::${var.test_bucket_name}*"]
       effect = "Allow"
   }
+
+  statement {
+      actions = [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:PassRole",
+          "iam:ListInstanceProfilesForRole"
+      ]
+      resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/atlantis_*"]
+      effect = "Allow"
+  }
+
+  statement {
+      actions = [
+          "lambda:*"
+      ]
+      resources = ["*"]
+      effect = "Allow"
+  }
+  
 }
 
 resource "aws_iam_policy" "atlantis_terraform" {
