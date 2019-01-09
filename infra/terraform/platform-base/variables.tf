@@ -11,6 +11,7 @@ variable "terraform_global_state_file" {
 variable "vpc_cidr" {}
 
 variable "availability_zones" {
+  type        = "list"
   description = "VPC AZs. Minimum of 2 required due to RDS's requirement for > 1 AZ. Define 3 AZs for a HA production environment"
 
   default = [
@@ -37,6 +38,7 @@ variable "k8s_version" {}
 variable "k8s_instancegroup_image" {}
 
 variable "k8s_availability_zones" {
+  type        = "list"
   description = "AZs for the Kubernetes cluster to span. Must be 1 or 3 AZs"
 
   default = [
