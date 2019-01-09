@@ -10,11 +10,27 @@ data "aws_route53_zone" "global" {
   ]
 }
 
+data "aws_iam_policy_document" "atlantis_terraform" {
+  statement {
+    actions   = ["ec2:*"]
+    resources = ["*"]
+    effect    = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "atlantis_terraform" {
+  name   = "atlantis-terraform"
+  policy = "${data.aws_iam_policy_document.atlantis_terraform.json}"
+}
+
 module "atlantis" {
   source  = "terraform-aws-modules/atlantis/aws"
   version = "1.5.1"
 
   name = "atlantis"
+
+  atlantis_image    = "quay.io/mojanalytics/atlantis:master"
+  allow_repo_config = "true"
 
   cidr            = "${var.atlantis_vpc_cidr_block}"
   azs             = ["${var.atlantis_vpc_availability_zones}"]
@@ -36,4 +52,12 @@ module "atlantis" {
   github_repo_names = [
     "analytics-platform-atlantis-example",
   ]
+}
+
+module "atlantis_iam_role" {
+  source = "../modules/atlantis_iam_role"
+
+  atlantis_ecs_role_arn       = "${module.atlantis.task_role_arn}"
+  terraform_state_bucket_name = "mojap-atlantis-terraform-test"
+  test_bucket_name            = "mojap-atlantis-test-bucket"
 }
