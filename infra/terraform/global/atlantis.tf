@@ -12,9 +12,9 @@ data "aws_route53_zone" "global" {
 
 data "aws_iam_policy_document" "atlantis_terraform" {
   statement {
-    actions = ["ec2:*"]
+    actions   = ["ec2:*"]
     resources = ["*"]
-    effect = "Allow"
+    effect    = "Allow"
   }
 }
 
@@ -29,7 +29,7 @@ module "atlantis" {
 
   name = "atlantis"
 
-  atlantis_image = "quay.io/mojanalytics/atlantis:master"
+  atlantis_image    = "quay.io/mojanalytics/atlantis:master"
   allow_repo_config = "true"
 
   cidr            = "${var.atlantis_vpc_cidr_block}"
@@ -57,7 +57,7 @@ module "atlantis" {
 module "atlantis_iam_role" {
   source = "../modules/atlantis_iam_role"
 
-  atlantis_ecs_role_arn = "${module.atlantis.task_role_arn}"
+  atlantis_ecs_role_arn       = "${module.atlantis.task_role_arn}"
   terraform_state_bucket_name = "mojap-atlantis-terraform-test"
-  test_bucket_name = "mojap-atlantis-test-bucket"
+  test_bucket_name            = "mojap-atlantis-test-bucket"
 }
