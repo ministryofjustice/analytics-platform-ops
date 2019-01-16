@@ -4,3 +4,7 @@ variable "instance_role_name" {
 }
 
 variable "policy_name" {}
+
+variable "auto_scaling_groups" {
+  type = "list"
+}
