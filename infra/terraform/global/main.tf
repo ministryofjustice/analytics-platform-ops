@@ -1,8 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = "terraform.analytics.justice.gov.uk"
-    key    = "base/terraform.tfstate"
-    region = "eu-west-1"
+    bucket         = "terraform.analytics.justice.gov.uk"
+    key            = "base/terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "terraform-global"
   }
 }
 
