@@ -144,4 +144,9 @@ module "cluster_autoscaler" {
 
   policy_name        = "${terraform.workspace}-cluster-autoscaler"
   instance_role_name = ["nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}"]
+
+  auto_scaling_groups = [
+    "nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}",
+    "highmem-nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}",
+  ]
 }
