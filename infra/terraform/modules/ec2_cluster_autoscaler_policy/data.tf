@@ -1,4 +1,4 @@
-data "aws_autoscaling_groups" "nodes" {
+data "aws_autoscaling_groups" "asgs" {
   filter {
     name   = "key"
     values = ["Name", "aws:autoscaling:groupName"]
@@ -6,6 +6,6 @@ data "aws_autoscaling_groups" "nodes" {
 
   filter {
     name   = "value"
-    values = ["${var.instance_role_name}"]
+    values = ["${var.auto_scaling_groups}"]
   }
 }
