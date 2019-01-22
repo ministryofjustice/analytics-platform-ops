@@ -5,6 +5,8 @@ data "aws_iam_policy_document" "policy" {
     actions = [
       "autoscaling:DescribeAutoScalingGroups",
       "autoscaling:DescribeAutoScalingInstances",
+      "autoscaling:DescribeLaunchConfigurations",
+      "autoscaling:DescribeTags",
     ]
 
     resources = ["*"]
