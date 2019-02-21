@@ -17,6 +17,10 @@ variable "uploads_bucket_name" {
   default = "mojap-land"
 }
 
+variable "lookups_bucket_name" {
+  default = "lokup-tables"
+}
+
 variable "global_cloudtrail_bucket_name" {
   default = "moj-analytics-global-cloudtrail"
 }
