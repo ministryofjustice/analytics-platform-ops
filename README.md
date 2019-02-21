@@ -369,15 +369,18 @@ The admin credentials for this cluster needs copying from S3 bucket $KOPS_STATE_
 ```
 $ kops export kubecfg $ENV_DOMAIN
 ```
-The developers did not do the cluster set-up (above) can get their kube config the same way, but they need some info from you. For example you can send them something like this:
+Other developers can also get those admin credentials for kubectl, with these handy instructions:
 ```
 # You need an AWS user account with access to the S3 bucket named in the KOPS_STATE_STORE environment variable below.
-# Now configure the aws cli:
+# Configure the aws cli:
 aws configure
 # Now you can install the cluster's kube config:
 export KOPS_STATE_STORE=s3://kops.accelerator.data-science.org
 kops export kubecfg accelerator.data-science.org.uk
 ```
+
+These admin kubectl creds should only be used to do the initial set-up of the cluster. After that, you should use your personal OIDC creds, obtained using a service such as: https://kuberos.services.alpha.mojanalytics.xyz/
+
 
 ##### `platform` Terraform
 
