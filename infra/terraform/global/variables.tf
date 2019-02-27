@@ -18,7 +18,7 @@ variable "uploads_bucket_name" {
 }
 
 variable "lookups_bucket_name" {
-  default = "lokup-tables"
+  default = "moj-analytics-lookup-tables"
 }
 
 variable "global_cloudtrail_bucket_name" {
