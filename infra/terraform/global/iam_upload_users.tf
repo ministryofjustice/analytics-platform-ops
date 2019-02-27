@@ -31,9 +31,8 @@ module "laa_cla_upload_user" {
 }
 
 module "lookup_upload_user" {
-  source = "../modules/data_upload_user"
+  source = "../modules/data_bucket_upload_user"
 
   upload_bucket_arn = "${aws_s3_bucket.lookups.arn}"
-  org_name          = "ap"
   system_name       = "lookup"
 }
