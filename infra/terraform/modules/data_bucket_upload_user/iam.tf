@@ -26,6 +26,19 @@ data "aws_iam_policy_document" "system_user_s3_upload_readwrite" {
       "${var.upload_bucket_arn}/",
     ]
   }
+
+  statement {
+    actions = [
+      "athena:*",
+      "glue:*",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "system_user_s3_readwrite" {
@@ -52,6 +65,19 @@ data "aws_iam_policy_document" "system_policy_s3_readonly" {
 
     resources = [
       "${var.upload_bucket_arn}/",
+    ]
+  }
+
+  statement {
+    actions = [
+      "athena:*",
+      "glue:*",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
     ]
   }
 }
