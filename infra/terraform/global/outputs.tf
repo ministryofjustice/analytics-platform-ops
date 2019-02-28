@@ -85,3 +85,11 @@ output "concourse_update_helm_repo_access_key_id" {
 output "concourse_update_helm_repo_access_key_secret" {
   value = "${aws_iam_access_key.concourse_update_helm_repo_access_key.secret}"
 }
+
+output "lookup_upload_user_access_key_id" {
+  value = "${module.lookup_upload_user.access_key_id}"
+}
+
+output "lookup_upload_user_access_key_secret" {
+  value = "${module.lookup_upload_user.access_key_secret}"
+}
