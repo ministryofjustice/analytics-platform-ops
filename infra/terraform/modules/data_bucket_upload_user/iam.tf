@@ -39,6 +39,32 @@ data "aws_iam_policy_document" "system_user_s3_upload_readwrite" {
       "*",
     ]
   }
+
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "arn:aws:logs:*:*:/aws-glue/*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "system_user_s3_readwrite" {
@@ -80,10 +106,86 @@ data "aws_iam_policy_document" "system_policy_s3_readonly" {
       "*",
     ]
   }
+
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "arn:aws:logs:*:*:/aws-glue/*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "system_user_s3_readonly" {
   name   = "${var.system_name}_s3_readonly"
   path   = "/uploaders/${var.system_name}/"
   policy = "${data.aws_iam_policy_document.system_policy_s3_readonly.json}"
+}
+
+resource "aws_iam_role" "lookups_job_role" {
+  name = "lookups_job_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": ["glue.amazonaws.com", "ec2.amazonaws.com"]
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lookups_job_role_attatchment" {
+  policy_arn = "${aws_iam_policy.system_user_s3_readwrite.arn}"
+  role       = "${aws_iam_role.lookups_job_role.name}"
+}
+
+resource "aws_iam_role" "lookups_user_role" {
+  name = "lookups_user_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": ["glue.amazonaws.com", "ec2.amazonaws.com"]
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lookups_user_role_attatchment" {
+  policy_arn = "${aws_iam_policy.system_user_s3_readonly.arn}"
+  role       = "${aws_iam_role.lookups_user_role.name}"
 }
