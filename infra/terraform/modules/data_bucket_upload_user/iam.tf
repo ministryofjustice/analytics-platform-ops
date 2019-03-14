@@ -89,6 +89,18 @@ data "aws_iam_policy_document" "system_user_s3_upload_readwrite" {
       "arn:aws:logs:*:*:/aws-glue/*",
     ]
   }
+
+  statement {
+    actions = [
+      "iam:PassRole",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "arn:aws:iam::*:role/lookups_job_role",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "system_user_s3_readwrite" {
