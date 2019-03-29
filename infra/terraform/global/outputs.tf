@@ -93,3 +93,11 @@ output "lookup_upload_user_access_key_id" {
 output "lookup_upload_user_access_key_secret" {
   value = "${module.lookup_upload_user.access_key_secret}"
 }
+
+output "hmcts_upload_user_access_key_id" {
+  value = "${module.hmcts_upload_user.access_key_id}"
+}
+
+output "hmcts_upload_user_access_key_secret" {
+  value = "${module.hmcts_upload_user.access_key_secret}"
+}
