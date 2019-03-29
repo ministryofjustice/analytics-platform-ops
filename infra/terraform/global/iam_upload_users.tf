@@ -1,3 +1,11 @@
+module "hmcts_upload_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name          = "hmcts"
+  system_name       = "azure"
+}
+
 module "hmpps_nomis_upload_user" {
   source = "../modules/data_upload_user"
 
