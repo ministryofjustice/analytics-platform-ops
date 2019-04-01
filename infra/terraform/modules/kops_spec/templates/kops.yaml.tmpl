@@ -49,6 +49,7 @@ ${etcd_events_members}
     oidcGroupsClaim: https://api.${cluster_dns_name}/claims/groups
     oidcIssuerURL: ${oidc_issuer_url}
     oidcUsernameClaim: nickname
+    oidcUsernamePrefix: ${oidc_provider_url}#
     runtimeConfig:
       batch/v2alpha1: "true"
   kubelet:
