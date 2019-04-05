@@ -76,3 +76,9 @@ variable "atlantis_vpc_public_subnets_cidr_blocks" {
 }
 
 variable "atlantis_github_user_token" {}
+
+variable "vpcflowlogs_s3_bucket_name" {
+  default = "moj-analytics-global-vpcflowlogs"
+}
+
+variable "vpc_id" {}
