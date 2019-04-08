@@ -147,17 +147,6 @@ resource "aws_iam_policy" "control_panel_api" {
       "Resource": [
         "arn:aws:iam::${var.account_id}:*"
       ]
-    },
-    {
-      "Sid": "TemporaryForOIDCMigration",
-      "Effect": "Allow",
-      "Action": [
-        "iam:GetRole",
-        "iam:UpdateAssumeRolePolicy"
-      ],
-      "Resource": [
-        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*"
-      ]
     }
   ]
 }
