@@ -198,6 +198,8 @@ You can now quit the launch process because terraform will do the launch. The im
     3. In the drop-down menu click "Create tenant"
          * Tenant domain: include the environment name, if not the platform
 
+    NB It's recommended for admins to use Multifactor Authentication (MFA) when accessing the Auth web console, which requires a ["Developer Pro" plan](https://auth0.com/pricing). Currently this costs from $14/month, which works with up to 100 External users (i.e. people using the platform).
+
 2. Create an application:
 
     1. In the side-bar click "Applications"
