@@ -240,6 +240,7 @@ In Auth0 you need to create some Applications.
       (replace the $variables)
       * Allowed Web Origins: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
       * Allowed Logout URLs: `http://localhost:3000, https://cpanel-master.services.$ENVNAME.$domain` (replace the $variables)
+      * JWT Expiration (seconds): `36000` (10 hours)
 6. Click "Save changes"
 7. Click "Connections" tab
 8. Switch OFF "Database" and "Google"
