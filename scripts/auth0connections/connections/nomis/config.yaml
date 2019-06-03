@@ -1,0 +1,15 @@
+---
+options:
+    scripts: {}
+    client_id: {{client_id}}
+    client_secret: {{client_secret}}
+    authorizationURL: {{gateway_url}}{{authorize_endpoint}}
+    tokenURL: {{gateway_url}}{{token_endpoint}}
+    scope: ''
+    customHeaders:
+        Authorization: Basic {{ (client_id + ':' + client_secret)|base64enc }}
+        Content-Type: application/json
+strategy: oauth2
+name: nomis
+is_domain_connection: false
+enabled_clients: []
