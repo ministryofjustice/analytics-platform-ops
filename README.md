@@ -225,9 +225,41 @@ You can now quit the launch process because terraform will do the launch. The im
     7. Under "Identity Provider Metadata" (NOT "Certificate"!) click "download"
     8. Refer to `platform-base` Terraform instructions below for information on configuring Terraform to use SAML signon
 
-##### Auth0 Applications
+##### Connections & Applications
 
-In Auth0 you need to create some Applications.
+In Auth0 you need to create some Connections and Applications.
+
+##### Connections
+
+###### GitHub
+ 1. Click GitHub to set it up
+ 2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
+    Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
+ 3. Check these boxes:
+    * Email address
+    * read:user
+    * read:org
+ 4. Click "Save"
+ 5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
+ 6. Click "Save" and "X" to close the dialog.
+####### Google
+1. Set the apps that Google can be used sign in to:
+     1. Still in "Connections" | "Social", click "Google" then "Applications"
+     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
+
+###### NOMIS & Other `oauth2` Connections
+To create additional connections like `nomis` there is a script that you can run, follow it's
+own [README](./scripts/auth0connections/README.md) for instructions on how to set it up.
+
+Once it is set up run:
+
+```bash
+./scripts/auth0connections/auth0connections.py -f PATH/to/config/repo/chart-env-config/ENV/auth0connections.yaml create
+```
+
+or the equivalent docker command if you're running it in docker.
+
+###### Applications
 
 ###### kubectl-oidc application
 
@@ -247,20 +279,9 @@ In Auth0 you need to create some Applications.
 7. Click "Connections" tab
 8. Switch OFF "Database" and "Google"
 9. In the side-bar click "Connections" then "Social"
-10. If GitHub is not already ON:
-     1. Click GitHub to set it up
-     2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
-        Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
-     3. Check these boxes:
-        * Email address
-        * read:user
-        * read:org
-     4. Click "Save"
-     5. Click "Applications" tab and switch on all applications that need login, including: auth0-authz, AWS, RStudio, Grafana, Control Panel, kubectl-oidc, Jupyter Lab, Concourse, Airflow, auth0-logs-to-logstash.
-     6. Click "Save" and "X" to close the dialog.
-11. Set the apps that Google can be used sign in to:
-     1. Still in "Connections" | "Social", click "Google" then "Applications"
-     2. Ensure only these are switched on: Default App, auth0-authz, API Client, auth0-github-deploy, API Explorer Client, API Explorer Application, auth0-logs-to-logstash, Airflow.
+10. Click GitHub
+     1. Click "Applications" tab and switch on `kubectl-oidc` application
+     1. Click "Save" and "X" to close the dialog.
 
 The Client ID and Client Secret values will be used in various helm chart configurations.
 
