@@ -53,8 +53,8 @@ __Optionally__ set a tag on the resulting snapshot. Here I am setting a tag `db_
 
 
 ```
-export INSTANCE_KEY=aws:autoscaling:groupName
-export INSTANCE_VALUE=webservers
+export INSTANCE_TAG_KEY=aws:autoscaling:groupName
+export INSTANCE_TAG_VALUE=webservers
 export TAG_KEY=db_vol
 export TAG_VALUE=true
 ```
