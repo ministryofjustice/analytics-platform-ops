@@ -20,6 +20,8 @@ data "aws_iam_policy_document" "system_user_s3_upload_readwrite" {
     resources = [
       "${var.upload_bucket_arn}",
       "${var.upload_bucket_arn}/*",
+      "arn:aws:s3:::alpha-lookup-*",
+      "arn:aws:s3:::alpha-lookup-*/*",
     ]
   }
 
@@ -48,6 +50,8 @@ data "aws_iam_policy_document" "system_user_s3_upload_readwrite" {
     resources = [
       "${var.upload_bucket_arn}",
       "${var.upload_bucket_arn}/*",
+      "arn:aws:s3:::alpha-lookup-*",
+      "arn:aws:s3:::alpha-lookup-*/*",
     ]
   }
 
@@ -151,6 +155,7 @@ data "aws_iam_policy_document" "system_policy_s3_readonly" {
 
     resources = [
       "${var.upload_bucket_arn}",
+      "arn:aws:s3:::alpha-lookup-*",
     ]
   }
 
@@ -168,6 +173,8 @@ data "aws_iam_policy_document" "system_policy_s3_readonly" {
     resources = [
       "${var.upload_bucket_arn}",
       "${var.upload_bucket_arn}/*",
+      "arn:aws:s3:::alpha-lookup-*",
+      "arn:aws:s3:::alpha-lookup-*/*",
     ]
   }
 
