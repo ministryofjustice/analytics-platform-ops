@@ -149,6 +149,21 @@ resource "aws_iam_policy" "control_panel_api" {
       ]
     },
     {
+      "Sid": "CanCreateAndDeleteSSMParameters",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:PutParameter",
+        "ssm:DeleteParameter",
+        "ssm:GetParameterHistory",
+        "ssm:GetParametersByPath",
+        "ssm:DeleteParameter",
+        "ssm:DeleteParameters"
+      ],
+      "Resource": [
+        "arn:aws:ssm::${var.account_id}:parameter/*"
+      ]
+    },
+    {
       "Sid": "TemporaryForOIDCMigration",
       "Effect": "Allow",
       "Action": [
