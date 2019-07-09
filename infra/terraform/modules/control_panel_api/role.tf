@@ -160,7 +160,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "ssm:DeleteParameters"
       ],
       "Resource": [
-        "arn:aws:ssm::${var.account_id}:parameter/*"
+        "arn:aws:ssm::${var.account_id}:parameter/${var.env}/*"
       ]
     },
     {
