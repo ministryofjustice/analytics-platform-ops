@@ -109,3 +109,11 @@ output "ppas_mdt_upload_access_key_id" {
 output "ppas_mdt_upload_access_key_secret" {
   value = "${module.ppas_mdt_upload_user.access_key_secret}"
 }
+
+output "laa_cla_upload_user_access_key_id" {
+  value = "${module.laa_cla_upload_user.access_key_id}"
+}
+
+output "laa_cla_upload_user_access_key_secret" {
+  value = "${module.laa_cla_upload_user.access_key_secret}"
+}
