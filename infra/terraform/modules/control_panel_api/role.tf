@@ -164,6 +164,16 @@ resource "aws_iam_policy" "control_panel_api" {
       ]
     },
     {
+      "Sid": "CanListRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListRoles"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:role/*"
+      ]
+    },
+    {
       "Sid": "TemporaryForOIDCMigration",
       "Effect": "Allow",
       "Action": [
