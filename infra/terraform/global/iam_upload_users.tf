@@ -38,6 +38,14 @@ module "laa_cla_upload_user" {
   system_name       = "cla"
 }
 
+module "ppas_mdt_upload_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name          = "ppas"
+  system_name       = "mdt"
+}
+
 module "lookup_upload_user" {
   source = "../modules/data_bucket_upload_user"
 
