@@ -101,3 +101,11 @@ output "hmcts_upload_user_access_key_id" {
 output "hmcts_upload_user_access_key_secret" {
   value = "${module.hmcts_upload_user.access_key_secret}"
 }
+
+output "ppas_mdt_upload_access_key_id" {
+  value = "${module.ppas_mdt_upload_user.access_key_id}"
+}
+
+output "ppas_mdt_upload_access_key_secret" {
+  value = "${module.ppas_mdt_upload_user.access_key_secret}"
+}
