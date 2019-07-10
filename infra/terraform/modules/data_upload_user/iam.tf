@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "system_user_s3_upload_writeonly" {
     effect = "Allow"
 
     resources = [
-      "${var.upload_bucket_arn}/${var.org_name}/${var.system_name}/",
+      "${var.upload_bucket_arn}/${var.org_name}/${var.system_name}/*",
     ]
   }
 }
