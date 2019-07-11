@@ -35,6 +35,13 @@ module "user_nfs_softnas" {
   dns_zone_domain           = "${data.terraform_remote_state.platform_base.dns_zone_domain}"
 }
 
+module "concourse_parameter_user" {
+  source = "../modules/user_get_parameter"
+
+  user_name = "concourse"
+  env       = "${terraform.workspace}"
+}
+
 module "data_backup" {
   source = "../modules/data_backup"
 
