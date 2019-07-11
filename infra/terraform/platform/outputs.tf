@@ -65,3 +65,11 @@ output "control_panel_api_db_password" {
 output "control_panel_api_db_host" {
   value = "${module.control_panel_api.db_host}"
 }
+
+output "concourse_parameter_user_access_key_id" {
+  value = "${module.concourse_parameter_user.access_key_id}"
+}
+
+output "concourse_parameter_user_access_key_secret" {
+  value = "${module.concourse_parameter_user.access_key_secret}"
+}
