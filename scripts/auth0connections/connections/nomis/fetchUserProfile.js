@@ -24,9 +24,12 @@ function(accessToken, ctx, cb) {
       var profile = {
         user_id: parsedBody.staffId,
         nickname: parsedBody.name,
+        name: parsedBody.name,
+        email: parsedBody.username + "+" + parsedBody.activeCaseLoadId + "@nomis",
         username: parsedBody.username,
         blocked: !parsedBody.active,
-        activeCaseLoadId: parsedBody.activeCaseLoadId
+        activeCaseLoadId: parsedBody.activeCaseLoadId,
+        _nomisAccessToken: accessToken
       };
       cb(null, profile);
     }
