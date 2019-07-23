@@ -135,15 +135,17 @@ grep \"key\" -C 1 .terraform/terraform.tfstate
 terraform apply -target aws_ses_domain_dkim.domain_verification
 
 # check the Terraform plans to create global infra (e.g. the Kops S3 bucket and a root DNS zone in Route53)
-terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
+terraform plan
 
 # NB You can usually ignore these actions, which fire every time due to `triggers {force_rebuild = "${timestamp()}"`:
 #    <= module.aws_account_logging.data.archive_file.cloudtrail_zip
 #    <= module.aws_account_logging.data.archive_file.s3logs_zip
 #    ~ module.aws_account_logging.aws_lambda_function.cloudtrail_to_elasticsearch
 #    ~ module.aws_account_logging.aws_lambda_function.s3_logs_to_elasticsearch
+#    ~ module.aws_account_logging.aws_lambda_function.vpcflowlogs_to_elasticsearch
 #    -/+ module.aws_account_logging.null_resource.cloudtrail_install_deps (new resource required)
 #    -/+ module.aws_account_logging.null_resource.s3logs_install_deps (new resource required)
+#    -/+ module.aws_account_logging.null_resource.vpcflowlogs_install_deps (new resource required)
 #    <= module.log_pruning.data.archive_file.prune_logs_zip
 #    ~ module.log_pruning.aws_lambda_function.prune_logs
 #    -/+ module.log_pruning.null_resource.prune_logs_deps (new resource required)
@@ -152,7 +154,7 @@ terraform plan -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapsh
 #    ~ module.hmpps_oasys_upload_user.aws_iam_policy.system_user_s3_writeonly
 
 # create resources
-terraform apply -var-file="assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshots.tfvars" -var-file="assets/prune_ebs_snapshots/vars_prune_ebs_snapshots.tfvars"
+terraform apply
 ```
 
 
