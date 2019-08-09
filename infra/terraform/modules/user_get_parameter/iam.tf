@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "parameter_readonly_document" {
     effect = "Allow"
 
     resources = [
-      "arn:aws:ssm:::parameter/${var.env}/webapp/*",
+      "arn:aws:ssm:*:*:parameter/${var.env}/webapp/*",
     ]
   }
 
