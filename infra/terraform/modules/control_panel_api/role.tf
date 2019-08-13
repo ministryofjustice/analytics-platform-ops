@@ -157,10 +157,11 @@ resource "aws_iam_policy" "control_panel_api" {
         "ssm:GetParameterHistory",
         "ssm:GetParametersByPath",
         "ssm:DeleteParameter",
-        "ssm:DeleteParameters"
+        "ssm:DeleteParameters",
+        "ssm:AddTagsToResource"
       ],
       "Resource": [
-        "arn:aws:ssm::${var.account_id}:parameter/${var.env}/*"
+        "arn:aws:ssm:*:${var.account_id}:parameter/${var.env}*"
       ]
     },
     {
