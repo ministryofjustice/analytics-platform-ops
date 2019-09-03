@@ -1,6 +1,6 @@
 # Audit S3 Bucket IAM policy
 
-Terraform Module to create an instance IAM policy allowing writing ec2 instances to write to audit log S3 bucket
+Terraform Module to create an instance IAM policy allowing ec2 instances to write to audit log S3 bucket
 
 ### Variables
 
