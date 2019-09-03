@@ -162,5 +162,8 @@ module "s3_audit_logs" {
   source = "../modules/s3_audit_logs"
 
   policy_name        = "${terraform.workspace}-s3-audit-logs"
-  instance_role_name = ["nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}"]
+  instance_role_name = [
+    "nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}",
+    "masters.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}",
+  ]
 }
