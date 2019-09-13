@@ -117,3 +117,11 @@ output "laa_cla_upload_user_access_key_id" {
 output "laa_cla_upload_user_access_key_secret" {
   value = "${module.laa_cla_upload_user.access_key_secret}"
 }
+
+output "hmpps_prisoner_money_user_access_key_id" {
+  value = "${module.hmpps_prisoner_money_user.access_key_id}"
+}
+
+output "hmpps_prisoner_money_user_access_key_secret" {
+  value = "${module.hmpps_prisoner_money_user.access_key_secret}"
+}
