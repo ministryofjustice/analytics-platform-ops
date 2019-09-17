@@ -30,6 +30,14 @@ module "hmpps_prisonss_upload_user" {
   system_name       = "prison-selfservice"
 }
 
+module "hmpps_prisoner_money_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name          = "hmpps"
+  system_name       = "prisoner-money"
+}
+
 module "laa_cla_upload_user" {
   source = "../modules/data_upload_user"
 
