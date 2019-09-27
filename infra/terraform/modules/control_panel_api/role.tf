@@ -176,6 +176,26 @@ resource "aws_iam_policy" "control_panel_api" {
       ]
     },
     {
+      "Sid": "CanManagePolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreatePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicy",
+        "iam:DeletePolicyVersion",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicyVersions",
+        "iam:ListPolicies",
+        "iam:ListEntitiesForPolicy",
+        "iam:DetachRolePolicy",
+        "iam:AttachRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${var.account_id}:policy/${var.env}/group/*"
+      ]
+    },
+    {
       "Sid": "TemporaryForOIDCMigration",
       "Effect": "Allow",
       "Action": [
