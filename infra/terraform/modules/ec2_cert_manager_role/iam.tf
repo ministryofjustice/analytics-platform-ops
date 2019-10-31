@@ -1,5 +1,5 @@
 data "aws_iam_policy_document" "assume" {
-  "statement" {
+  statement {
     effect = "Allow"
 
     principals {
@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "assume" {
 }
 
 data "aws_iam_policy_document" "policy" {
-  "statement" {
+  statement {
     effect    = "Allow"
     actions   = ["route53:GetChange"]
     resources = ["arn:aws:route53:::change/*"]
@@ -22,6 +22,12 @@ data "aws_iam_policy_document" "policy" {
     effect    = "Allow"
     actions   = ["route53:ChangeResourceRecordSets"]
     resources = ["arn:aws:route53:::hostedzone/${var.hosted_zone_id}"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["route53:ListHostedZonesByName"]
+    resources = ["*"]
   }
 }
 
