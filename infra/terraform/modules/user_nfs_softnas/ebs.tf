@@ -87,6 +87,18 @@ resource "aws_ebs_volume" "softnas_vol6" {
   }
 }
 
+resource "aws_ebs_volume" "softnas_vol7" {
+  availability_zone = "${element(aws_instance.softnas.*.availability_zone, count.index)}"
+  type              = "gp2"
+  size              = "2048"
+
+  count = "${var.num_instances}"
+
+  tags {
+    Name = "${var.env}-${var.name_identifier}-${count.index}-vol7"
+  }
+}
+
 resource "aws_volume_attachment" "softnas_vol1" {
   device_name = "/dev/sdf"
   volume_id   = "${element(aws_ebs_volume.softnas_vol1.*.id, count.index)}"
@@ -131,6 +143,14 @@ resource "aws_volume_attachment" "softnas_vol6" {
   device_name = "/dev/xvdk"
   instance_id = "${element(aws_instance.softnas.*.id, count.index)}"
   volume_id   = "${element(aws_ebs_volume.softnas_vol6.*.id, count.index)}"
+
+  count = "${var.num_instances}"
+}
+
+resource "aws_volume_attachment" "softnas_vol7" {
+  device_name = "/dev/xvdl"
+  instance_id = "${element(aws_instance.softnas.*.id, count.index)}"
+  volume_id   = "${element(aws_ebs_volume.softnas_vol7.*.id, count.index)}"
 
   count = "${var.num_instances}"
 }
