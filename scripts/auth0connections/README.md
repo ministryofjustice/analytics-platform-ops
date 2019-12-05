@@ -29,7 +29,7 @@ poetry run ./auth0connections.py -f path/to/values.yaml local
 
 #### `remote`
 
-Make an API call to auth0
+Show a list of existing connections on auth0
 
 example:
 
