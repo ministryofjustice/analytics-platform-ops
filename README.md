@@ -1,18 +1,18 @@
 # MOJ Analytics Platform Ops and Infrastructure
 
-[Kubernetes][kubernetes]-based data analysis platform, using [Terraform][terraform], [Kops][kops] and [Helm][helm] charts.
+[Kubernetes]-based data analysis platform, using [Terraform], [Kops] and [Helm] charts.
 
-Contact robin.linacre@digital.justice.gov.uk if you're in government and interested in talking to us about analytics platforms.
+Contact samuel.tazzyman@digital.justice.gov.uk if you're in government and interested in talking to us about analytics platforms.
 
 ## Directory structure
 
 * `infra`
-[Terraform][terraform] resources for AWS infrastructure and [Kops][kops] resources for Kubernetes clusters
+[Terraform] resources for AWS infrastructure and [Kops] resources for Kubernetes clusters
 
 ## Prerequisites
 Install:
 
-  * [Terraform][terraform]
+  * [Terraform]
   * [Kops v1.11+][kops]
   * [git-crypt][gitcrypt]
 
@@ -20,11 +20,11 @@ Install:
 
 A combination of [Terraform](https://www.terraform.io) and [Kops](https://github.com/kubernetes/kops) are used to create and manage AWS environments and Kubernetes clusters.
 
-**[Terraform][terraform]** is used to provision the base AWS environment (VPC, NAT Gateways, subnets etc.) and non-Kubernetes, off-cluster resources such as S3, EFS, IAM policies, Lambda functions, etc).
+**[Terraform]** is used to provision the base AWS environment (VPC, NAT Gateways, subnets etc.) and non-Kubernetes, off-cluster resources such as S3, EFS, IAM policies, Lambda functions, etc).
 
-**[Kops][kops]** is used to provision and manage Kubernetes clusters (EC2 instances, ELBs, Security Groups, AutoScaling Groups, Route53 DNS entries, etc).
+**[Kops]** is used to provision and manage Kubernetes clusters (EC2 instances, ELBs, Security Groups, AutoScaling Groups, Route53 DNS entries, etc).
 
-**[Helm][helm]** is used to manage installation and updates of all Kubernetes resources, including end-user software.
+**[Helm]** is used to manage installation and updates of all Kubernetes resources, including end-user software.
 
 This project and repository is designed to manage multiple environments (staging, test, production, etc), so contains some global elements that are used by all environments, namely S3 buckets for Terraform and Kops, and a Route53 DNS zone.
 
@@ -36,7 +36,7 @@ Because both Terraform and Kops create AWS resources in two different phases, th
 
 ## Secrets and git-crypt
 
-Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key. You can use the instructions here, but change the repo name: https://github.com/ministryofjustice/analytics-platform-config/blob/master/README.md#git-crypt
+Terraform `terraform.tfvars` files contain sensitive information, so are encrypted using `git-crypt`. To work with this repository you must ask a repo member or admin to add your GPG key. You can follow [these instructions](https://github.com/ministryofjustice/analytics-platform-config/blob/master/README.md#git-crypt), but remember to change the repo name from `analytics-platform-config` to `analytics-platform-ops`.
 
 If you get merge conflicts on gitcrypted files then by default it will not put the <<< ---- >>> sections to show you the different versions. You can fix this behaviour by specifying this custom merge driver in your .git/config:
 ```
