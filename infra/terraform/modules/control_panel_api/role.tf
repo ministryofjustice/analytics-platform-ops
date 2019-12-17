@@ -106,6 +106,7 @@ resource "aws_iam_policy" "control_panel_api" {
       "Sid": "CanDeleteRoles",
       "Effect": "Allow",
       "Action": [
+        "iam:GetRole",
         "iam:DeleteRole",
         "iam:ListAttachedRolePolicies",
         "iam:ListRolePolicies",
