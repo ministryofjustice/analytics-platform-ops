@@ -43,3 +43,19 @@ variable "softnas_role_name" {
 variable "default_volume_size" {
   default = 10
 }
+
+variable "is_production" {
+  default     = true
+  description = "determine the value of the is-production Tag of the EBS volumes"
+}
+
+variable "tags" {
+  type = "map"
+
+  default = {
+    business-unit = "Platforms"
+    application   = "analytical-platform"
+    component     = "SoftNAS"
+    owner         = "analytical-platform:analytics-platform-tech@digital.justice.gov.uk"
+  }
+}
