@@ -36,6 +36,16 @@ module "user_nfs_softnas" {
   is_production             = "${var.is_production}"
 }
 
+module "ebs_snapshots" {
+  source = "../modules/ebs_snapshots"
+
+  name = "${terraform.workspace}-dlm"
+
+  target_tags = {
+    env = "${terraform.workspace}"
+  }
+}
+
 module "concourse_parameter_user" {
   source = "../modules/user_get_parameter"
 
