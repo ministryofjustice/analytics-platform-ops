@@ -9,7 +9,7 @@ resource "aws_dlm_lifecycle_policy" "dlm_lifecycle" {
     target_tags    = "${var.target_tags}"
 
     schedule {
-      name      = "at ${var.schedule_time} and after ${var.schedule_interval} ${var.schedule_interval_unit} every day"
+      name      = "Snapshots of EBS volumes every ${var.schedule_interval} ${var.schedule_interval_unit}"
       copy_tags = "${var.schedule_copy_tags}"
 
       create_rule {
