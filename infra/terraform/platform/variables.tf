@@ -15,7 +15,7 @@ variable "softnas_num_instances" {
 }
 
 variable "is_production" {
-  default = true
+  default = "true"
 }
 
 variable "softnas_default_volume_size" {
