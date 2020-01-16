@@ -8,7 +8,7 @@ variable "target_tags" {
 }
 
 variable "schedule_time" {
-  default     = "0:45"
+  default     = "00:45"
   description = "The time of day at which the DLM will run"
 }
 
