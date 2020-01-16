@@ -1,5 +1,5 @@
 ### IMPORTANT NOTE
-# The following volume definitions include volumes that were provisioned outside 
+# The following volume definitions include volumes that were provisioned outside
 # of Terraform via the SoftNAS GUI. Sizes differ (2.x250GB, 2x500GB), and two
 # volumes have encryption enabled, and two don't. This is not ideal, but as
 # SoftNAS is likely to be replaced with an alternative product the as-is
@@ -20,9 +20,11 @@ resource "aws_ebs_volume" "softnas_vol1" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-vol1"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol1",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
 }
 
 resource "aws_ebs_volume" "softnas_vol2" {
@@ -33,9 +35,11 @@ resource "aws_ebs_volume" "softnas_vol2" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-vol2"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol2",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
 }
 
 resource "aws_ebs_volume" "softnas_vol3" {
@@ -45,9 +49,11 @@ resource "aws_ebs_volume" "softnas_vol3" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-vol3"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol3",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
 }
 
 resource "aws_ebs_volume" "softnas_vol4" {
@@ -58,9 +64,11 @@ resource "aws_ebs_volume" "softnas_vol4" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-vol4"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol4",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
 }
 
 resource "aws_ebs_volume" "softnas_vol5" {
@@ -70,9 +78,11 @@ resource "aws_ebs_volume" "softnas_vol5" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-vol5"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol5",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
 }
 
 resource "aws_ebs_volume" "softnas_vol6" {
@@ -82,9 +92,11 @@ resource "aws_ebs_volume" "softnas_vol6" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-vol6"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol6",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
 }
 
 resource "aws_volume_attachment" "softnas_vol1" {
