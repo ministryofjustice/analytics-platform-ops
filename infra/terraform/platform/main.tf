@@ -33,6 +33,17 @@ module "user_nfs_softnas" {
   ssh_public_key            = "${var.softnas_ssh_public_key}"
   dns_zone_id               = "${data.terraform_remote_state.platform_base.dns_zone_id}"
   dns_zone_domain           = "${data.terraform_remote_state.platform_base.dns_zone_domain}"
+  is_production             = "${var.is_production}"
+}
+
+module "ebs_snapshots" {
+  source = "../modules/ebs_snapshots"
+
+  name = "${terraform.workspace}-dlm"
+
+  target_tags = {
+    env = "${terraform.workspace}"
+  }
 }
 
 module "concourse_parameter_user" {
