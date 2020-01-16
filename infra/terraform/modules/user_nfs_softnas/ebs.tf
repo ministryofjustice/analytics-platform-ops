@@ -140,7 +140,7 @@ resource "aws_volume_attachment" "softnas_vol5" {
 }
 
 resource "aws_volume_attachment" "softnas_vol6" {
-  device_name = "/dev/xvdk"
+  device_name = "/dev/sdk"
   instance_id = "${element(aws_instance.softnas.*.id, count.index)}"
   volume_id   = "${element(aws_ebs_volume.softnas_vol6.*.id, count.index)}"
 
