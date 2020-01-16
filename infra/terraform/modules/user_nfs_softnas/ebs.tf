@@ -99,6 +99,21 @@ resource "aws_ebs_volume" "softnas_vol6" {
   ), var.tags)}"
 }
 
+# Created EBS volume only for `softnas-1` in AWS Console - that's why there
+# is no loop/count in this resource
+resource "aws_ebs_volume" "softnas_1_vol7" {
+  availability_zone = "${aws_instance.softnas.1.availability_zone}"
+  type              = "gp2"
+  size              = "2048"
+  encrypted         = true
+
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-1-vol7",
+    "env", "${var.env}",
+    "is-production", "${var.is_production}",
+  ), var.tags)}"
+}
+
 resource "aws_volume_attachment" "softnas_vol1" {
   device_name = "/dev/sdf"
   volume_id   = "${element(aws_ebs_volume.softnas_vol1.*.id, count.index)}"
@@ -145,4 +160,12 @@ resource "aws_volume_attachment" "softnas_vol6" {
   volume_id   = "${element(aws_ebs_volume.softnas_vol6.*.id, count.index)}"
 
   count = "${var.num_instances}"
+}
+
+# Created EBS volume only for `softnas-1` in AWS Console - that's why there
+# is no loop/count in this resource
+resource "aws_volume_attachment" "softnas_1_vol7" {
+  device_name = "/dev/sdl"
+  instance_id = "${aws_instance.softnas.1.id}"
+  volume_id   = "${aws_ebs_volume.softnas_1_vol7.id}"
 }
