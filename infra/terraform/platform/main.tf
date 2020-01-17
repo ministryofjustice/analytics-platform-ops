@@ -9,7 +9,7 @@ terraform {
 
 provider "aws" {
   region  = "${var.region}"
-  version = "~> 1.50"
+  version = "~> 1.60"
 }
 
 module "data_buckets" {
