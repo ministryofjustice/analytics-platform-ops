@@ -1,5 +1,5 @@
 resource "aws_dlm_lifecycle_policy" "dlm_lifecycle" {
-  description = "DLM Lifecycle Policy to take periodic EBS snapshots"
+  description = "DLM Lifecycle Policy to take periodic EBS snapshots - ${var.env}"
   state       = "${var.lifecycle_state}"
 
   execution_role_arn = "${aws_iam_role.dlm_role.arn}"
@@ -27,4 +27,10 @@ resource "aws_dlm_lifecycle_policy" "dlm_lifecycle" {
       }
     }
   }
+
+  tags = "${merge(map(
+    "Name", "${var.name}",
+    "env", "${var.env}",
+    "is-production", "${var.is_production ? "true" : "false"}",
+  ), var.tags)}"
 }
