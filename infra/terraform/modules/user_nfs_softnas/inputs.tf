@@ -45,7 +45,6 @@ variable "default_volume_size" {
 }
 
 variable "is_production" {
-  default     = "true"
   description = "determine the value of the is-production Tag of the EBS volumes"
 }
 
