@@ -1,4 +1,5 @@
 variable "name" {
+  type        = "string"
   description = "The common name given to resources"
 }
 
@@ -8,6 +9,7 @@ variable "target_tags" {
 }
 
 variable "schedule_time" {
+  type        = "string"
   default     = "00:45"
   description = "The time of day at which the DLM will run"
 }
@@ -18,6 +20,7 @@ variable "schedule_interval" {
 }
 
 variable "schedule_interval_unit" {
+  type        = "string"
   default     = "HOURS"
   description = "The unit of time that applies to the schedule interval"
 }
@@ -33,6 +36,27 @@ variable "schedule_copy_tags" {
 }
 
 variable "lifecycle_state" {
+  type        = "string"
   default     = "ENABLED"
   description = "Whether or not to enable the DLM"
+}
+
+variable "env" {
+  type        = "string"
+  description = "environment name (env tag of DLM)"
+}
+
+variable "is_production" {
+  description = "whether is a production environment (is-production tag of DLM)"
+}
+
+variable "tags" {
+  type        = "map"
+  description = "Tags for DLM"
+
+  default = {
+    business-unit = "Platforms"
+    application   = "analytical-platform"
+    owner         = "analytical-platform:analytics-platform-tech@digital.justice.gov.uk"
+  }
 }
