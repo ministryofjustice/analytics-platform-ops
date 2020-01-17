@@ -25,9 +25,11 @@ Parameters
 | ------------------------------------ | ------------ | ----------------------------------------- |
 | `name`                (**Required**) | `string`     | The common name given to resources        |
 | `target_tags`         (**Required**) | `map`        | The DLM will take a snapshot of all EBS volumes with any of these target tags |
+| `env`                 (**Required**) | `string`     | Environment name. It will be used as DLM `env` tag value |
+| `is_production`       (**Required**) | `string`     | Whether is a production environment. Can be `false` or `true`. It will be used as DLM `is-production` tag value |
 | `schedule_interval`                  | `int`        | The interval at which the dlm will run (**default `12`**) |
 | `schedule_interval_unit`             | `string`     | The unit of time that applies to the schedule interval (**default `HOURS`**) |
 | `schedule_time`                      | `string`     | The time of day at which the dlm will run (**default `00:45`**) |
-| `retain_count`                    | `int`        | The number of snapshots to retain (**default `28`**) |
+| `retain_count`                       | `int`        | The number of snapshots to retain (**default `28`**) |
 | `schedule_copy_tags`                 | `boolean`    | Whether or not to copy tags from the targeted volume to the resulting snapshot (**default `true`**)|
-| `lifecycle_enabled`                  | `string`     | Whether or not to enable the DLM, can be `"ENABLED"` or `"DISABLED"` (**default `"ENABLED"`**) |
+| `lifecycle_enabled`                  | `string`     | Whether or not to enable the DLM. It can be `"ENABLED"` or `"DISABLED"` (**default `"ENABLED"`**) |
