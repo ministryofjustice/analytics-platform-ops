@@ -23,7 +23,7 @@ resource "aws_ebs_volume" "softnas_vol1" {
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol1",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -38,7 +38,7 @@ resource "aws_ebs_volume" "softnas_vol2" {
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol2",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -52,7 +52,7 @@ resource "aws_ebs_volume" "softnas_vol3" {
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol3",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -67,7 +67,7 @@ resource "aws_ebs_volume" "softnas_vol4" {
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol4",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -81,27 +81,31 @@ resource "aws_ebs_volume" "softnas_vol5" {
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol5",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
 resource "aws_ebs_volume" "softnas_vol6" {
-  availability_zone = "${element(aws_instance.softnas.*.availability_zone, count.index)}"
+  # production-only volume
+  count = "${var.is_production ? var.num_instances : 0}"
+
+  availability_zone = "${element(concat(aws_instance.softnas.*.availability_zone, list("")), count.index)}"
   type              = "gp2"
   size              = "1024"
-
-  count = "${var.num_instances}"
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol6",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
-# Created EBS volume only for `softnas-1` in AWS Console - that's why there
-# is no loop/count in this resource
+# Created EBS volume only for `softnas-1` in AWS Console - that's why the
+# SoftNAS instance is hardcoded to `.1` and it's a production-only volume
 resource "aws_ebs_volume" "softnas_1_vol7" {
+  # production-only volume
+  count = "${var.is_production ? 1 : 0}"
+
   availability_zone = "${aws_instance.softnas.1.availability_zone}"
   type              = "gp2"
   size              = "2048"
@@ -110,7 +114,7 @@ resource "aws_ebs_volume" "softnas_1_vol7" {
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-1-vol7",
     "env", "${var.env}",
-    "is-production", "${var.is_production}",
+    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -155,16 +159,20 @@ resource "aws_volume_attachment" "softnas_vol5" {
 }
 
 resource "aws_volume_attachment" "softnas_vol6" {
-  device_name = "/dev/sdk"
-  instance_id = "${element(aws_instance.softnas.*.id, count.index)}"
-  volume_id   = "${element(aws_ebs_volume.softnas_vol6.*.id, count.index)}"
+  # production-only volume
+  count = "${var.is_production ? var.num_instances : 0}"
 
-  count = "${var.num_instances}"
+  device_name = "/dev/sdk"
+  instance_id = "${element(concat(aws_instance.softnas.*.id, list("")), count.index)}"
+  volume_id   = "${element(concat(aws_ebs_volume.softnas_vol6.*.id, list("")), count.index)}"
 }
 
-# Created EBS volume only for `softnas-1` in AWS Console - that's why there
-# is no loop/count in this resource
+# Created EBS volume only for `softnas-1` in AWS Console - that's why the
+# SoftNAS instance is hardcoded to `.1` and it's a production-only volume
 resource "aws_volume_attachment" "softnas_1_vol7" {
+  # production-only volume
+  count = "${var.is_production ? 1 : 0}"
+
   device_name = "/dev/sdl"
   instance_id = "${aws_instance.softnas.1.id}"
   volume_id   = "${aws_ebs_volume.softnas_1_vol7.id}"
