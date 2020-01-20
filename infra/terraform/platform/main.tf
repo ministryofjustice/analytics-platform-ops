@@ -39,7 +39,9 @@ module "user_nfs_softnas" {
 module "ebs_snapshots" {
   source = "../modules/ebs_snapshots"
 
-  name = "${terraform.workspace}-dlm"
+  name          = "${terraform.workspace}-dlm"
+  env           = "${terraform.workspace}"
+  is_production = "${var.is_production}"
 
   target_tags = {
     env = "${terraform.workspace}"
