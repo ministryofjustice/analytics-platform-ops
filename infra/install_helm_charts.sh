@@ -37,8 +37,8 @@ mkdir $HELM_CHARTS_CONFIG_ENV_DIR
 # Install node-exporter helm chart
 helm install mojanalytics/node-exporter --namespace kube-system --name node-metrics
 
-# Install heapster helm chart
-helm install mojanalytics/heapster --namespace kube-system --name heapster
+# Install metrics-server helm chart
+helm install metrics-server stable/metrics-server --namespace default --name metrics-server -f $HELM_CHARTS_CONFIG_ENV_DIR/metrics-server.yaml
 
 # Request SSL certificate
 #
