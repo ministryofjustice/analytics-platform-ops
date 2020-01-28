@@ -48,6 +48,20 @@ module "ebs_snapshots" {
   }
 }
 
+module "softnas_monitoring" {
+  source = "../modules/cloudwatch_alerts"
+
+  name               = "${terraform.workspace}-softnas-alerts"
+  ec2_instance_ids   = "${module.user_nfs_softnas.ec2_instance_ids}"
+  ec2_instance_names = "${module.user_nfs_softnas.ec2_instance_names}"
+  cpu_threshold      = 80
+  email              = "analytics-platform-tech@digital.justice.gov.uk"
+
+  component     = "SoftNAS"
+  env           = "${terraform.workspace}"
+  is_production = "${var.is_production}"
+}
+
 module "concourse_parameter_user" {
   source = "../modules/user_get_parameter"
 
