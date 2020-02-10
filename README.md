@@ -236,7 +236,7 @@ In Auth0 you need to create some Connections and Applications.
 ###### GitHub
  1. Click GitHub to set it up
  2. Follow: [Connect your app to GitHub](https://auth0.com/docs/connections/social/github)
-    Make sure you create the connection in your organization, not your own account. Complete the Client ID and Client Secret on GitHub.
+    Make sure you create the connection in your organization, not your own account (e.g. https://github.com/organizations/moj-analytical-services/settings/applications). Complete the Client ID and Client Secret on GitHub.
  3. Check these boxes:
     * Email address
     * read:user
