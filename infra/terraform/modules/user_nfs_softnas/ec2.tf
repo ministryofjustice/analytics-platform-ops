@@ -57,9 +57,9 @@ resource "aws_security_group" "softnas" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
-    Name = "${var.env}-softnas"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-softnas",
+  ), var.tags)}"
 }
 
 resource "aws_network_interface" "softnas_eth0" {
@@ -68,9 +68,9 @@ resource "aws_network_interface" "softnas_eth0" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-eth0"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-eth0",
+  ), var.tags)}"
 }
 
 resource "aws_network_interface" "softnas_eth1" {
@@ -82,9 +82,9 @@ resource "aws_network_interface" "softnas_eth1" {
 
   count = "${var.num_instances}"
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}-eth1"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}-eth1",
+  ), var.tags)}"
 }
 
 resource "aws_instance" "softnas" {
@@ -105,7 +105,7 @@ resource "aws_instance" "softnas" {
     device_index         = 1
   }
 
-  tags {
-    Name = "${var.env}-${var.name_identifier}-${count.index}"
-  }
+  tags = "${merge(map(
+    "Name", "${var.env}-${var.name_identifier}-${count.index}",
+  ), var.tags)}"
 }

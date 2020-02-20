@@ -8,10 +8,7 @@ resource "aws_iam_role" "dlm_role" {
   assume_role_policy    = "${data.aws_iam_policy_document.assume.json}"
   force_detach_policies = true
 
-  tags = "${merge(map(
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
-  ), var.tags)}"
+  tags = "${var.tags}"
 }
 
 resource "aws_iam_policy_attachment" "dlm_policy_policy_attachment" {
