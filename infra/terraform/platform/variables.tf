@@ -18,6 +18,11 @@ variable "is_production" {
   default = "true"
 }
 
+variable "tags" {
+  type        = "map"
+  description = "tags resources will have, e.g. 'application', 'env' or 'is-production' etc...modules could add more"
+}
+
 variable "softnas_default_volume_size" {
   default = 10
 }

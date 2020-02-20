@@ -22,8 +22,6 @@ resource "aws_ebs_volume" "softnas_vol1" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol1",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -37,8 +35,6 @@ resource "aws_ebs_volume" "softnas_vol2" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol2",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -51,8 +47,6 @@ resource "aws_ebs_volume" "softnas_vol3" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol3",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -66,8 +60,6 @@ resource "aws_ebs_volume" "softnas_vol4" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol4",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -80,8 +72,6 @@ resource "aws_ebs_volume" "softnas_vol5" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol5",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -95,8 +85,6 @@ resource "aws_ebs_volume" "softnas_vol6" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-${count.index}-vol6",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 
@@ -113,8 +101,6 @@ resource "aws_ebs_volume" "softnas_1_vol7" {
 
   tags = "${merge(map(
     "Name", "${var.env}-${var.name_identifier}-1-vol7",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
 

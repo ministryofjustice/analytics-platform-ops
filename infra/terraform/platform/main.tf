@@ -34,18 +34,23 @@ module "user_nfs_softnas" {
   dns_zone_id               = "${data.terraform_remote_state.platform_base.dns_zone_id}"
   dns_zone_domain           = "${data.terraform_remote_state.platform_base.dns_zone_domain}"
   is_production             = "${var.is_production}"
+
+  tags = "${merge(map(
+    "component", "SoftNAS",
+  ), var.tags)}"
 }
 
 module "ebs_snapshots" {
   source = "../modules/ebs_snapshots"
 
-  name          = "${terraform.workspace}-dlm"
-  env           = "${terraform.workspace}"
-  is_production = "${var.is_production}"
+  name = "${terraform.workspace}-dlm"
+  env  = "${terraform.workspace}"
 
   target_tags = {
     env = "${terraform.workspace}"
   }
+
+  tags = "${var.tags}"
 }
 
 module "softnas_monitoring" {
@@ -57,9 +62,9 @@ module "softnas_monitoring" {
   cpu_threshold      = 80
   email              = "analytics-platform-tech@digital.justice.gov.uk"
 
-  component     = "SoftNAS"
-  env           = "${terraform.workspace}"
-  is_production = "${var.is_production}"
+  tags = "${merge(map(
+    "component", "SoftNAS",
+  ), var.tags)}"
 }
 
 module "concourse_parameter_user" {
