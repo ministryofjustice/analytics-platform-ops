@@ -13,8 +13,5 @@ resource "aws_cloudformation_stack" "notifications" {
 
   tags = "${merge(map(
     "Name", "${var.name}-notifications",
-    "component", "${var.component}",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }

@@ -49,12 +49,6 @@ variable "is_production" {
 }
 
 variable "tags" {
-  type = "map"
-
-  default = {
-    business-unit = "Platforms"
-    application   = "analytical-platform"
-    component     = "SoftNAS"
-    owner         = "analytical-platform:analytics-platform-tech@digital.justice.gov.uk"
-  }
+  type        = "map"
+  description = "Tags to attach to resources"
 }

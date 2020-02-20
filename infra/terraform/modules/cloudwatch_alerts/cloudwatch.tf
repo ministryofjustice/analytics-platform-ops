@@ -20,9 +20,5 @@ resource "aws_cloudwatch_metric_alarm" "cpu_threshold" {
   actions_enabled = "true"
   alarm_actions   = ["${ aws_cloudformation_stack.notifications.outputs["ARN"] }"]
 
-  tags = "${merge(map(
-    "component", "${var.component}",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
-  ), var.tags)}"
+  tags = "${var.tags}"
 }
