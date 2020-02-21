@@ -189,3 +189,14 @@ module "cluster_autoscaler" {
     "highmem-nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}",
   ]
 }
+
+module "archived_buckets_bucket" {
+  source = "../modules/archived_buckets_bucket"
+
+  name                = "${terraform.workspace}-archived-buckets-data"
+  logging_bucket_name = "${data.terraform_remote_state.global.s3_logs_bucket_name}"
+  expiration_days     = 183                                                         # 6 months
+  region              = "${var.region}"
+
+  tags = "${var.tags}"
+}
