@@ -1,5 +1,5 @@
 # S3 Bucket containing the data for archived S3 buckets
-resource "aws_s3_bucket" "archived_buckets" {
+resource "aws_s3_bucket" "archived_buckets_data" {
   bucket = "${var.name}"
   acl    = "private"
   region = "${var.region}"
@@ -36,8 +36,8 @@ resource "aws_s3_bucket" "archived_buckets" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "archived_buckets" {
-  bucket = "${aws_s3_bucket.archived_buckets.id}"
+resource "aws_s3_bucket_public_access_block" "archived_buckets_data" {
+  bucket = "${aws_s3_bucket.archived_buckets_data.id}"
 
   block_public_acls       = true
   block_public_policy     = true
