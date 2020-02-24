@@ -200,5 +200,7 @@ module "buckets_archiver" {
   k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}"
   region              = "${var.region}"
 
-  tags = "${var.tags}"
+  tags = "${merge(map(
+    "component", "buckets-archiver",
+  ), var.tags)}"
 }

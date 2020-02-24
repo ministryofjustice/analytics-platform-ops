@@ -2,6 +2,8 @@ resource "aws_iam_role" "buckets_archiver" {
   name        = "${var.env}_buckets_archiver"
   description = "IAM role assumed by the buckets archiver"
 
+  tags = "${var.tags}"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
