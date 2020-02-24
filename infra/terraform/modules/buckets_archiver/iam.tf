@@ -39,21 +39,31 @@ resource "aws_iam_policy" "buckets_archiver" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "CanListBuckets",
-      "Effect": "Allow",
-      "Action": [
-          "s3:ListBucket"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.env}-*"
-      ]
+        "Sid": "CanFilterBucketsByTag",
+        "Effect": "Allow",
+        "Action": [
+            "tag:GetResources"
+        ],
+        "Resource": [
+            "*"
+        ]
+    },
+    {
+        "Sid": "CanListBuckets",
+        "Effect": "Allow",
+        "Action": [
+            "s3:ListBucket"
+        ],
+        "Resource": [
+            "arn:aws:s3:::${var.env}-*"
+        ]
     },
     {
       "Sid": "CanReadAndDeleteFromSource",
       "Effect": "Allow",
       "Action": [
           "s3:GetObject",
-          "s3:DeleteObject",
+          "s3:DeleteObject"
       ],
       "Resource": [
         "arn:aws:s3:::${var.env}-*/*"
