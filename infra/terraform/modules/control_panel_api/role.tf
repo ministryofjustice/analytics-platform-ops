@@ -40,8 +40,18 @@ resource "aws_iam_policy" "control_panel_api" {
         "s3:CreateBucket",
         "s3:PutBucketLogging",
         "s3:PutBucketPublicAccessBlock",
-        "s3:PutBucketTagging",
         "s3:PutEncryptionConfiguration"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${var.env}-*"
+      ]
+    },
+    {
+      "Sid": "CanTagBuckets",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketTagging",
+        "s3:PutBucketTagging"
       ],
       "Resource": [
         "arn:aws:s3:::${var.env}-*"
