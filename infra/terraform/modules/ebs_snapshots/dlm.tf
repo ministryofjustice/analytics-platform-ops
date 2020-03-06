@@ -30,7 +30,5 @@ resource "aws_dlm_lifecycle_policy" "dlm_lifecycle" {
 
   tags = "${merge(map(
     "Name", "${var.name}",
-    "env", "${var.env}",
-    "is-production", "${var.is_production ? "true" : "false"}",
   ), var.tags)}"
 }
