@@ -1,0 +1,280 @@
+REVISION: 1
+RELEASED: Mon Feb 11 11:13:08 2019
+CHART: rstudio-1.5.8
+USER-SUPPLIED VALUES:
+authProxy:
+  auth0:
+    clientId: rpYFh3GD2vmk13Rtcvre2gZY2dAvdBSS
+    clientSecret: z-TRRsRWoq5nYlsGFpnUkiRu-8vS4aXCG2pesw5-W5YFm2XJtAcE2JIWq2-EGYXI
+    domain: alpha-analytics-moj.eu.auth0.com
+  cookieSecret: a2199ce67d06cb48da0b6c9675ec5253ce3f84d35fca14cdbba3623ebd24c378
+aws:
+  iamRole: alpha_user_aceross
+rstudio:
+  secureCookieKey: 39b7d2b7407a688709012a2963779987509bd0a547fe0d22bbeaaa4916213d8a
+toolsDomain: tools.alpha.mojanalytics.xyz
+username: aceross
+
+COMPUTED VALUES:
+authProxy:
+  appProtocol: https
+  auth0:
+    clientId: rpYFh3GD2vmk13Rtcvre2gZY2dAvdBSS
+    clientSecret: z-TRRsRWoq5nYlsGFpnUkiRu-8vS4aXCG2pesw5-W5YFm2XJtAcE2JIWq2-EGYXI
+    domain: alpha-analytics-moj.eu.auth0.com
+  cookieMaxAge: "28800"
+  cookieSecret: a2199ce67d06cb48da0b6c9675ec5253ce3f84d35fca14cdbba3623ebd24c378
+  express:
+    host: 0.0.0.0
+    port: 3000
+  image:
+    pullPolicy: IfNotPresent
+    repository: quay.io/mojanalytics/rstudio-auth-proxy
+    tag: v1.4.3
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 25m
+      memory: 64Mi
+aws:
+  defaultRegion: eu-west-1
+  iamRole: alpha_user_aceross
+rstudio:
+  image:
+    pullPolicy: IfNotPresent
+    repository: quay.io/mojanalytics/rstudio
+    tag: 3.4.2-6
+  port: "8787"
+  resources:
+    limits:
+      cpu: 1.5
+      memory: 20Gi
+    requests:
+      cpu: 200m
+      memory: 5Gi
+  secureCookieKey: 39b7d2b7407a688709012a2963779987509bd0a547fe0d22bbeaaa4916213d8a
+toolsDomain: tools.alpha.mojanalytics.xyz
+username: aceross
+
+HOOKS:
+MANIFEST:
+
+---
+# Source: rstudio/templates/secrets.yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "aceross-rstudio-rstudio"
+  labels:
+    chart: "rstudio-1.5.8"
+    app: "rstudio"
+type: Opaque
+data:
+  client_secret: "ei1UUlJzUldvcTVuWWxzR0ZwblVraVJ1LTh2UzRhWENHMnBlc3c1LVc1WUZtMlhKdEFjRTJKSVdxMi1FR1lYSQ=="
+  client_id: "cnBZRmgzR0Qydm1rMTNSdGN2cmUyZ1pZMmRBdmRCU1M="
+  domain: "YWxwaGEtYW5hbHl0aWNzLW1vai5ldS5hdXRoMC5jb20="
+  app_host: "YWNlcm9zcy1yc3R1ZGlvLnRvb2xzLmFscGhhLm1vamFuYWx5dGljcy54eXo="
+  callback_url: "aHR0cHM6Ly9hY2Vyb3NzLXJzdHVkaW8udG9vbHMuYWxwaGEubW9qYW5hbHl0aWNzLnh5ei9jYWxsYmFjaw=="
+  cookie_secret: "YTIxOTljZTY3ZDA2Y2I0OGRhMGI2Yzk2NzVlYzUyNTNjZTNmODRkMzVmY2ExNGNkYmJhMzYyM2ViZDI0YzM3OA=="
+  secure_cookie_key: "MzliN2QyYjc0MDdhNjg4NzA5MDEyYTI5NjM3Nzk5ODc1MDliZDBhNTQ3ZmUwZDIyYmJlYWFhNDkxNjIxM2Q4YQ=="
+  aws_default_region: "ZXUtd2VzdC0x"
+---
+# Source: rstudio/templates/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aceross-rstudio
+  namespace: user-aceross
+---
+# Source: rstudio/templates/service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "aceross-rstudio-rstudio"
+  labels:
+    chart: "rstudio-1.5.8"
+    app: "rstudio"
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: "rstudio"
+  ports:
+  - port: 80
+    targetPort: 3000
+---
+# Source: rstudio/templates/deployment.yml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: aceross-rstudio-rstudio
+  labels:
+    chart: "rstudio-1.5.8"
+    app: "rstudio"
+    "mojanalytics.xyz/idleable": "true"
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: "rstudio"
+      annotations:
+        iam.amazonaws.com/role: alpha_user_aceross
+    spec:
+      serviceAccountName: aceross-rstudio
+      containers:
+
+        - name: rstudio-auth-proxy
+          image: "quay.io/mojanalytics/rstudio-auth-proxy:v1.4.3"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: proxy
+              containerPort: 3000
+          env:
+            - name: USER
+              value: aceross
+            - name: APP_PROTOCOL
+              value: https
+            - name: APP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: app_host
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: client_secret
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: client_id
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: domain
+            - name: AUTH0_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: callback_url
+            - name: COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: cookie_secret
+            - name: SECURE_COOKIE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: secure_cookie_key
+            - name: COOKIE_MAXAGE
+              value: "28800"
+            - name: PROXY_TARGET_HOST
+              value: localhost
+            - name: PROXY_TARGET_PORT
+              value: "8787"
+            - name: EXPRESS_HOST
+              value: 0.0.0.0
+            - name: EXPRESS_PORT
+              value: "3000"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: proxy
+            initialDelaySeconds: 5
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: proxy
+            initialDelaySeconds: 10
+            periodSeconds: 2
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            
+
+        - name: r-studio-server
+          image: "quay.io/mojanalytics/rstudio:3.4.2-6"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: rstudio
+              containerPort: 8787
+          env:
+            - name: USER
+              value: aceross
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: aws_default_region
+            - name: SECURE_COOKIE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aceross-rstudio-rstudio
+                  key: secure_cookie_key
+            - name: TOOLS_DOMAIN
+              value: tools.alpha.mojanalytics.xyz
+          readinessProbe:
+            httpGet:
+              path: /
+              port: rstudio
+            initialDelaySeconds: 5
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: rstudio
+            initialDelaySeconds: 10
+            periodSeconds: 2
+          volumeMounts:
+            - name: home
+              mountPath: "/home/aceross"
+          resources:
+            limits:
+              cpu: 1.5
+              memory: 20Gi
+            requests:
+              cpu: 200m
+              memory: 5Gi
+            
+
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: nfs-home
+---
+# Source: rstudio/templates/ingress.yml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "aceross-rstudio-rstudio"
+  labels:
+    chart: "rstudio-1.5.8"
+    app: "rstudio"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: aceross-rstudio.tools.alpha.mojanalytics.xyz
+    http:
+      paths:
+      - backend:
+          serviceName: aceross-rstudio-rstudio
+          servicePort: 80
+  tls:
+    - hosts:
+        - aceross-rstudio.tools.alpha.mojanalytics.xyz
