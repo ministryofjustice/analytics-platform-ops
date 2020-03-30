@@ -51,9 +51,6 @@ redeploy() {
 			kubectl delete deployment -l app=jupyter-lab -n user-$u
 
 			kubectl delete deployment -l app=rstudio -n user-$u
-
-			kubectl delete deployment -l chart=$HELM_CHART-$HELM_CHART_VERSION -n user-$u
-
 		fi
 
 		RELEASE_NAME=$HELM_CHART-$u
