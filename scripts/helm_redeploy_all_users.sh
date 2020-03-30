@@ -42,19 +42,17 @@ redeploy() {
 
 	while IFS= read -r u; do
 		
-		kubectl delete all -l app=jupyter-lab -n user-$u
+		kubectl delete deployment -l app=jupyter-lab -n user-$u
 
-		kubectl delete all -l app=rstudio -n user-$u
-
-		kubectl delete all -l chart=$HELM_CHART-$HELM_CHART_VERSION -n user-$u
+		kubectl delete deployment -l app=rstudio -n user-$u
 
 		if [[ $? -ne 0 ]]; then
 
-			kubectl delete all -l app=jupyter-lab -n user-$u
+			kubectl delete deployment -l app=jupyter-lab -n user-$u
 
-			kubectl delete all -l app=rstudio -n user-$u
+			kubectl delete deployment -l app=rstudio -n user-$u
 
-			kubectl delete all -l chart=$HELM_CHART-$HELM_CHART_VERSION -n user-$u
+			kubectl delete deployment -l chart=$HELM_CHART-$HELM_CHART_VERSION -n user-$u
 
 		fi
 
