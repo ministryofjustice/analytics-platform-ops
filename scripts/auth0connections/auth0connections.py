@@ -30,28 +30,44 @@ def get_client():
 
 
 def render_local_connections(config):
+    '''Returns full connection dicts, from the connections listed in the config
+    file, and rendered using the template specified.
+    
+    Uses a template specified in the connection config
+    e.g. 'template_name: hmpps-auth' in the connection configuration
+         means use the template in: ./connection_templates/hmmps-auth/
+    '''
     connections = {}
-    connections_root = Path(__file__).cwd() / Path("connections")
-    connection_dirs = [entry for entry in connections_root.iterdir() if entry.is_dir()]
+    template_root = Path(__file__).cwd() / Path("connection_templates")
+    template_dirs = dict((entry.stem, entry) for entry in template_root.iterdir() if entry.is_dir())
 
-    for connection in connection_dirs:
-        connection_name = connection.stem
-        assert connection_name in config, \
-            f'"{connection_name}" exists in {connections_root} but is missing from config: {config.keys()}'
-        scripts = connection.glob("*.js")
+    for connection_name in config:
+        connection = config[connection_name]
+        connection['name'] = connection_name
+        template_name = connection['connection_template']
+        try:
+            template_path = template_dirs[template_name]
+        except KeyError:
+            print(f'template_name: "{template_name}" is specified in the config, but no such template exists in {template_root}')
+            sys.exit(1)
+
+        # render the scripts
+        scripts = template_path.glob("*.js")
         script_templates = {
             x.stem: jinja_env.from_string(x.open(encoding="utf8").read())
             for x in scripts
         }
         scripts_rendered = {}
-        for name, template in script_templates.items():
-            scripts_rendered[name] = template.render(**config.get(connection_name))
+        for name, script_template in script_templates.items():
+            scripts_rendered[name] = script_template.render(**connection)
 
-        with (connection / Path("config.yaml")).open("r") as connection_config:
-            yaml_rendered = jinja_env.from_string(connection_config.read()).render(
-                **config.get(connection_name)
+        # render the main connection template
+        with (template_path / Path("config.yaml")).open("r") as config_yaml_file:
+            yaml_rendered = jinja_env.from_string(config_yaml_file.read()).render(
+                **connection
             )
             body = yaml.safe_load(yaml_rendered) or defaultdict(dict)
+            # add in the rendered scripts
             body["options"]["scripts"] = scripts_rendered
             connections[connection_name] = body
 
