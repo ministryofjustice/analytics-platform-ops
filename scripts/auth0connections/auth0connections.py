@@ -4,6 +4,7 @@ import functools
 from collections import defaultdict
 from pathlib import Path
 from pprint import pprint
+import sys
 
 import click
 import yaml
@@ -35,6 +36,8 @@ def render_local_connections(config):
 
     for connection in connection_dirs:
         connection_name = connection.stem
+        assert connection_name in config, \
+            f'"{connection_name}" exists in {connections_root} but is missing from config: {config.keys()}'
         scripts = connection.glob("*.js")
         script_templates = {
             x.stem: jinja_env.from_string(x.open(encoding="utf8").read())
@@ -65,13 +68,19 @@ def cli(ctx, config_file):
 
 
 @cli.command()
-def remote():
+@click.option('--names', '-n', help='Only print each connection\'s name', is_flag=True)
+def remote(names):
     """
     Show a list of existing connections on auth0
     """
     click.echo("Remote connections:")
     client = get_client()
-    click.echo(yaml.safe_dump(client.connections.all()))
+    if names:
+        click.echo(yaml.safe_dump(
+            [c['name'] for c in client.connections.all()]
+        ))
+    else:
+        click.echo(yaml.safe_dump(client.connections.all()))
 
 
 @cli.command()
@@ -95,12 +104,30 @@ def create(ctx):
         if not connection_name in remote_connections:
             click.echo(f"Creating {connection_name}")
             resp = client.connections.create(body)
-            click.echo(pprint(resp))
+            if resp:
+                click.echo(pprint(resp))
         else:
             click.echo(
                 f"Skipping: {connection_name} as it already exists. Delete it "
                 f"from auth0 if you want this script to recreate it"
             )
+
+
+@cli.command()
+@click.pass_context
+@click.argument('name')
+def delete(ctx, name):
+    click.echo(f"Deleting connection {name}")
+    client = get_client()
+    remote_connections = dict((c["name"], c) for c in client.connections.all())
+    try:
+        connection_id = remote_connections[name]['id']
+    except KeyError:
+        click.echo(f"Error: Connection {name} does not exist (remotely)", err=True)
+        sys.exit(1)
+    resp = client.connections.delete(connection_id)
+    if resp:
+        click.echo(pprint(resp))
 
 
 if __name__ == "__main__":
