@@ -10,6 +10,6 @@ options:
         Authorization: Basic {{ (client_id + ':' + client_secret)|base64enc }}
         Content-Type: application/json
 strategy: oauth2
-name: nomis
+name: {{name}}
 is_domain_connection: false
 enabled_clients: []
