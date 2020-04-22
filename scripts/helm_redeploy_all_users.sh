@@ -19,7 +19,7 @@ JUPYTER_CHART="../../analytics-platform-helm-charts/charts/jupyter-lab"
 RSTUDIO_CONFIG_FILE="../../analytics-platform-config/chart-env-config/${ENVIRONMENT}/rstudio.yml"
 JUPYTER_CONFIG_FILE="../../analytics-platform-config/chart-env-config/${ENVIRONMENT}/jupyter.yml"
 # USERNAME=$(helm list --max 10000 | grep "${HELM_CHART}" | awk '{print $1}' | sed "s/${HELM_CHART}-//g")
-USERNAME="mamonu"
+
 USERNAME_FILE=$PWD/usernames.txt
 
 stat $CHART || exit
@@ -35,10 +35,19 @@ username_file() {
 
 username_file
 
+# while IFS= read -r u; do
+# 	u=$(echo "$u" | tr '[:upper:]' '[:lower:]')
+# 	helm delete --purge $u-rstudio
+
+# done <$USERNAME_FILE 
+
+
 redeploy() {
 	set -x
 
 	while IFS= read -r u; do
+		u=$(echo "$u" | tr '[:upper:]' '[:lower:]')
+
 		RELEASE_NAME=$HELM_CHART-$u
 		JUPYTER_RELEASE_NAME=jupyter-lab-$u
 		RSTUDIO_RELEASE_NAME=rstudio-$u
