@@ -4,6 +4,7 @@ import functools
 from collections import defaultdict
 from pathlib import Path
 from pprint import pprint
+import sys
 
 import click
 import yaml
@@ -29,26 +30,48 @@ def get_client():
 
 
 def render_local_connections(config):
+    '''Returns full connection dicts, from the connections listed in the config
+    file, and rendered using the template specified.
+    
+    Uses a template specified in the connection config
+    e.g. 'template_name: hmpps-auth' in the connection configuration
+         means use the template in: ./connection_templates/hmmps-auth/
+    '''
     connections = {}
-    connections_root = Path(__file__).cwd() / Path("connections")
-    connection_dirs = [entry for entry in connections_root.iterdir() if entry.is_dir()]
+    template_root = Path(__file__).cwd() / Path("connection_templates")
+    template_dirs = dict((entry.stem, entry) for entry in template_root.iterdir() if entry.is_dir())
 
-    for connection in connection_dirs:
-        connection_name = connection.stem
-        scripts = connection.glob("*.js")
+    for connection_name in config:
+        connection = config[connection_name]
+        connection['name'] = connection_name
+        try:
+            template_name = connection['connection_template']
+        except KeyError:
+            click.echo(f'ERROR: Connection YAML "{connection_name}": missing key "connection_template"')
+            sys.exit(1)
+        try:
+            template_path = template_dirs[template_name]
+        except KeyError:
+            click.echo(f'ERROR: template_name: "{template_name}" is specified in the config, but no such template exists in {template_root}')
+            sys.exit(1)
+
+        # render the scripts
+        scripts = template_path.glob("*.js")
         script_templates = {
             x.stem: jinja_env.from_string(x.open(encoding="utf8").read())
             for x in scripts
         }
         scripts_rendered = {}
-        for name, template in script_templates.items():
-            scripts_rendered[name] = template.render(**config.get(connection_name))
+        for name, script_template in script_templates.items():
+            scripts_rendered[name] = script_template.render(**connection)
 
-        with (connection / Path("config.yaml")).open("r") as connection_config:
-            yaml_rendered = jinja_env.from_string(connection_config.read()).render(
-                **config.get(connection_name)
+        # render the main connection template
+        with (template_path / Path("config.yaml")).open("r") as config_yaml_file:
+            yaml_rendered = jinja_env.from_string(config_yaml_file.read()).render(
+                **connection
             )
             body = yaml.safe_load(yaml_rendered) or defaultdict(dict)
+            # add in the rendered scripts
             body["options"]["scripts"] = scripts_rendered
             connections[connection_name] = body
 
@@ -65,13 +88,20 @@ def cli(ctx, config_file):
 
 
 @cli.command()
-def remote():
+@click.option('--names', '-n', help='Only print each connection\'s name', is_flag=True)
+def remote(names):
     """
     Show a list of existing connections on auth0
+    (-f is ignored)
     """
     click.echo("Remote connections:")
     client = get_client()
-    click.echo(yaml.safe_dump(client.connections.all()))
+    if names:
+        click.echo(yaml.safe_dump(
+            [c['name'] for c in client.connections.all()]
+        ))
+    else:
+        click.echo(yaml.safe_dump(client.connections.all()))
 
 
 @cli.command()
@@ -87,6 +117,13 @@ def local(ctx):
 @cli.command()
 @click.pass_context
 def create(ctx):
+    '''
+    Creates on Auth0 the connections that are defined locally, using the
+    Auth0 management API.
+
+    Does not overwrite connections of the same name - delete a connection if you
+    wish to overwrite it.
+    '''
     click.echo("Creating connections:")
     rendered_connections = render_local_connections(ctx.obj["config_file"])
     client = get_client()
@@ -95,12 +132,30 @@ def create(ctx):
         if not connection_name in remote_connections:
             click.echo(f"Creating {connection_name}")
             resp = client.connections.create(body)
-            click.echo(pprint(resp))
+            if resp:
+                click.echo(pprint(resp))
         else:
             click.echo(
                 f"Skipping: {connection_name} as it already exists. Delete it "
                 f"from auth0 if you want this script to recreate it"
             )
+
+
+@cli.command()
+@click.pass_context
+@click.argument('name')
+def delete(ctx, name):
+    click.echo(f"Deleting connection {name}")
+    client = get_client()
+    remote_connections = dict((c["name"], c) for c in client.connections.all())
+    try:
+        connection_id = remote_connections[name]['id']
+    except KeyError:
+        click.echo(f"Error: Connection {name} does not exist (remotely)", err=True)
+        sys.exit(1)
+    resp = client.connections.delete(connection_id)
+    if resp:
+        click.echo(pprint(resp))
 
 
 if __name__ == "__main__":
