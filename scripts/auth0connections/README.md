@@ -1,7 +1,7 @@
 # Auth0 Connection Creator Script
 
-This script creates auth0 connections that are defined in the `./connections`
-directory.
+This script creates Auth0 connections that are defined as YAML config that
+references a connection template in the `./connection_templates` directory.
 
 This should really be done in `terraform` using the auth0 provider, but this has
 already been attempted and couldn't be done as it requires all `apps/clients` linked to
@@ -17,34 +17,52 @@ what we need it to do.
 
 ### Commands
 
+#### Preparation
+
+Before running the commands you need to setup your environment like this:
+
+```bash
+cd analytics-platform-ops/scripts/auth0connections
+# Get API key from: https://manage.auth0.com/dashboard/eu/dev-analytics-moj/apis/management/explorer
+export AUTH0_TOKEN=eyJ...
+export AUTH0_DOMAIN=dev-analytics-moj.eu.auth0.com
+```
+
+(See Environment Variables for more info)
+
 #### `local`
 
-Scan [`./connections`](./connections) and print the defined connections.
+Prints what Auth0 connections are defined locally - i.e. in the specified YAML
+and [`./connection_templates`](./connection_templates).
 
 example:
 
 ```bash
-poetry run ./auth0connections.py -f path/to/values.yaml local
+poetry run ./auth0connections.py -f ~/ap/analytics-platform-config/chart-env-config/dev/auth0connections.yaml local
 ```
 
 #### `remote`
 
-Show a list of existing connections on auth0
+Prints what Auth0 connections are defined on Auth0
 
 example:
 
 ```bash
-poetry run ./auth0connections.py -f path/to/values.yaml remote
+poetry run ./auth0connections.py -f ~/ap/analytics-platform-config/chart-env-config/dev/auth0connections.yaml remote
 ```
 
 #### `create`
 
-Create the local connections in Auth0 using the management API.
+Creates on Auth0 the connections that are defined locally, using the Auth0
+management API.
+
+Does not overwrite connections of the same name - delete a connection if
+ you wish to overwrite it.
 
 example:
 
 ```bash
-poetry run ./auth0connections.py -f path/to/values.yaml create
+poetry run ./auth0connections.py -f ~/ap/analytics-platform-config/chart-env-config/dev/auth0connections.yaml create
 ```
 
 ## Environment Variables
