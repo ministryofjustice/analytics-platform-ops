@@ -6,3 +6,4 @@ nomis:
     authorize_endpoint: /auth/oauth/authorize
     token_endpoint: /auth/oauth/token
     user_endpoint: /auth/api/user/me
+    connection_template: hmpps-auth
