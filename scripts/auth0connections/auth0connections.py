@@ -44,11 +44,15 @@ def render_local_connections(config):
     for connection_name in config:
         connection = config[connection_name]
         connection['name'] = connection_name
-        template_name = connection['connection_template']
+        try:
+            template_name = connection['connection_template']
+        except KeyError:
+            click.echo(f'ERROR: Connection YAML "{connection_name}": missing key "connection_template"')
+            sys.exit(1)
         try:
             template_path = template_dirs[template_name]
         except KeyError:
-            print(f'template_name: "{template_name}" is specified in the config, but no such template exists in {template_root}')
+            click.echo(f'ERROR: template_name: "{template_name}" is specified in the config, but no such template exists in {template_root}')
             sys.exit(1)
 
         # render the scripts
@@ -88,6 +92,7 @@ def cli(ctx, config_file):
 def remote(names):
     """
     Show a list of existing connections on auth0
+    (-f is ignored)
     """
     click.echo("Remote connections:")
     client = get_client()
@@ -112,6 +117,13 @@ def local(ctx):
 @cli.command()
 @click.pass_context
 def create(ctx):
+    '''
+    Creates on Auth0 the connections that are defined locally, using the
+    Auth0 management API.
+
+    Does not overwrite connections of the same name - delete a connection if you
+    wish to overwrite it.
+    '''
     click.echo("Creating connections:")
     rendered_connections = render_local_connections(ctx.obj["config_file"])
     client = get_client()
