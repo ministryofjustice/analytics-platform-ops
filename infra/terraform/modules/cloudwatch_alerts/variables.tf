@@ -14,8 +14,13 @@ variable "ec2_instance_ids" {
 }
 
 variable "cpu_threshold" {
-  default     = 80
-  description = "CPU usage threashold (percentage) which triggers the alert (**default `80`**)"
+  default     = 75
+  description = "High CPU usage threshold (percentage) which triggers the alert (**default `75`**)"
+}
+
+variable "cpu_low_threshold" {
+  default     = 5
+  description = "Low CPU usage threshold (percentage) which triggers the alert (**default `5`**)"
 }
 
 variable "email" {

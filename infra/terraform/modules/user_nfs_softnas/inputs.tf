@@ -52,3 +52,8 @@ variable "tags" {
   type        = "map"
   description = "Tags to attach to resources"
 }
+
+variable "monitoring" {
+  description = "If true, the launched EC2 instance will have detailed monitoring enabled"
+  default = true
+}
