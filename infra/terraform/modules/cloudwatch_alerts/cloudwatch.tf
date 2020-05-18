@@ -37,7 +37,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low_threshold" {
   statistic           = "Maximum"
   comparison_operator = "LessThanThreshold"
   threshold           = "${var.cpu_low_threshold}"
-  period              = "300"                           # 5 minutes
+  period              = "300"                      # 5 minutes
   evaluation_periods  = "3"
   datapoints_to_alarm = "2"
   treat_missing_data  = "breaching"

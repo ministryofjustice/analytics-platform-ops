@@ -55,5 +55,5 @@ variable "tags" {
 
 variable "monitoring" {
   description = "If true, the launched EC2 instance will have detailed monitoring enabled"
-  default = true
+  default     = true
 }
