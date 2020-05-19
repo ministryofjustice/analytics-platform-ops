@@ -92,6 +92,7 @@ resource "aws_instance" "softnas" {
   instance_type        = "${var.instance_type}"
   key_name             = "${aws_key_pair.softnas.key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.softnas.name}"
+  monitoring           = "${var.monitoring}"
 
   count = "${var.num_instances}"
 
