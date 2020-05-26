@@ -44,11 +44,9 @@ What's going on: When you "add their GPG key", it will take the repo's root key,
 
 5. Tell GPG that you trust the key and sign it:
 
-       gpg --edit-key "alice@cyb.org" trust
+       gpg --edit-key "alice@cyb.org" trust sign
          # 4
-         # save
-         # quit
-       gpg --edit-key "alice@cyb.org" sign
+         # y
          # you will need to type your own passphrase
          # save
 
@@ -95,7 +93,11 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
 
 3. Temporarily delete branch protection rules. Record what they were first! The config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: https://github.com/ministryofjustice/analytics-platform-config/settings/branches
 
-4. Run `remove-gpg-users.sh` to delete the keys for a list of users. This will remove the keys from master etc on the remote repo.
+4. Run `remove-gpg-users.sh` to delete the keys for a list of users:
+
+       ~/ap/analytics-platform-ops/git-crypt/remove-gpg-users.sh
+
+   This will remove the keys from master etc on the remote repo.
 
 5. Reclone and check that the commits have been removed by running e.g:
 
@@ -114,12 +116,14 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
         # check a current user still has their commits
         git log -- .git-crypt/keys/default/0/4F695620194C67495C8EFD2B9502AA070E5ED9A8.gpg
 
+6. Reinstate any branch protection rules on the GitHub repo.
 
-#### Rotate the root key
+### Rotate the root key
 
 Having deleted old users in the previous section, you must now also create a fresh root key. The "root key" is the symmetric encryption key that the encrypted files in this repo are encrypted with. The script will create the .gpg files for each user, which is the root key encrypted with a user's public key.
 
-1. Ensure you have all the current users' public GPG keys on your personal GPG keyring. If you don't you'll get an error adding them in a moment. The fingerprints of the GPG keys that you need are listed in the filenames:
+1. It's easiest to make sure there are no open Pull Requests or active branches on the repository, because these can be difficult to recover once the root secret is changed.
+2. Ensure you have all the current users' public GPG keys on your personal GPG keyring, and that they are trusted. If you don't you'll get an error adding them in a moment. The fingerprints of the GPG keys that you need are listed in the filenames:
 
        ls .git-crypt/keys/default/0/
 
@@ -129,11 +133,46 @@ Having deleted old users in the previous section, you must now also create a fre
 
    To add someone, you need to ask them for their public GPG key (they are not stored in this repo) and then see the above section "Adding someone's gpg key to this repo". You will probably be able to find most people's in the Slack history.
 
-2. Create a branch for this change.
-3. Rotate the root key by running `rotate-gpg-keys.sh`. The script will create a temp directory in `/tmp/`, re-initialise .git-crypt with the new root key, re-encrypt the files with the new master key and refresh the user .gpg files with the new root key.
-4. These changes will be commited back to the original repostory. So just run `git push` to your new branch and create a PR as normal. Every encrypted file is touched.
-5. Reinstate any branch protection rules on the GitHub repo.
-6. Warn other devs to reclone the repo, or you'll just get errors about git-crypt / smudge. e.g.:
+3. Create a branch for this change:
+
+       git checkout -b rotate-git-crypt-root-key
+
+4. Rotate the root key by running `rotate-gpg-keys.sh`:
+
+       ~/ap/analytics-platform-ops/git-crypt/rotate-gpg-keys.sh
+
+   The script will create a temp directory in `/tmp/`, re-initialise .git-crypt with the new root key, re-encrypt the files with the new master key and refresh the user .gpg files with the new root key.
+5. Push the changes to the remote:
+
+       git push -u origin rotate-git-crypt-root-key
+
+6. Create a PR as normal, with suggested comment:
+
+        Rotated the git crypt root key by following the standard process: https://github.com/ministryofjustice/analytics-platform-ops/tree/master/git-crypt#rotate-the-root-key
+
+        To test it works:
+
+            git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
+            git checkout rotate-git-crypt-root-key
+            cd /tmp/myrepo
+            git crypt unlock
+
+        Once this is merged, all users will need to reclone, to avoid git-crypt error messages on push/pull:
+
+            mv analytics-platform-config analytics-platform-config.bak
+            git clone git@github.com:ministryofjustice/analytics-platform-config
+            git crypt unlock
+
+   In this PR, every encrypted file is touched.
+
+7. Just check you can still unlock it using your GPG key:
+
+       git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
+       cd /tmp/myrepo
+       git crypt unlock
+
+8. When merged, warn other devs to reclone the repo, or they'll just get errors about git-crypt / smudge. e.g.:
 
        mv analytics-platform-config analytics-platform-config.bak
        git clone git@github.com:ministryofjustice/analytics-platform-config
+       git crypt unlock
