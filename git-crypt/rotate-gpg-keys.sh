@@ -11,7 +11,7 @@
 # Based on https://github.com/AGWA/git-crypt/issues/47#issuecomment-212734882
 #
 #
-set -e
+set -ex
 
 TMPDIR=`mktemp -d`
 CURRENT_DIR=`git rev-parse --show-toplevel`
@@ -22,7 +22,6 @@ git crypt unlock
 
 # Work on copy.
 cp -r `pwd` $TMPDIR
-
 
 pushd $TMPDIR/$BASENAME
 
