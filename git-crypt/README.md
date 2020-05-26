@@ -81,26 +81,38 @@ To remove a user's access to a git-crypt'd repo:
 
 You need to remove an old user's .gpg file from the repo, not just from master, but all previous commits, including branches. This prevents them from checking out this repo, getting their .gpg file, which they can decrypt to give them the repo's (symmetric) root key, which could decrypt the rest of the repo.
 
- 1. Identify the users with current access, by looking at the git history for the .gpg keys:
+1. Identify the users with current access, by looking at the git history for the .gpg keys:
 
-        git checkout master
         pushd .git-crypt/keys/default/0; for file in *.gpg; do echo "${file} : " && git log -- ${file} | sed -n 9p; done; popd
 
     Decide which users should not have access, and add their .gpg filename as a line in `keys.txt`.
 
- 2. Make sure [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner/) is installed on your machine. For example:
+2. Make sure [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner/) is installed on your machine. For example:
 
         $ brew install bfg
         $ bfg --version
         bfg 1.13.0
 
- 3. Make sure you're on the `master` branch. Run `remove-gpg-users.sh` to delete the keys for a list of users. This will remove the keys from all branches, folders commits.
+3. Temporarily delete branch protection rules. Record what they were first! The config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: https://github.com/ministryofjustice/analytics-platform-config/settings/branches
 
- 4. Check that the commits have been removed by running e.g:
+4. Run `remove-gpg-users.sh` to delete the keys for a list of users. This will remove the keys from master etc on the remote repo.
 
-       `git log -- .git-crypt/keys/default/0/0BC40E3E6462918D96DD1A68D5A4BCE161AC7DC8.gpg` to see the commits have been removed for old users
+5. Reclone and check that the commits have been removed by running e.g:
 
-       `git log -- .git-crypt/keys/default/0/4F695620194C67495C8EFD2B9502AA070E5ED9A8.gpg` to see the commits are still there for current users
+        # e.g. for config repo
+        cd ..
+        mv analytics-platform-config analytics-platform-config.bak
+        git clone git@github.com:ministryofjustice/analytics-platform-config
+        cd analytics-platform-config
+
+        # check the list of current keys contain only users we want to keep
+        ls .git-crypt/keys/default/0/
+
+        # check an old user to see the older commits have been removed
+        git log -- .git-crypt/keys/default/0/0BC40E3E6462918D96DD1A68D5A4BCE161AC7DC8.gpg
+
+        # check a current user still has their commits
+        git log -- .git-crypt/keys/default/0/4F695620194C67495C8EFD2B9502AA070E5ED9A8.gpg
 
 
 #### Rotate the root key
@@ -113,14 +125,15 @@ Having deleted old users in the previous section, you must now also create a fre
 
    The keys you have on your GPG keyring are listed:
 
-       gpg --list-keys
+       gpg --list-keys |grep '^ '|sort
 
-   To add someone, you need to ask them for their public GPG key (they are not stored in this repo) and then see the above section "Adding someone's gpg key to this repo".
+   To add someone, you need to ask them for their public GPG key (they are not stored in this repo) and then see the above section "Adding someone's gpg key to this repo". You will probably be able to find most people's in the Slack history.
 
 2. Create a branch for this change.
 3. Rotate the root key by running `rotate-gpg-keys.sh`. The script will create a temp directory in `/tmp/`, re-initialise .git-crypt with the new root key, re-encrypt the files with the new master key and refresh the user .gpg files with the new root key.
 4. These changes will be commited back to the original repostory. So just run `git push` to your new branch and create a PR as normal. Every encrypted file is touched.
-5. Warn other devs to reclone the repo, or you'll just get errors about git-crypt / smudge. e.g.:
+5. Reinstate any branch protection rules on the GitHub repo.
+6. Warn other devs to reclone the repo, or you'll just get errors about git-crypt / smudge. e.g.:
 
        mv analytics-platform-config analytics-platform-config.bak
        git clone git@github.com:ministryofjustice/analytics-platform-config
