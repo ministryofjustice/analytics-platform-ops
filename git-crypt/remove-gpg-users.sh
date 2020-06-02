@@ -15,7 +15,7 @@ display_usage() {
     echo "e.g.   remove-gpg-users.sh ministryofjustice analytics-platform-config 009C7ABCDEFA51899473BE4CA4B6DCF9EBAB932.gpg 2480EC66A51899473BE4CA4B6DC10A52603E7A8E.gpg"
 }
 # check enough arguments are supplied
-if [  $# -le 3 ]
+if [  $# -le 2 ]
 then
     echo "Error: $# is not enough arguments"
     echo
@@ -52,9 +52,13 @@ done
 cd $CLONE_DIR
 git reflog expire --expire=now --all && git gc --prune=now --aggressive
 git push || true
+set +ex
 
-# Note:
-# You can ignore errors about pushing to pull requests (because you should change the root key anyway):
-#       ! [remote rejected] refs/pull/99/head -> refs/pull/99/head (deny updating a hidden ref)
-# BUT check you\'ve not got an error about pushing to master - you need to switch off branch protection:
-#       ! [remote rejected] master -> master (protected branch hook declined)
+echo
+echo "Note:"
+echo "You'll see some errors above like:"
+echo "      ! [remote rejected] refs/pull/99/head -> refs/pull/99/head (deny updating a hidden ref)"
+echo "Errors about \"/pull/\" you can ignore - that is expected."
+echo "BUT check you\'ve not got an error about pushing to master:"
+echo "      ! [remote rejected] master -> master (protected branch hook declined)"
+echo "In this case, you'll need to switch off branch protection and rerun this script."
