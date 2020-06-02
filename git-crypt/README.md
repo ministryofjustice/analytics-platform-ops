@@ -93,9 +93,9 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
 
 3. Temporarily delete branch protection rules. Record what they were first! The config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: https://github.com/ministryofjustice/analytics-platform-config/settings/branches
 
-4. Run `remove-gpg-users.sh` to delete the keys for a list of users:
+4. Run `remove-gpg-users.sh` to delete the keys for a list of users. For example:
 
-       ~/ap/analytics-platform-ops/git-crypt/remove-gpg-users.sh
+       ~/ap/analytics-platform-ops/git-crypt/remove-gpg-users.sh ministryofjustice analytics-platform-config 009C7ABCDEFA51899473BE4CA4B6DCF9EBAB932.gpg 2480EC66A51899473BE4CA4B6DC10A52603E7A8E.gpg
 
    This will remove the keys from master etc on the remote repo.
 
