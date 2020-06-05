@@ -34,9 +34,11 @@ What's going on: When you "add their GPG key", it will take the repo's root key,
 
 2. Ask the person to export their GPG public key like this:
 
-       gpg --armor --export alice@cyb.org
+       gpg --armor --export alice@cyb.org >alice.asc
 
 3. Once you receive the file, save it on your disk e.g. /tmp/alice.asc
+
+4. It's helpful to save add it to our [private store of keys](if they agree, add it to the https://github.com/ministryofjustice/analytical-platform-public-keys) so we don't have to ask again when we next rotate the repo key. Ask for their consent first.
 
 4. Import it into your GPG keyring:
 
@@ -115,7 +117,7 @@ Having deleted old users in the previous section, you must now also create a fre
 
        gpg --list-keys
 
-   To add someone, you need to ask them for their public GPG key (they are not stored in this repo) and then see the above section "Adding someone's gpg key to this repo".
+   To add someone, they might already be in the [private key store](if they agree, add it to the https://github.com/ministryofjustice/analytical-platform-public-keys). Otherwise you need to [ask them for their public GPG key](#adding-someones-gpg-key-to-the-repo). Either way you need to [add their key to your keychain and trust it](#adding-someones-gpg-key-to-the-repo).
 
 2. Create a branch for this change.
 3. Rotate the root key by running `rotate-gpg-keys.sh`. The script will create a temp directory in `/tmp/`, re-initialise .git-crypt with the new root key, re-encrypt the files with the new master key and refresh the user .gpg files with the new root key.
