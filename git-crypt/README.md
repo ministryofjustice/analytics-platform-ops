@@ -2,7 +2,6 @@
 
 Some AP repositories have git-crypt enabled. This doc describes how we add and remove users, and has associated scripts.
 
-
 ## Decrypting the secrets
 
 These steps allow you to decrypt the encrypted files of a git-crypt'd repository.
@@ -30,7 +29,7 @@ To enable someone to decrypt the git-crypt'd repo, we add their GPG key.
 
 What's going on: When you "add their GPG key", it will take the repo's root key, encrypt it with the user's public GPG key and store the resulting .gpg file in this repo (in `.git-crypt/keys/default/0/`). When that user types `git-crypt unlock`, then it will decrypt that .gpg file, using their private GPG key, to get the repo's root key (storing it as `.git/git-crypt/keys/default`) and then it will use that to decrypt the repo's files.
 
-1. If the person does not have a personal GPG key pair, ask them to create one - see: https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key#generating-a-gpg-key
+1. If the person does not have a personal GPG key pair, ask them to create one - see: <https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key#generating-a-gpg-key>
 
 2. Ask the person to export their GPG public key like this:
 
@@ -91,32 +90,56 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
         $ bfg --version
         bfg 1.13.0
 
-3. Temporarily delete branch protection rules. Record what they were first! The config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: https://github.com/ministryofjustice/analytics-platform-config/settings/branches
+3. Temporarily delete branch protection rules. Record what they were first! For example, the config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: <https://github.com/ministryofjustice/analytics-platform-config/settings/branches>
 
-4. Run `remove-gpg-users.sh` to delete the keys for a list of users. For example:
+4. Get a fresh clone the repo using the --mirror option, so that you get all the branches too. e.g.
 
-       ~/ap/analytics-platform-ops/git-crypt/remove-gpg-users.sh ministryofjustice analytics-platform-config 009C7ABCDEFA51899473BE4CA4B6DCF9EBAB932.gpg 2480EC66A51899473BE4CA4B6DC10A52603E7A8E.gpg
+        cd /tmp
+        git clone --mirror git@github.com:ministryofjustice/analytics-platform-config
 
-   This will remove the keys from master etc on the remote repo.
+5. For each user you want to remove, you need to delete their .gpg file in this freshly cloned repo. e.g. to delete two users:
 
-5. Reclone and check that the commits have been removed by running e.g:
+        bfg --delete-files 009C7ABCDEFA51899473BE4CA4B6DCF9EBAB93A2.gpg --no-blob-protection
+        bfg --delete-files 2480EC66A51899473BE4CA4B6DC10A52603E7A8E.gpg --no-blob-protection
 
-        # e.g. for config repo
-        cd ..
-        mv analytics-platform-config analytics-platform-config.bak
-        git clone git@github.com:ministryofjustice/analytics-platform-config
-        cd analytics-platform-config
+   This will delete the keys from all commits on all branches. We use --no-blob-protection to delete them from the current branch as well.
 
-        # check the list of current keys contain only users we want to keep
-        ls .git-crypt/keys/default/0/
+6. You need to 'expire' and 'prune' those deleted files from the repo, to really make them go:
 
-        # check an old user to see the older commits have been removed
-        git log -- .git-crypt/keys/default/0/0BC40E3E6462918D96DD1A68D5A4BCE161AC7DC8.gpg
+        git reflog expire --expire=now --all && git gc --prune=now --aggressive
 
-        # check a current user still has their commits
-        git log -- .git-crypt/keys/default/0/4F695620194C67495C8EFD2B9502AA070E5ED9A8.gpg
+7. Now push these changes to GitHub:
 
-6. Reinstate any branch protection rules on the GitHub repo.
+        git push
+
+   NB: You'll see some errors like:
+
+        ! [remote rejected] refs/pull/99/head -> refs/pull/99/head (deny updating a hidden ref)
+
+   Errors about "/pull" you can ignore - that is expected.
+   HOWEVER check you've not got an error about pushing to master:
+
+        ! [remote rejected] master -> master (protected branch hook declined)
+
+   If you get that, you'll need to switch off branch protection and re-push.
+
+8. Reclone and check that the commits have been removed e.g:
+
+       cd ~/ap   # or whereever you keep your repos
+       mv analytics-platform-config analytics-platform-config.bak
+       git clone git@github.com:ministryofjustice/analytics-platform-config
+       cd analytics-platform-config
+
+       # check the list of current keys contain only users we want to keep
+       ls .git-crypt/keys/default/0/
+
+       # check an old user's commits are removed
+       git log -- .git-crypt/keys/default/0/0BC40E3E6462918D96DD1A68D5A4BCE161AC7DC8.gpg
+
+       # check a current user still has their commits
+       git log -- .git-crypt/keys/default/0/4F695620194C67495C8EFD2B9502AA070E5ED9A8.gpg
+
+9. Reinstate any branch protection rules on the GitHub repo.
 
 ### Rotate the root key
 
