@@ -122,7 +122,10 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
 
 Having deleted old users in the previous section, you must now also create a fresh root key. The "root key" is the symmetric encryption key that the encrypted files in this repo are encrypted with. The script will create the .gpg files for each user, which is the root key encrypted with a user's public key.
 
-1. It's easiest to make sure there are no open Pull Requests or active branches on the repository, because these can be difficult to recover once the root secret is changed.
+1. It's easiest to make sure there are no open Pull Requests or active branches on the repository, because these can be difficult to recover once the root secret is changed. The problem is that in the repo, the files on master and the branch will be encrypted with different keys. The upshot is that it means you can't have a clone and then switch between branches, or diff between them - you simply get smudge/clean filter errors. (Although you should be able to git clone a specific branch successfully, so all is not lost if you need to recover one after the key is changed.)
+
+   So if you can't avoid active branches, you should checkout each of these branches before you rotate the key, rebase with `git rebase origin/master` and then `git diff master >branch.diff`. This saves the branch in plain text. Once you've finished the rotation (see below), create a new branch and then `git apply branch.diff`.
+
 2. Ensure you have all the current users' public GPG keys on your personal GPG keyring, and that they are trusted. If you don't you'll get an error adding them in a moment. The fingerprints of the GPG keys that you need are listed in the filenames:
 
        ls .git-crypt/keys/default/0/
@@ -148,16 +151,16 @@ Having deleted old users in the previous section, you must now also create a fre
 
 6. Create a PR as normal, with suggested comment:
 
-        Rotated the git crypt root key by following the standard process: https://github.com/ministryofjustice/analytics-platform-ops/tree/master/git-crypt#rotate-the-root-key
+       Rotated the git crypt root key by following the standard process: https://github.com/ministryofjustice/analytics-platform-ops/tree/master/git-crypt#rotate-the-root-key
 
-        To test it works:
+       To test it works:
 
             git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
             git checkout rotate-git-crypt-root-key
             cd /tmp/myrepo
             git crypt unlock
 
-        Once this is merged, all users will need to reclone, to avoid git-crypt error messages on push/pull:
+       Once this is merged, all users will need to reclone, to avoid git-crypt error messages on push/pull:
 
             mv analytics-platform-config analytics-platform-config.bak
             git clone git@github.com:ministryofjustice/analytics-platform-config
