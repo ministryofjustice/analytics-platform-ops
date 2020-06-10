@@ -163,16 +163,22 @@ Having deleted old users in the previous section, you must now also create a fre
 
        git checkout -b rotate-git-crypt-root-key
 
-4. Rotate the root key by running `rotate-gpg-keys.sh`:
+4. If you've not got a clone of this repo you could just download the script you need:
+
+       wget https://raw.githubusercontent.com/ministryofjustice/analytics-platform-ops/master/git-crypt/rotate-gpg-keys.sh
+       chmod +x rotate-gpg-keys.sh
+
+5. Rotate the root key by running `rotate-gpg-keys.sh`:
 
        ~/ap/analytics-platform-ops/git-crypt/rotate-gpg-keys.sh
 
-   The script will create a temp directory in `/tmp/`, re-initialise .git-crypt with the new root key, re-encrypt the files with the new master key and refresh the user .gpg files with the new root key.
-5. Push the changes to the remote:
+   For the git repo in the current directory, this script will re-initialize git-crypt with a new secret and re-add all the gpg keys. It does the work in a temporary directory, pulling the changes into the current directory at the end - so if the script fails half way through, the current directory is left unchanged, and the script can simply be rerun.
+
+6. Push the changes to the remote:
 
        git push -u origin rotate-git-crypt-root-key
 
-6. Create a PR as normal, with suggested comment:
+7. Create a PR as normal, with suggested comment:
 
        Rotated the git crypt root key by following the standard process: https://github.com/ministryofjustice/analytics-platform-ops/tree/master/git-crypt#rotate-the-root-key
 
@@ -191,13 +197,13 @@ Having deleted old users in the previous section, you must now also create a fre
 
    In this PR, every encrypted file is touched.
 
-7. Just check you can still unlock it using your GPG key:
+8. Just check you can still unlock it using your GPG key:
 
        git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
        cd /tmp/myrepo
        git crypt unlock
 
-8. When merged, warn other devs to reclone the repo, or they'll just get errors about git-crypt / smudge. e.g.:
+9. When merged, warn other devs to reclone the repo, or they'll just get errors about git-crypt / smudge. e.g.:
 
        mv analytics-platform-config analytics-platform-config.bak
        git clone git@github.com:ministryofjustice/analytics-platform-config
