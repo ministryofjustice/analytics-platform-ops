@@ -184,16 +184,16 @@ Having deleted old users in the previous section, you must now also create a fre
 
        To test it works:
 
-            git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
-            git checkout rotate-git-crypt-root-key
-            cd /tmp/myrepo
-            git crypt unlock
+           git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
+           git checkout rotate-git-crypt-root-key
+           cd /tmp/myrepo
+           git crypt unlock
 
        Once this is merged, all users will need to reclone, to avoid git-crypt error messages on push/pull:
 
-            mv analytics-platform-config analytics-platform-config.bak
-            git clone git@github.com:ministryofjustice/analytics-platform-config
-            git crypt unlock
+           mv analytics-platform-config analytics-platform-config.bak
+           git clone git@github.com:ministryofjustice/analytics-platform-config
+           git crypt unlock
 
    In this PR, every encrypted file is touched.
 
