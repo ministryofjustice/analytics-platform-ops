@@ -1,28 +1,34 @@
 #!/bin/bash
 #
+# For the git repo in the current directory, this script will re-initialize
+# git-crypt with a new secret and re-add all the gpg keys.
 #
-# It will re-initialize git-crypt for the repository and re-add all keys except
-# the one requested for removal.
+# Purpose: by running this script, users who used to have their GPG keys in this
+# git-crypt'd repo will not be able to view future changes.
 #
-# Note: You still need to change all your secrets to fully protect yourself.
-# Removing a user will prevent them from reading future changes but they will
-# still have a copy of the data up to the point of their removal.
+# Notes:
+# 1. Before running this you should have already removed GPG keys of old users.
+# 2. Old users may still have a clone, if not the old root key to this repo,
+#    giving them access the files contained up until this rotation. So those
+#    secrets within the files will all need rotating as well.
+# 3. It does the work in a temporary directory, pulling the changes into the
+#    current directory at the end - so if the script fails half way through, the
+#    current directory is left unchanged, and the script can simply be rerun.
 #
 # Based on https://github.com/AGWA/git-crypt/issues/47#issuecomment-212734882
 #
 #
-set -e
+set -ex
 
 TMPDIR=`mktemp -d`
 CURRENT_DIR=`git rev-parse --show-toplevel`
 BASENAME=$(basename `pwd`)
 
-# Unlock the directory, we need to copy encrypted versions of the files
+# Unlock the directory - we need to copy encrypted versions of the files
 git crypt unlock
 
 # Work on copy.
 cp -r `pwd` $TMPDIR
-
 
 pushd $TMPDIR/$BASENAME
 
