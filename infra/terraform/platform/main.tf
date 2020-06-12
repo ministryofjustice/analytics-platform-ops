@@ -205,3 +205,27 @@ module "buckets_archiver" {
     "component", "buckets-archiver",
   ), var.tags)}"
 }
+
+module "kubenetes_master_monitoring" {
+  source = "../modules/elb_cloudwatch_alerts"
+
+  name          = "${terraform.workspace}-kubenetes-master-alerts"
+  elb_name      = "${var.kubenetes_master_elb_name}"
+  alarm_actions = ["${module.softnas_monitoring.stack_notifications_arn}"]
+
+  tags = "${merge(map(
+    "component", "Kubenetes",
+  ), var.tags)}"
+}
+
+module "bastion_monitoring" {
+  source = "../modules/elb_cloudwatch_alerts"
+
+  name          = "${terraform.workspace}-bastion-alerts"
+  elb_name      = "${var.bastion_elb_name}"
+  alarm_actions = ["${module.softnas_monitoring.stack_notifications_arn}"]
+
+  tags = "${merge(map(
+    "component", "Kubenetes",
+  ), var.tags)}"
+}
