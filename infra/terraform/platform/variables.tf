@@ -47,5 +47,5 @@ variable "airflow_db_password" {}
 
 variable "ses_ap_email_identity_arn" {}
 
-variable "kubenetes_master_elb_name" {}
+variable "kubernetes_master_elb_name" {}
 variable "bastion_elb_name" {}
