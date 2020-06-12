@@ -54,6 +54,14 @@ module "ppas_mdt_upload_user" {
   system_name       = "mdt"
 }
 
+module "ppas_workforce_planning_upload_user" {
+  source = "../modules/data_upload_user"
+
+  upload_bucket_arn = "${aws_s3_bucket.uploads.arn}"
+  org_name          = "ppas"
+  system_name       = "workforce-planning"
+}
+
 module "lookup_upload_user" {
   source = "../modules/data_bucket_upload_user"
 
