@@ -210,7 +210,7 @@ module "kubernetes_master_monitoring" {
   source = "../modules/elb_cloudwatch_alerts"
 
   name          = "${terraform.workspace}-kubernetes-master-alerts"
-  elb_name      = "${var.kubernetes_master_elb_name}"
+  elb_name      = "api-${terraform.workspace}"
   alarm_actions = ["${module.softnas_monitoring.stack_notifications_arn}"]
 
   tags = "${merge(map(
@@ -222,7 +222,7 @@ module "bastion_monitoring" {
   source = "../modules/elb_cloudwatch_alerts"
 
   name          = "${terraform.workspace}-bastion-alerts"
-  elb_name      = "${var.bastion_elb_name}"
+  elb_name      = "bastion-${terraform.workspace}"
   alarm_actions = ["${module.softnas_monitoring.stack_notifications_arn}"]
 
   tags = "${merge(map(
