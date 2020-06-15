@@ -226,6 +226,18 @@ module "kubernetes_master_monitoring" {
   ), var.tags)}"
 }
 
+module "kubernetes_master_asg_monitoring" {
+  source = "../modules/asg_cloudwatch_alerts"
+
+  name          = "${terraform.workspace}-kubernetes-master-asg-alerts"
+  asg_names     = ["master-${var.region}a.masters.${terraform.workspace}.mojanalytics.xyz", "master-${var.region}b.masters.${terraform.workspace}.mojanalytics.xyz", "master-${var.region}c.masters.${terraform.workspace}.mojanalytics.xyz"]
+  alarm_actions = ["${module.ap_infra_alert_topic.stack_notifications_arn}"]
+
+  tags = "${merge(map(
+    "component", "Kubernetes",
+  ), var.tags)}"
+}
+
 module "bastion_monitoring" {
   source = "../modules/elb_cloudwatch_alerts"
 
