@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "surge_queue_length" {
   period              = "${var.period}"
   evaluation_periods  = "${var.evaluation_periods}"
   datapoints_to_alarm = "${var.datapoints_to_alarm}"
-  treat_missing_data  = "breaching"
+  treat_missing_data  = "notBreaching"
 
   actions_enabled = "true"
   alarm_actions   = ["${var.alarm_actions}"]
