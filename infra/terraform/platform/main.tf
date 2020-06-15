@@ -206,12 +206,20 @@ module "buckets_archiver" {
   ), var.tags)}"
 }
 
+module "ap_infra_alert_topic" {
+  source = "../modules/sns_alerts"
+
+  name  = "${terraform.workspace}-ap-infra-alerts"
+  email = "analytics-platform-tech@digital.justice.gov.uk"
+  tags  = "${var.tags}"
+}
+
 module "kubernetes_master_monitoring" {
   source = "../modules/elb_cloudwatch_alerts"
 
   name          = "${terraform.workspace}-kubernetes-master-alerts"
   elb_name      = "api-${terraform.workspace}"
-  alarm_actions = ["${module.softnas_monitoring.stack_notifications_arn}"]
+  alarm_actions = ["${module.ap_infra_alert_topic.stack_notifications_arn}"]
 
   tags = "${merge(map(
     "component", "Kubernetes",
@@ -223,7 +231,7 @@ module "bastion_monitoring" {
 
   name          = "${terraform.workspace}-bastion-alerts"
   elb_name      = "bastion-${terraform.workspace}"
-  alarm_actions = ["${module.softnas_monitoring.stack_notifications_arn}"]
+  alarm_actions = ["${module.ap_infra_alert_topic.stack_notifications_arn}"]
 
   tags = "${merge(map(
     "component", "Bastion",
