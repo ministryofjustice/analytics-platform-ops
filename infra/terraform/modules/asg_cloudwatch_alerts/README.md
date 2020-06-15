@@ -28,6 +28,6 @@ Parameters
 | Name                                 | Type     | Description                               |
 | ------------------------------------ | -------- | ----------------------------------------- |
 | `name`                (**Required**) | `string` | Name of the resources |
-| `asg_name`            (**Required**) | `string` | Names of the ELB to monitor |
+| `asg_names`            (**Required**) | `string` | Names of the ELB to monitor |
 | `alarm_actions`       (**Required**) | `list`   | List of ARNS of resources for alerts to be sent to |
 | `tags`                (**Required**) | `map`    | Tags to attach to resources |
