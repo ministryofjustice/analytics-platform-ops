@@ -38,3 +38,8 @@ variable "tags" {
   type        = "map"
   description = "Tags to attach to resources"
 }
+
+variable "desired_capacity_threshold" {
+  description = "Desired Capacity threshold that triggers the alarm. If 0 then no alarms are created for desired capacity"
+  default     = 0
+}
