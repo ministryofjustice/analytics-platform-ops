@@ -240,6 +240,20 @@ module "kubernetes_master_asg_monitoring" {
   ), var.tags)}"
 }
 
+module "kubernetes_node_asg_monitoring" {
+  source = "../modules/asg_cloudwatch_alerts"
+
+  name                       = "${terraform.workspace}-kubernetes-node-asg-alerts"
+  asg_names                  = ["nodes.${terraform.workspace}.mojanalytics.xyz"]
+  alarm_actions              = ["${module.ap_infra_alert_topic.stack_notifications_arn}"]
+  desired_capacity_threshold = "${var.k8s_desired_capacity_threshold}"
+  cpu_threshold              = 90
+
+  tags = "${merge(map(
+    "component", "Kubernetes",
+  ), var.tags)}"
+}
+
 module "bastion_monitoring" {
   source = "../modules/elb_cloudwatch_alerts"
 

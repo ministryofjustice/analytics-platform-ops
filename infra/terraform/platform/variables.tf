@@ -48,3 +48,5 @@ variable "airflow_db_password" {}
 variable "ses_ap_email_identity_arn" {}
 
 variable "softnas_cpu_low_threshold" {}
+
+variable "k8s_desired_capacity_threshold" {}
