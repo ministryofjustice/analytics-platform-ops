@@ -56,11 +56,13 @@ module "ebs_snapshots" {
 module "softnas_monitoring" {
   source = "../modules/cloudwatch_alerts"
 
-  name               = "${terraform.workspace}-softnas-alerts"
-  ec2_instance_ids   = "${module.user_nfs_softnas.ec2_instance_ids}"
-  ec2_instance_names = "${module.user_nfs_softnas.ec2_instance_names}"
+  name = "${terraform.workspace}-softnas-alerts"
+
+  # The logic below has been added as we only want alerts for one SoftNAS instance
+  ec2_instance_ids   = ["${element(module.user_nfs_softnas.ec2_instance_ids, 1)}"]
+  ec2_instance_names = ["${element(module.user_nfs_softnas.ec2_instance_names, 1)}"]
   cpu_threshold      = 70
-  cpu_low_threshold  = 5
+  cpu_low_threshold  = "${var.softnas_cpu_low_threshold}"
   email              = "analytics-platform-tech@digital.justice.gov.uk"
 
   tags = "${merge(map(

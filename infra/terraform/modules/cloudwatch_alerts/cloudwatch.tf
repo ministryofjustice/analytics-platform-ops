@@ -9,12 +9,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_threshold" {
 
   namespace           = "AWS/EC2"
   metric_name         = "CPUUtilization"
-  statistic           = "Maximum"
+  statistic           = "Average"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = "${var.cpu_threshold}"
-  period              = "300"                           # 5 minutes
-  evaluation_periods  = "3"
-  datapoints_to_alarm = "2"
+  period              = "${var.period}"
+  evaluation_periods  = "${var.evaluation_periods}"
+  datapoints_to_alarm = "${var.datapoints_to_alarm}"
   treat_missing_data  = "breaching"
 
   actions_enabled = "true"
@@ -34,12 +34,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low_threshold" {
 
   namespace           = "AWS/EC2"
   metric_name         = "CPUUtilization"
-  statistic           = "Maximum"
+  statistic           = "Average"
   comparison_operator = "LessThanThreshold"
   threshold           = "${var.cpu_low_threshold}"
-  period              = "300"                      # 5 minutes
-  evaluation_periods  = "3"
-  datapoints_to_alarm = "2"
+  period              = "${var.period}"
+  evaluation_periods  = "${var.evaluation_periods}"
+  datapoints_to_alarm = "${var.datapoints_to_alarm}"
   treat_missing_data  = "breaching"
 
   actions_enabled = "true"

@@ -46,3 +46,5 @@ variable "airflow_db_username" {}
 variable "airflow_db_password" {}
 
 variable "ses_ap_email_identity_arn" {}
+
+variable "softnas_cpu_low_threshold" {}
