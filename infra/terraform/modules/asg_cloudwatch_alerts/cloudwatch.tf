@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "desired_capacity" {
 
   namespace           = "AWS/EC2"
   metric_name         = "GroupDesiredCapacity"
-  statistic           = "Count"
+  statistic           = "Maximum"
   comparison_operator = "GreaterThanThreshold"
   threshold           = "${var.desired_capacity_threshold}"
   period              = "${var.period}"
