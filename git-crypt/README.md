@@ -37,35 +37,34 @@ What's going on: When you "add their GPG key", it will take the repo's root key,
 
 3. Once you receive the file, save it on your disk e.g. /tmp/alice.asc
 
-4. It's helpful to save add it to our [private store of keys](if they agree, add it to the https://github.com/ministryofjustice/analytical-platform-public-keys) so we don't have to ask again when we next rotate the repo key. Ask for their consent first.
+4. It's helpful to save add it to our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys) so that next time the person rotating the repo key don't have to ask for everyones' keys again. Ask for the user's their consent first.
 
-4. Import it into your GPG keyring:
+5. Import it into your GPG keyring:
 
        gpg --import /tmp/alice.asc
 
-5. Tell GPG that you trust the key and sign it:
+6. Tell GPG that you trust the key and sign it:
 
-       gpg --edit-key "alice@cyb.org" trust sign
+       gpg --edit-key "alice@cyb.org" trust sign quit
          # 4
          # y
          # you will need to type your own passphrase
-         # save
 
-6. Confirm that '[  full  ]' is shown when you list it:
+7. Confirm that '[  full  ]' is shown when you list it:
 
-       gpg --list-keys
+       $ gpg --list-keys
        pub   rsa4096 2015-02-05 [SC]
              17818CFB47FFFC384F0CC
        uid           [  full  ] alice  <alice@cyb.org>
        sub   rsa4096 2015-02-05 [E]
 
-7. In this repo, make sure you're on a master branch, with no outstanding changes, and add the key to the .git-crypt directory:
+8. In this repo, make sure you're on a master branch, with no outstanding changes, and add the key to the .git-crypt directory:
 
        cd analytics-platform-config  # or whatever the repo is called
        git status
        git-crypt add-gpg-user alice@cyb.org
 
-8. The change is already committed, so simply:
+9. The change is already committed, so simply:
 
        git push
 
@@ -82,46 +81,49 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
 
 1. Identify the users with current access, by looking at the git history for the .gpg keys:
 
-        pushd .git-crypt/keys/default/0; for file in *.gpg; do echo "${file} : " && git log -- ${file} | sed -n 9p; done; popd
+       pushd .git-crypt/keys/default/0; for file in *.gpg; do echo "${file} : " && git log -- ${file} | sed -n 9p; done; popd
 
     Decide which users should not have access, and add their .gpg filename as a line in `keys.txt`.
 
 2. Make sure [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner/) is installed on your machine. For example:
 
-        $ brew install bfg
-        $ bfg --version
-        bfg 1.13.0
+       $ brew install bfg
+       $ bfg --version
+       bfg 1.13.0
 
 3. Temporarily delete branch protection rules. Record what they were first! For example, the config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: <https://github.com/ministryofjustice/analytics-platform-config/settings/branches>
 
-4. Get a fresh clone the repo using the --mirror option, so that you get all the branches too. e.g.
+4. Get a fresh clone of the repo using the --mirror option, so that you get all the branches too. e.g.
 
-        cd /tmp
-        git clone --mirror git@github.com:ministryofjustice/analytics-platform-config
+       cd /tmp
+       git clone --mirror git@github.com:ministryofjustice/analytics-platform-config.git
+       cd analytics-platform-config
 
 5. For each user you want to remove, you need to delete their .gpg file in this freshly cloned repo. e.g. to delete two users:
 
-        bfg --delete-files 009C7ABCDEFA51899473BE4CA4B6DCF9EBAB93A2.gpg --no-blob-protection
-        bfg --delete-files 2480EC66A51899473BE4CA4B6DC10A52603E7A8E.gpg --no-blob-protection
+       bfg --delete-files 009C7ABCDEFA51899473BE4CA4B6DCF9EBAB93A2.gpg --no-blob-protection
+       bfg --delete-files 2480EC66A51899473BE4CA4B6DC10A52603E7A8E.gpg --no-blob-protection
 
    This will delete the keys from all commits on all branches. We use --no-blob-protection to delete them from the current branch as well.
 
 6. You need to 'expire' and 'prune' those deleted files from the repo, to really make them go:
 
-        git reflog expire --expire=now --all && git gc --prune=now --aggressive
+       git reflog expire --expire=now --all && git gc --prune=now --aggressive
+
+   If you get an error `fatal: not a git repository (or any of the parent directories): .git` then rename your checkout so it has `.git` on the end e.g. `/tmp/analytics-platform-config` -> `/tmp/analytics-platform-config.git`
 
 7. Now push these changes to GitHub:
 
-        git push
+       git push
 
    NB: You'll see some errors like:
 
-        ! [remote rejected] refs/pull/99/head -> refs/pull/99/head (deny updating a hidden ref)
+       ! [remote rejected] refs/pull/99/head -> refs/pull/99/head (deny updating a hidden ref)
 
    Errors about "/pull" you can ignore - that is expected.
    HOWEVER check you've not got an error about pushing to master:
 
-        ! [remote rejected] master -> master (protected branch hook declined)
+       ! [remote rejected] master -> master (protected branch hook declined)
 
    If you get that, you'll need to switch off branch protection and re-push.
 
@@ -159,7 +161,7 @@ Having deleted old users in the previous section, you must now also create a fre
 
        gpg --list-keys |grep '^ '|sort
 
-   To add someone, they might already be in the [private key store](if they agree, add it to the https://github.com/ministryofjustice/analytical-platform-public-keys). Otherwise you need to [ask them for their public GPG key](#adding-someones-gpg-key-to-the-repo). Either way you need to [add their key to your keychain and trust it](#adding-someones-gpg-key-to-the-repo).
+   If a current user is not on your GPG keyring you need to get hold of their public key. They might already be in the [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys). Otherwise you need to [ask them for their public GPG key](#adding-someones-gpg-key-to-the-repo). Now [add their key to your keychain and trust it](#adding-someones-gpg-key-to-the-repo).
 
 3. Create a branch for this change:
 
@@ -187,8 +189,8 @@ Having deleted old users in the previous section, you must now also create a fre
        To test it works:
 
            git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
-           git checkout rotate-git-crypt-root-key
            cd /tmp/myrepo
+           git checkout rotate-git-crypt-root-key
            git crypt unlock
 
        Once this is merged, all users will need to reclone, to avoid git-crypt error messages on push/pull:
@@ -203,6 +205,7 @@ Having deleted old users in the previous section, you must now also create a fre
 
        git clone git@github.com:ministryofjustice/analytics-platform-config /tmp/myrepo
        cd /tmp/myrepo
+       git checkout rotate-git-crypt-root-key
        git crypt unlock
 
 9. When merged, warn other devs to reclone the repo, or they'll just get errors about git-crypt / smudge. e.g.:
