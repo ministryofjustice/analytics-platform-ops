@@ -69,16 +69,40 @@ def is_control_panel_bucket(name, bucket):
             tags = bucket.Tagging()
             tags.load()
             for obj in tags.tag_set:
-                if obj["Key"] == "buckettype" and obj["Value"] == "datawarehouse":
+                if (
+                    obj["Key"] == "buckettype"
+                    and obj["Value"] == "datawarehouse"
+                ):
                     is_valid = True
                     break
         except ClientError as ex:
-            if ex.response.get('Error', {}).get('Code') != 'NoSuchTagSet':
+            if ex.response.get("Error", {}).get("Code") != "NoSuchTagSet":
                 raise
             # It wasn't possible to get the bucket's tags.
             is_valid = False
     logger.info(f"{is_valid} - Bucket {name} is associated with CP")
     return is_valid
+
+
+def get_bucket(name):
+    """
+    Return details of the named bucket (or none, if it isn't a bucket that's
+    valid for the purposes of this script).
+    """
+    bucket_obj = boto3.resource("s3").Bucket(name)
+    if is_control_panel_bucket(name, bucket_obj):
+        versioning = bucket_obj.Versioning()
+        try:
+            lifecycle_conf = bucket_obj.LifecycleConfiguration()
+            lifecycle = lifecycle_conf.rules
+        except ClientError as ex:
+            lifecycle = ""
+        return {
+            "bucket": bucket_obj,
+            "versioning": versioning.status,
+            "lifecycle": lifecycle,
+        }
+    return None
 
 
 def get_buckets(number=0):
@@ -101,24 +125,16 @@ def get_buckets(number=0):
     with click.progressbar(buckets, len(buckets)) as bucket_list:
         for bucket in bucket_list:
             name = bucket["Name"]
-            bucket_obj = boto3.resource("s3").Bucket(name)
-            if is_control_panel_bucket(name, bucket_obj):
-                versioning = bucket_obj.Versioning()
-                try:
-                    lifecycle_conf = bucket_obj.LifecycleConfiguration()
-                    lifecycle = lifecycle_conf.rules
-                except ClientError as ex:
-                    lifecycle = ""
-                result[name] = {
-                    "bucket": bucket_obj,
-                    "versioning": versioning.status,
-                    "lifecycle": lifecycle,
-                }
+            bucket_metadata = get_bucket(name)
+            if bucket_metadata:
+                result[name] = bucket_metadata
     return result
 
 
 @click.group()
-@click.option("--verbose", is_flag=True, help="Comprehensive logging set to stdout.")
+@click.option(
+    "--verbose", is_flag=True, help="Comprehensive logging set to stdout."
+)
 def main(verbose=False):
     """
     A tool to manage the versioning and life cycle of S3 buckets.
@@ -168,20 +184,30 @@ def list(number=0):
 
 
 @main.command()
-@click.option("-n", "--number", required=False, type=int)
+@click.option("-n", "--name", required=False, type=str)
+@click.option("-a", "--amount", required=False, type=int)
 @click.option("-x", "--execute", is_flag=True)
-def update(number=0, execute=False):
+def update(name="", amount=0, execute=False):
     """
-    Update n (or all, if not given) bucket details. Use --execute to make the
-    changes happen, or else a preview will take place.
+    Update either the named bucket or amount number of buckets, or all, if not
+    given all buckets. Use --execute to make the changes happen, or else a
+    preview will take place.
     """
-    buckets = get_buckets(number)
-    for k, v in buckets.items():
-        name = k
-        bucket = v["bucket"]
-        versioning = v["versioning"] == "Enabled"
-        lifecycle = v["lifecycle"]
-        update_bucket(name, bucket, versioning, lifecycle, execute)
+    if name:
+        bucket_metadata = get_bucket(name)
+        if bucket_metadata:
+            bucket = bucket_metadata["bucket"]
+            versioning = bucket_metadata["versioning"] == "Enabled"
+            lifecycle = bucket_metadata["lifecycle"]
+            update_bucket(name, bucket, versioning, lifecycle, execute)
+    else:
+        buckets = get_buckets(amount)
+        for k, v in buckets.items():
+            name = k
+            bucket = v["bucket"]
+            versioning = v["versioning"] == "Enabled"
+            lifecycle = v["lifecycle"]
+            update_bucket(name, bucket, versioning, lifecycle, execute)
 
 
 def update_bucket(name, bucket, versioning, lifecycle, execute):
@@ -199,44 +225,47 @@ def update_bucket(name, bucket, versioning, lifecycle, execute):
         if not VERBOSE:
             click.echo(msg)
         if execute:
-            # TODO: Uncomment to actually make the changes.
-            # v = bucket.Versioning()
-            # v.enable()
+            v = bucket.Versioning()
+            v.enable()
             click.secho("OK", fg="green")
         else:
             click.secho("OK", fg="yellow")
     # Set life cycle rule to send non-current versions of files to glacier
-    # storage after 30 days.
-    lifecycle_id = f"{name}_lifecycle_configuration"
-    msg = f"Setting lifecycle {lifecycle_id} for bucket {name}."
-    logger.info(msg)
-    if not VERBOSE:
-        click.echo("\n\n" + msg)
-    life_cycle = {
-        "Rules": [
-            {
-                "ID": lifecycle_id,
-                "Status": "Enabled",
-                "Prefix": "",
-                "NoncurrentVersionTransitions": [
-                    {"NoncurrentDays": 30, "StorageClass": "GLACIER",},
-                ],
-            },
-        ]
-    }
-    msg = json.dumps(life_cycle)
-    logger.info(msg)
-    if not VERBOSE:
-        click.echo(msg)
-    if execute:
-        # TODO: Uncomment to actually make the changes.
-        # lifecycle_conf = boto3.client("s3").put_bucket_lifecycle_configuration(
-        #    Bucket=bucket_name,
-        #    LifecycleConfiguration=life_cycle
-        # )
-        click.secho("OK", fg="green")
+    # storage after 30 days. Only do this is there is not already a life cycle,
+    # otherwise warn the user.
+    if lifecycle:
+        click.secho(f"Lifecycle already exists for {name}.", fg="red")
     else:
-        click.secho("OK", fg="yellow")
+        lifecycle_id = "lifecycle_configuration"
+        msg = f"Setting lifecycle {lifecycle_id} for bucket {name}."
+        logger.info(msg)
+        if not VERBOSE:
+            click.echo("\n\n" + msg)
+        life_cycle = {
+            "Rules": [
+                {
+                    "ID": lifecycle_id,
+                    "Status": "Enabled",
+                    "Prefix": "",
+                    "NoncurrentVersionTransitions": [
+                        {"NoncurrentDays": 30, "StorageClass": "GLACIER",},
+                    ],
+                },
+            ]
+        }
+        msg = json.dumps(life_cycle)
+        logger.info(msg)
+        if not VERBOSE:
+            click.echo(msg)
+        if execute:
+            lifecycle_conf = boto3.client(
+                "s3"
+            ).put_bucket_lifecycle_configuration(
+                Bucket=name, LifecycleConfiguration=life_cycle
+            )
+            click.secho("OK", fg="green")
+        else:
+            click.secho("OK", fg="yellow")
 
 
 if __name__ == "__main__":
