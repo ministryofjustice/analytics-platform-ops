@@ -40,7 +40,9 @@ resource "aws_iam_policy" "control_panel_api" {
         "s3:CreateBucket",
         "s3:PutBucketLogging",
         "s3:PutBucketPublicAccessBlock",
-        "s3:PutEncryptionConfiguration"
+        "s3:PutEncryptionConfiguration",
+        "s3:PutBucketVersioning",
+        "s3:PutLifecycleConfiguration"
       ],
       "Resource": [
         "arn:aws:s3:::${var.env}-*"
