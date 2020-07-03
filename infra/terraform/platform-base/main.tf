@@ -62,7 +62,7 @@ module "kops_spec" {
   cluster_dns_name = "${module.cluster_dns.dns_zone_domain}"
   cluster_dns_zone = "${module.cluster_dns.dns_zone_id}"
 
-  oidc_client_id  = "${var.oidc_client_id}"
+  oidc_client_id  = "${var.kubernetes_oidc_client_id}"
   oidc_issuer_url = "${var.oidc_provider_url}"
 
   instancegroup_image = "${var.k8s_instancegroup_image}"

@@ -1,5 +1,5 @@
 # var.availability_zones is used for `count` in template_files rather than
-# a more directly appropriate property of subnets due to limitations on 
+# a more directly appropriate property of subnets due to limitations on
 # using length() with computed module outputs. See:
 # https://github.com/hashicorp/terraform/issues/12570
 
@@ -70,7 +70,7 @@ data "template_file" "nodes_instancegroup" {
     machine_type              = "${var.nodes_machine_type}"
     root_volume_size          = "${var.nodes_root_volume_size}"
     max_size                  = "${var.nodes_instancegroup_max_size}"
-    min_size                  = "${var.nodes_instancegroup_max_size}"
+    min_size                  = "${var.nodes_instancegroup_min_size}"
     subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
     taints                    = "[]"
     node_labels               = "{}"
@@ -89,7 +89,7 @@ data "template_file" "highmem_nodes_instancegroup" {
     machine_type              = "${var.highmem_nodes_machine_type}"
     root_volume_size          = "${var.highmem_nodes_root_volume_size}"
     max_size                  = "${var.highmem_nodes_instancegroup_max_size}"
-    min_size                  = "${var.highmem_nodes_instancegroup_max_size}"
+    min_size                  = "${var.highmem_nodes_instancegroup_min_size}"
     subnets                   = "  - ${join("\n  - ", var.private_subnet_availability_zones)}"
     taints                    = "\n  - dedicated=highmem:NoSchedule"
     node_labels               = "\n    node-role.kubernetes.io/highmem: \"\""
@@ -108,8 +108,8 @@ data "template_file" "bastions_instancegroup" {
     machine_type              = "${var.bastions_machine_type}"
     root_volume_size          = "${var.bastions_root_volume_size}"
     max_size                  = "${var.bastions_instancegroup_max_size}"
-    min_size                  = "${var.bastions_instancegroup_max_size}"
-    subnets                   = "  - ${join("\n  - ", var.public_subnet_availability_zones)}"
+    min_size                  = "${var.bastions_instancegroup_min_size}"
+    subnets                   = "  - dmz-${join("\n  - dmz-", var.public_subnet_availability_zones)}"
     taints                    = "[]"
     node_labels               = "{}"
   }
