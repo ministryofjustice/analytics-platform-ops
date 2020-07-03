@@ -25,6 +25,10 @@ variable "oidc_provider_url" {}
 
 variable "oidc_client_id" {}
 
+variable "kubernetes_oidc_client_id" {
+  description = "Client ID of Auth0 application used by Kubernetes cluster"
+}
+
 variable "oidc_provider_thumbprints" {
   type = "list"
 }
