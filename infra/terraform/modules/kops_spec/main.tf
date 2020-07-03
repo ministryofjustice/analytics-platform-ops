@@ -109,7 +109,7 @@ data "template_file" "bastions_instancegroup" {
     root_volume_size          = "${var.bastions_root_volume_size}"
     max_size                  = "${var.bastions_instancegroup_max_size}"
     min_size                  = "${var.bastions_instancegroup_min_size}"
-    subnets                   = "  - ${join("\n  - ", var.public_subnet_availability_zones)}"
+    subnets                   = "  - dmz-${join("\n  - dmz-", var.public_subnet_availability_zones)}"
     taints                    = "[]"
     node_labels               = "{}"
   }
