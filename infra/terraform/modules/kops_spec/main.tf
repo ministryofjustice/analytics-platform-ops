@@ -139,5 +139,12 @@ data "template_file" "kops" {
     nodes_instancegroup         = "${data.template_file.nodes_instancegroup.rendered}"
     highmem_nodes_instancegroup = "${data.template_file.highmem_nodes_instancegroup.rendered}"
     bastions_instancegroup      = "${data.template_file.bastions_instancegroup.rendered}"
+
+    kube_cpu_reserved       = "${var.kube_cpu_reserved}"
+    kube_memory_reserved    = "${var.kube_memory_reserved}"
+    kube_storage_reserved   = "${var.kube_storage_reserved}"
+    system_cpu_reserved     = "${var.system_cpu_reserved}"
+    system_memory_reserved  = "${var.system_memory_reserved}"
+    system_storage_reserved = "${var.system_storage_reserved}"
   }
 }

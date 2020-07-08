@@ -56,7 +56,15 @@ ${etcd_events_members}
     anonymousAuth: false
     authenticationTokenWebhook: true
     authorizationMode: Webhook
+    kubeReserved:
+      cpu: ${kube_cpu_reserved}
+      memory: ${kube_memory_reserved}
+      ephemeral-storage: ${kube_storage_reserved}
     readOnlyPort: 0
+    systemReserved:
+      cpu: ${system_cpu_reserved}
+      memory: ${system_memory_reserved}
+      ephemeral-storage: ${system_storage_reserved}
   kubernetesApiAccess:
   - 0.0.0.0/0
   kubernetesVersion: ${k8s_version}

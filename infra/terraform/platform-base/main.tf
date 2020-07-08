@@ -87,4 +87,11 @@ module "kops_spec" {
   bastions_instancegroup_min_size = "${var.k8s_bastions_instancegroup_min_size}"
   bastions_instancegroup_max_size = "${var.k8s_bastions_instancegroup_max_size}"
   bastions_root_volume_size       = "${var.k8s_bastions_root_volume_size}"
+
+  kube_cpu_reserved       = "${var.kube_cpu_reserved}"
+  kube_memory_reserved    = "${var.kube_memory_reserved}"
+  kube_storage_reserved   = "${var.kube_storage_reserved}"
+  system_cpu_reserved     = "${var.system_cpu_reserved}"
+  system_memory_reserved  = "${var.system_memory_reserved}"
+  system_storage_reserved = "${var.system_storage_reserved}"
 }
