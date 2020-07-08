@@ -58,3 +58,33 @@ variable "oidc_issuer_url" {}
 variable "k8s_version" {}
 variable "vpc_id" {}
 variable "vpc_cidr" {}
+
+variable "kube_cpu_reserved" {
+  description = "Amount of CPU reserved for kubernetes processes on nodes"
+  type        = "string"
+}
+
+variable "kube_memory_reserved" {
+  description = "Amount of memory reserved for kubernetes processes on nodes"
+  type        = "string"
+}
+
+variable "kube_storage_reserved" {
+  description = "Amount of Storage reserved for kubernetes processes on nodes"
+  type        = "string"
+}
+
+variable "system_cpu_reserved" {
+  description = "Amount of CPU reserved for system processes on nodes"
+  type        = "string"
+}
+
+variable "system_memory_reserved" {
+  description = "Amount of memory reserved for system processes on nodes"
+  type        = "string"
+}
+
+variable "system_storage_reserved" {
+  description = "Amount of storage reserved for system processes on nodes"
+  type        = "string"
+}
