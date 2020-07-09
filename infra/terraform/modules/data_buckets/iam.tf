@@ -113,11 +113,3 @@ resource "aws_iam_group_policy" "analysts_s3" {
 }
 EOF
 }
-
-resource "aws_iam_user" "shared_analyst" {
-  name = "${var.env}-shared-analyst"
-}
-
-resource "aws_iam_access_key" "shared_analyst" {
-  user = "${aws_iam_user.shared_analyst.name}"
-}
