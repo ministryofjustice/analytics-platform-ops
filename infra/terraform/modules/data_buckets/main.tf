@@ -20,14 +20,6 @@ output "scratch_bucket_id" {
   value = "${aws_s3_bucket.scratch.id}"
 }
 
-output "shared_analyst_access_key_id" {
-  value = "${aws_iam_access_key.shared_analyst.id}"
-}
-
-output "shared_analyst_access_key_secret" {
-  value = "${aws_iam_access_key.shared_analyst.secret}"
-}
-
 # CREST bucket
 
 output "crest_bucket_arn" {
