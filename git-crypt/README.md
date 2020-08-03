@@ -2,17 +2,34 @@
 
 Some AP repositories have git-crypt enabled. This doc describes how we add and remove users, and has associated scripts.
 
+## Understanding git-crypt
+
+A repo that has been git-crypt'd should have in its repo:
+
+* `.gitattributes` - defines which files should be encrypted
+* `.git-crypt/keys/default/0/*.gpg` - .gpg file for every user (Each .gpg file is the repo's symmetric encryption key, which has been encrypted for a particular user with their individual public key. The filename is the user key's fingerprint.)
+
+To identify users with current access, look at the git history for the .gpg files:
+
+    pushd .git-crypt/keys/default/0; for file in *.gpg; do echo "${file} : " && git log -- ${file} | sed -n 9p; done; popd
+
+When you `git-crypt unlock` the repo, you are decrypting your `.git-crypt/keys/default/0/xyz.gpg` file with your private key, to get the repo's symmetric key, which is saved here, in your local-only .git folder:
+
+* `.git/git-crypt/keys/default`
+
+That symmetric key is then used to decrypt the relevant files.
+
 ## Decrypting the secrets
 
 These steps allow you to decrypt the encrypted files of a git-crypt'd repository.
 
-1. Get your gpg key added to the repo - see [below](#adding-someones-gpg-key-to-this-repo).
+1. Get your GPG key added to the repo - see [below](#adding-someones-gpg-key-to-this-repo).
 
 2. Install git-crypt. On MacOS:
 
        brew install git-crypt
 
-3. Pull the repo, so that it is the version with your newly added gpg key:
+3. Pull the repo, so that it is the version with your newly added GPG key:
 
        cd analytics-platform-config  # or whatever the repo is called
        git pull
@@ -21,7 +38,7 @@ These steps allow you to decrypt the encrypted files of a git-crypt'd repository
 
        git-crypt unlock
 
-   If this fails, it might be because your gpg key requires a pass-phrase, but there is a problem with the pinentry-program. Check your gpg-agent daemon. I had to correct `~/.gnupg/gpg-agent.conf` to point to the correct `pinentry` binary, then killed the gpg-agent process and restarted it with: `gpg-agent --daemon /bin/sh`.
+   If this fails, it might be because your GPG key requires a pass-phrase, but there is a problem with the pinentry-program. Check your gpg-agent daemon. I had to correct `~/.gnupg/gpg-agent.conf` to point to the correct `pinentry` binary, then killed the gpg-agent process and restarted it with: `gpg-agent --daemon /bin/sh`.
 
 ## Adding someone's GPG key to the repo
 
@@ -29,28 +46,36 @@ To enable someone to decrypt the git-crypt'd repo, we add their GPG key.
 
 What's going on: When you "add their GPG key", it will take the repo's root key, encrypt it with the user's public GPG key and store the resulting .gpg file in this repo (in `.git-crypt/keys/default/0/`). When that user types `git-crypt unlock`, then it will decrypt that .gpg file, using their private GPG key, to get the repo's root key (storing it as `.git/git-crypt/keys/default`) and then it will use that to decrypt the repo's files.
 
-1. If the person does not have a personal GPG key pair, ask them to create one - see: <https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key#generating-a-gpg-key>
+1. You need the person's public key on your GPG keyring. To check if you have it already:
 
-2. Ask the person to export their GPG public key like this:
+       gpg --list-keys
+
+   If you have it, skip to step 9.
+
+2. To get a person's key onto your GPG keyring, you need to download their key first. It might be in our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys) or available from [Keybase](https://github.com/ministryofjustice/analytical-platform-public-keys/blob/main/keybase_keys.md). If so, download it and skip to step 7.
+
+3. If the person does not have a personal GPG key pair, ask them to create one - see: <https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key#generating-a-gpg-key>
+
+4. Ask the person to export their GPG public key like this:
 
        gpg --armor --export alice@cyb.org >alice.asc
 
-3. Once you receive the file, save it on your disk e.g. /tmp/alice.asc
+5. Once you receive the file, save it on your disk e.g. /tmp/alice.asc
 
-4. It's helpful to save add it to our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys) so that next time the person rotating the repo key don't have to ask for everyones' keys again. Ask for the user's their consent first.
+6. It's helpful to save add it to our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys) so that next time the person rotating the repo key don't have to ask for everyones' keys again. Ask for the user's their consent first.
 
-5. Import it into your GPG keyring:
+7. Import the person's public key onto your GPG keyring:
 
        gpg --import /tmp/alice.asc
 
-6. Tell GPG that you trust the key and sign it:
+8. Tell GPG that you trust the key and sign it:
 
-       gpg --edit-key "alice@cyb.org" trust sign quit
+       gpg --edit-key "alice@cyb.org" trust sign save quit
          # 4
          # y
          # you will need to type your own passphrase
 
-7. Confirm that '[  full  ]' is shown when you list it:
+9. Confirm that '[  full  ]' is shown when you list it (i.e. it is trusted and signed):
 
        $ gpg --list-keys
        pub   rsa4096 2015-02-05 [SC]
@@ -58,15 +83,22 @@ What's going on: When you "add their GPG key", it will take the repo's root key,
        uid           [  full  ] alice  <alice@cyb.org>
        sub   rsa4096 2015-02-05 [E]
 
-8. In this repo, make sure you're on a master branch, with no outstanding changes, and add the key to the .git-crypt directory:
+10. In this repo, make sure you're on the main/master branch, with no outstanding changes, and add the key to the repo:
 
        cd analytics-platform-config  # or whatever the repo is called
        git status
        git-crypt add-gpg-user alice@cyb.org
 
-9. The change is already committed, so simply:
+11. The change is already committed (a new .gpg file in .git-crypt), so now do:
 
        git push
+
+12. Invite the user to decrypt the repo, for example:
+
+        I've added your key to the repo in a commit (to the main branch), so you should be able to successfully unlock the encrypted files now:
+
+            git pull
+            git-crypt unlock
 
 ## Removing users
 
@@ -79,7 +111,7 @@ To remove a user's access to a git-crypt'd repo:
 
 You need to remove an old user's .gpg file from the repo, not just from master, but all previous commits, including branches. This prevents them from checking out this repo, getting their .gpg file, which they can decrypt to give them the repo's (symmetric) root key, which could decrypt the rest of the repo.
 
-1. Identify the users with current access, by looking at the git history for the .gpg keys:
+1. Identify the users with current access, by looking at the git history for the .gpg files:
 
        pushd .git-crypt/keys/default/0; for file in *.gpg; do echo "${file} : " && git log -- ${file} | sed -n 9p; done; popd
 
@@ -91,13 +123,18 @@ You need to remove an old user's .gpg file from the repo, not just from master, 
        $ bfg --version
        bfg 1.13.0
 
-3. Temporarily delete branch protection rules. Record what they were first! For example, the config repo has a "Branch protection rule" for master that ensures no direct pushes and requires a PR has at least 1 review. See: <https://github.com/ministryofjustice/analytics-platform-config/settings/branches>
+3. Temporarily relax the branch protection rules, so that you can push directly to main. On the GitHub page for the repo, go to Settings | Branches (e.g. <https://github.com/ministryofjustice/analytics-platform-config/settings/branches>). If there is a rule for `main`, edit it. Record what the settings are first! You don't need to delete the rule entirely - you just need these settings:
+
+       * ☐ Include administrators
+       * ☒ Allow force pushes
+
+   Now select 'Save changes'.
 
 4. Get a fresh clone of the repo using the --mirror option, so that you get all the branches too. e.g.
 
        cd /tmp
        git clone --mirror git@github.com:ministryofjustice/analytics-platform-config.git
-       cd analytics-platform-config
+       cd analytics-platform-config.git
 
 5. For each user you want to remove, you need to delete their .gpg file in this freshly cloned repo. e.g. to delete two users:
 
@@ -176,7 +213,7 @@ Having deleted old users in the previous section, you must now also create a fre
 
        ~/ap/analytics-platform-ops/git-crypt/rotate-gpg-keys.sh
 
-   For the git repo in the current directory, this script will re-initialize git-crypt with a new secret and re-add all the gpg keys. It does the work in a temporary directory, pulling the changes into the current directory at the end - so if the script fails half way through, the current directory is left unchanged, and the script can simply be rerun.
+   For the git repo in the current directory, this script will re-initialize git-crypt with a new secret and re-add all the GPG keys. It does the work in a temporary directory, pulling the changes into the current directory at the end - so if the script fails half way through, the current directory is left unchanged, and the script can simply be rerun.
 
 6. Push the changes to the remote:
 
