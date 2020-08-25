@@ -52,48 +52,44 @@ What's going on: When you "add their GPG key", it will take the repo's root key,
 
    If you have it, skip to step 9.
 
-2. To get a person's key onto your GPG keyring, you need to download their key first. It might be in our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys) or available from [Keybase](https://github.com/ministryofjustice/analytical-platform-public-keys/blob/main/keybase_keys.md). If so, download it and skip to step 7.
+2. To get a person's key onto your GPG keyring, you need to download their key first. First see if it is added to their GitHub profile e.g.:
 
-3. If the person does not have a personal GPG key pair, ask them to create one - see: <https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key#generating-a-gpg-key>
+       GITHUB_USER=davidread curl -s https://api.github.com/users/$GITHUB_USER/gpg_keys | jq -r '.[0].raw_key'
 
-4. Ask the person to export their GPG public key like this:
+   Otherwise it might be in our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys), although we're trying to use GitHub as the directory now.
 
-       gpg --armor --export alice@cyb.org >alice.asc
+   If you don't find the key, ask the user to [create a GPG key pair](https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key#generating-a-gpg-key) and [add their GPG key pair to their GitHub account](https://docs.github.com/en/articles/adding-a-new-gpg-key-to-your-github-account).
 
-5. Once you receive the file, save it on your disk e.g. /tmp/alice.asc
-
-6. It's helpful to save add it to our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys) so that next time the person rotating the repo key don't have to ask for everyones' keys again. Ask for the user's their consent first.
-
-7. Import the person's public key onto your GPG keyring:
+3. Import the person's public key onto your GPG keyring:
 
        gpg --import /tmp/alice.asc
 
-8. Tell GPG that you trust the key and sign it:
+4. Tell GPG that you trust the key and sign it:
 
-       gpg --edit-key "alice@cyb.org" trust sign save quit
+       gpg --edit-key "alice.smith@digital.justice.gov.uk" trust sign save quit
          # 4
          # y
          # you will need to type your own passphrase
 
-9. Confirm that '[  full  ]' is shown when you list it (i.e. it is trusted and signed):
+5. Confirm that '[  full  ]' is shown when you list it (i.e. it is trusted and signed):
 
        $ gpg --list-keys
        pub   rsa4096 2015-02-05 [SC]
              17818CFB47FFFC384F0CC
-       uid           [  full  ] alice  <alice@cyb.org>
+       uid           [  full  ] alice  <alice.smith@digital.justice.gov.uk>
        sub   rsa4096 2015-02-05 [E]
 
-10. In this repo, make sure you're on the main/master branch, with no outstanding changes, and add the key to the repo:
+6. In this repo, make sure you're on the main/master branch, with no outstanding changes, and add the key to the repo:
 
        cd analytics-platform-config  # or whatever the repo is called
        git status
-       git-crypt add-gpg-user alice@cyb.org
+       git-crypt add-gpg-user alice.smith@digital.justice.gov.uk
 
-11. The change is already committed (a new .gpg file in .git-crypt), so now do:
+7. The change is already committed (a new .gpg file in .git-crypt), so now do:
 
        git push
 
-12. Invite the user to decrypt the repo, for example:
+8. Invite the user to decrypt the repo, for example:
 
         I've added your key to the repo in a commit (to the main branch), so you should be able to successfully unlock the encrypted files now:
 
@@ -198,7 +194,11 @@ Having deleted old users in the previous section, you must now also create a fre
 
        gpg --list-keys |grep '^ '|sort
 
-   If a current user is not on your GPG keyring you need to get hold of their public key. They might already be in the [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys). Otherwise you need to [ask them for their public GPG key](#adding-someones-gpg-key-to-the-repo). Now [add their key to your keychain and trust it](#adding-someones-gpg-key-to-the-repo).
+   If a current user is not on your GPG keyring you need to get hold of their public key. Hopefully their key is added to their GitHub profile e.g.:
+
+       GITHUB_USER=davidread curl -s https://api.github.com/users/$GITHUB_USER/gpg_keys | jq -r '.[0].raw_key'
+
+   Otherwise it might be in our [repo of public keys](https://github.com/ministryofjustice/analytical-platform-public-keys). Otherwise you need to ask them to [add their GPG key pair to their GitHub account](https://docs.github.com/en/articles/adding-a-new-gpg-key-to-your-github-account). Now [add their key to your keychain and trust it](#adding-someones-gpg-key-to-the-repo).
 
 3. Create a branch for this change:
 
