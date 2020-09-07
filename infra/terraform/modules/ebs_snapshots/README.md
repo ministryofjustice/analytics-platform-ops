@@ -28,7 +28,6 @@ Parameters
 | ------------------------------------ | ------------ | ----------------------------------------- |
 | `name`                (**Required**) | `string`     | The common name given to resources        |
 | `target_tags`         (**Required**) | `map`        | The DLM will take a snapshot of all EBS volumes with any of these target tags |
-| `env`                 (**Required**) | `string`     | Environment name. It will added to the DLM description |
 | `tags`                (**Required**) | `map`        | Tags to attach to resources |
 | `schedule_interval`                  | `int`        | The interval at which the dlm will run (**default `12`**) |
 | `schedule_interval_unit`             | `string`     | The unit of time that applies to the schedule interval (**default `HOURS`**) |

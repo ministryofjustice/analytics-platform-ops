@@ -15,7 +15,6 @@ provider "aws" {
 module "user_nfs_softnas" {
   source = "../modules/user_nfs_softnas"
 
-  env                       = "${terraform.workspace}"
   num_instances             = "${var.softnas_num_instances}"
   softnas_ami_id            = "${var.softnas_ami_id}"
   instance_type             = "${var.softnas_instance_type}"
@@ -38,9 +37,11 @@ module "ebs_snapshots" {
   source = "../modules/ebs_snapshots"
 
   name = "${terraform.workspace}-dlm"
-  env  = "${terraform.workspace}"
 
-  target_tags = { env = "${terraform.workspace}" }
+  target_tags = {
+    env = "${terraform.workspace}"
+  }
+
   tags = "${var.tags}"
 }
 
@@ -65,27 +66,22 @@ module "concourse_parameter_user" {
   source = "../modules/user_get_parameter"
 
   user_name = "concourse"
-  env       = "${terraform.workspace}"
 }
 
 module "data_backup" {
   source = "../modules/data_backup"
 
-  env                 = "${terraform.workspace}"
   k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}"
   logs_bucket_arn     = "${data.terraform_remote_state.global.s3_logs_bucket_name}"
 }
 
 module "container_registry" {
   source = "../modules/container_registry"
-
-  env = "${terraform.workspace}"
 }
 
 module "control_panel_api" {
   source = "../modules/control_panel_api"
 
-  env                        = "${terraform.workspace}"
   db_username                = "${var.control_panel_api_db_username}"
   db_password                = "${var.control_panel_api_db_password}"
   k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}"
@@ -171,7 +167,6 @@ module "cluster_autoscaler" {
 module "buckets_archiver" {
   source = "../modules/buckets_archiver"
 
-  env                 = "${terraform.workspace}"
   name                = "${terraform.workspace}-archived-buckets-data"
   logging_bucket_name = "${data.terraform_remote_state.global.s3_logs_bucket_name}"
   expiration_days     = 183                                                                                                                                                        # 6 months

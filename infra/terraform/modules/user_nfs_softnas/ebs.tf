@@ -21,7 +21,7 @@ resource "aws_ebs_volume" "softnas_vol1" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol1",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-vol1",
   ), var.tags)}"
 }
 
@@ -34,7 +34,7 @@ resource "aws_ebs_volume" "softnas_vol2" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol2",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-vol2",
   ), var.tags)}"
 }
 
@@ -46,7 +46,7 @@ resource "aws_ebs_volume" "softnas_vol3" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol3",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-vol3",
   ), var.tags)}"
 }
 
@@ -59,7 +59,7 @@ resource "aws_ebs_volume" "softnas_vol4" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol4",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-vol4",
   ), var.tags)}"
 }
 
@@ -71,7 +71,7 @@ resource "aws_ebs_volume" "softnas_vol5" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol5",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-vol5",
   ), var.tags)}"
 }
 
@@ -84,7 +84,7 @@ resource "aws_ebs_volume" "softnas_vol6" {
   size              = "1024"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-vol6",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-vol6",
   ), var.tags)}"
 }
 
@@ -100,7 +100,7 @@ resource "aws_ebs_volume" "softnas_1_vol7" {
   encrypted         = true
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-1-vol7",
+    "Name", "${terraform.workspace}-${var.name_identifier}-1-vol7",
   ), var.tags)}"
 }
 

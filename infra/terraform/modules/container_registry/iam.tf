@@ -1,5 +1,5 @@
 resource "aws_iam_user" "jenkinsci" {
-  name = "${var.env}-jenkinsci"
+  name = "${terraform.workspace}-jenkinsci"
 }
 
 resource "aws_iam_access_key" "jenkinsci" {
@@ -7,7 +7,7 @@ resource "aws_iam_access_key" "jenkinsci" {
 }
 
 resource "aws_iam_user_policy" "jenkinsci" {
-  name = "${var.env}-jenkinsci"
+  name = "${terraform.workspace}-jenkinsci"
   user = "${aws_iam_user.jenkinsci.name}"
 
   policy = <<EOF

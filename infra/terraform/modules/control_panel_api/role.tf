@@ -1,5 +1,5 @@
 resource "aws_iam_role" "control_panel_api" {
-  name        = "${var.env}_control_panel_api"
+  name        = "${terraform.workspace}_control_panel_api"
   description = "IAM role assumed by the Control Panel API"
 
   assume_role_policy = <<EOF
@@ -27,7 +27,7 @@ EOF
 }
 
 resource "aws_iam_policy" "control_panel_api" {
-  name = "${var.env}_control_panel_api"
+  name = "${terraform.workspace}_control_panel_api"
 
   policy = <<EOF
 {
@@ -45,7 +45,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "s3:PutLifecycleConfiguration"
       ],
       "Resource": [
-        "arn:aws:s3:::${var.env}-*"
+        "arn:aws:s3:::${terraform.workspace}-*"
       ]
     },
     {
@@ -56,7 +56,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "s3:PutBucketTagging"
       ],
       "Resource": [
-        "arn:aws:s3:::${var.env}-*"
+        "arn:aws:s3:::${terraform.workspace}-*"
       ]
     },
     {
@@ -66,7 +66,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:CreatePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:policy/${var.env}-*"
+        "arn:aws:iam::${var.account_id}:policy/${terraform.workspace}-*"
       ]
     },
     {
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:DeletePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:policy/${var.env}-*"
+        "arn:aws:iam::${var.account_id}:policy/${terraform.workspace}-*"
       ]
     },
     {
@@ -99,8 +99,8 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:AttachRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
-        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_app_*"
       ]
     },
     {
@@ -110,8 +110,8 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:CreateRole"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
-        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_app_*"
       ]
     },
     {
@@ -126,8 +126,8 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:DeleteRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
-        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_app_*"
       ]
     },
     {
@@ -137,8 +137,8 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:GetRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
-        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_app_*"
       ]
     },
     {
@@ -148,8 +148,8 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:PutRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:role/${var.env}_user_*",
-        "arn:aws:iam::${var.account_id}:role/${var.env}_app_*"
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_user_*",
+        "arn:aws:iam::${var.account_id}:role/${terraform.workspace}_app_*"
       ]
     },
     {
@@ -175,7 +175,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "ssm:AddTagsToResource"
       ],
       "Resource": [
-        "arn:aws:ssm:*:${var.account_id}:parameter/${var.env}*"
+        "arn:aws:ssm:*:${var.account_id}:parameter/${terraform.workspace}*"
       ]
     },
     {
@@ -205,7 +205,7 @@ resource "aws_iam_policy" "control_panel_api" {
         "iam:AttachRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${var.account_id}:policy/${var.env}/group/*"
+        "arn:aws:iam::${var.account_id}:policy/${terraform.workspace}/group/*"
       ]
     }
   ]

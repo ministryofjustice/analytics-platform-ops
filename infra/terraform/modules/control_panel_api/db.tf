@@ -1,10 +1,10 @@
 resource "aws_db_subnet_group" "control_panel_db" {
-  name       = "${var.env}_control_panel_db"
+  name       = "${terraform.workspace}_control_panel_db"
   subnet_ids = ["${var.db_subnet_ids}"]
 }
 
 resource "aws_security_group" "control_panel_db" {
-  name   = "${var.env}_control_panel_db"
+  name   = "${terraform.workspace}_control_panel_db"
   vpc_id = "${var.vpc_id}"
 
   ingress {
@@ -16,7 +16,7 @@ resource "aws_security_group" "control_panel_db" {
 }
 
 resource "aws_db_instance" "control_panel_db" {
-  identifier                 = "${var.env}-control-panel-db"
+  identifier                 = "${terraform.workspace}-control-panel-db"
   storage_type               = "${var.storage_type}"
   allocated_storage          = "${var.allocated_storage}"
   engine                     = "postgres"

@@ -1,8 +1,3 @@
-variable "env" {
-  type        = "string"
-  description = "environment name"
-}
-
 variable "name" {
   type        = "string"
   description = "name of the 'archived buckets' bucket"
