@@ -41,13 +41,6 @@ module "mojanalytics_concourse_iam_list_roles_user" {
   system_name = "concourse"
 }
 
-// Empty Placeholder variable to be overrided when using the lambda_mgmt module
-variable "environment_variables" {
-  type = "map"
-
-  default = {}
-}
-
 // Backup etcd volumes attached to kubernetes masters -->
 
 // Create Snapshot policy document
