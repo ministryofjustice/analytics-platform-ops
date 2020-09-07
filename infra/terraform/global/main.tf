@@ -15,7 +15,7 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "aws_account_logging" {
-  source = "../modules/aws_account_logging"
+  source = "./modules/aws_account_logging"
 
   es_domain   = "${var.es_domain}"
   es_port     = "${var.es_port}"
@@ -36,7 +36,7 @@ module "aws_account_logging" {
 }
 
 module "mojanalytics_concourse_iam_list_roles_user" {
-  source      = "../modules/iam_list_roles"
+  source      = "./modules/iam_list_roles"
   org_name    = "mojanalytics"
   system_name = "concourse"
 }
@@ -56,7 +56,7 @@ data "archive_file" "kubernetes_etcd_ebs_snapshot_code" {
 }
 
 module "kubernetes_etcd_ebs_snapshot" {
-  source                = "../modules/lambda_mgmt"
+  source                = "./modules/lambda_mgmt"
   lambda_function_name  = "create_etcd_ebs_snapshot"
   zipfile               = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
   handler               = "create_etcd_ebs_snapshot"
@@ -79,7 +79,7 @@ data "archive_file" "kubernetes_prune_ebs_snapshots_code" {
 }
 
 module "kubernetes_prune_ebs_snapshots" {
-  source                = "../modules/lambda_mgmt"
+  source                = "./modules/lambda_mgmt"
   lambda_function_name  = "prune_ebs_snapshots"
   zipfile               = "assets/prune_ebs_snapshots/prune_ebs_snapshots.zip"
   handler               = "prune_ebs_snapshots"
@@ -89,7 +89,7 @@ module "kubernetes_prune_ebs_snapshots" {
 }
 
 module "ses_domain" {
-  source = "../modules/ses_domain"
+  source = "./modules/ses_domain"
   domain = "${var.platform_root_domain}"
 
   aws_route53_zone_id = "${aws_route53_zone.platform_zone.zone_id}"
