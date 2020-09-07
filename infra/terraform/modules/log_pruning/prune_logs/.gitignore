@@ -1,9 +1,0 @@
-*.dist-info
-*.egg-info
-*.so
-certifi
-click
-curator
-elasticsearch
-urllib3
-yaml

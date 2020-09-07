@@ -35,28 +35,6 @@ module "aws_account_logging" {
   vpc_id = "${var.vpc_id}"
 }
 
-module "log_pruning" {
-  source = "../modules/log_pruning"
-
-  curator_conf = <<EOF
-- name: main
-  endpoint: ${var.es_scheme}://${var.es_username}:${var.es_password}@${var.es_domain}:${var.es_port}
-  indices:
-    - prefix: s3logs-
-      days: 30
-    - prefix: cloudtrail-
-      days: 30
-    - prefix: logstash-dev-
-      days: 2
-    - prefix: logstash-apps-dev-
-      days: 2
-    - prefix: logstash-alpha-
-      days: 30
-    - prefix: logstash-apps-alpha-
-      days: 30
-EOF
-}
-
 module "mojanalytics_concourse_iam_list_roles_user" {
   source      = "../modules/iam_list_roles"
   org_name    = "mojanalytics"
