@@ -12,12 +12,6 @@ provider "aws" {
   version = "~> 2.45"
 }
 
-module "data_buckets" {
-  source = "../modules/data_buckets"
-
-  env = "${terraform.workspace}"
-}
-
 module "user_nfs_softnas" {
   source = "../modules/user_nfs_softnas"
 
@@ -46,10 +40,7 @@ module "ebs_snapshots" {
   name = "${terraform.workspace}-dlm"
   env  = "${terraform.workspace}"
 
-  target_tags = {
-    env = "${terraform.workspace}"
-  }
-
+  target_tags = { env = "${terraform.workspace}" }
   tags = "${var.tags}"
 }
 
@@ -83,22 +74,6 @@ module "data_backup" {
   env                 = "${terraform.workspace}"
   k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.platform_root_domain}"
   logs_bucket_arn     = "${data.terraform_remote_state.global.s3_logs_bucket_name}"
-}
-
-module "encrypt_scratch_lambda_function" {
-  source = "../modules/lambda_functions"
-
-  env        = "${terraform.workspace}"
-  bucket_id  = "${module.data_buckets.scratch_bucket_id}"
-  bucket_arn = "${module.data_buckets.scratch_bucket_arn}"
-}
-
-module "encrypt_crest_lambda_function" {
-  source = "../modules/lambda_functions"
-
-  env        = "${terraform.workspace}"
-  bucket_id  = "${module.data_buckets.crest_bucket_id}"
-  bucket_arn = "${module.data_buckets.crest_bucket_arn}"
 }
 
 module "container_registry" {
