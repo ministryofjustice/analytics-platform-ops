@@ -1,10 +1,10 @@
 resource "aws_key_pair" "softnas" {
-  key_name   = "${var.env}-${var.name_identifier}"
+  key_name   = "${terraform.workspace}-${var.name_identifier}"
   public_key = "${var.ssh_public_key}"
 }
 
 resource "aws_security_group" "softnas" {
-  name        = "${var.env}-${var.name_identifier}"
+  name        = "${terraform.workspace}-${var.name_identifier}"
   description = "Allow NFS from cluster and HTTP from SSH bastions"
   vpc_id      = "${var.vpc_id}"
 
@@ -58,7 +58,7 @@ resource "aws_security_group" "softnas" {
   }
 
   tags = "${merge(map(
-    "Name", "${var.env}-softnas",
+    "Name", "${terraform.workspace}-softnas",
   ), var.tags)}"
 }
 
@@ -69,7 +69,7 @@ resource "aws_network_interface" "softnas_eth0" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-eth0",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-eth0",
   ), var.tags)}"
 }
 
@@ -83,7 +83,7 @@ resource "aws_network_interface" "softnas_eth1" {
   count = "${var.num_instances}"
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}-eth1",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}-eth1",
   ), var.tags)}"
 }
 
@@ -107,6 +107,6 @@ resource "aws_instance" "softnas" {
   }
 
   tags = "${merge(map(
-    "Name", "${var.env}-${var.name_identifier}-${count.index}",
+    "Name", "${terraform.workspace}-${var.name_identifier}-${count.index}",
   ), var.tags)}"
 }

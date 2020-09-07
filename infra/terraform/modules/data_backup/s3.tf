@@ -1,10 +1,10 @@
 resource "aws_s3_bucket" "nfs_backup" {
-  bucket = "${var.env}-moj-analytics-nfs-backup"
+  bucket = "${terraform.workspace}-moj-analytics-nfs-backup"
   region = "${data.aws_region.current.name}"
   acl    = "private"
 
   tags {
-    Name = "${var.env}-moj-analytics-nfs-backup"
+    Name = "${terraform.workspace}-moj-analytics-nfs-backup"
   }
 
   versioning {
@@ -13,7 +13,7 @@ resource "aws_s3_bucket" "nfs_backup" {
 
   logging {
     target_bucket = "${var.logs_bucket_arn}"
-    target_prefix = "${var.env}-moj-analytics-nfs-backup/"
+    target_prefix = "${terraform.workspace}-moj-analytics-nfs-backup/"
   }
 
   # Current object versions transition to Glacier after 30 days
@@ -24,7 +24,7 @@ resource "aws_s3_bucket" "nfs_backup" {
   # deleted after 30
 
   lifecycle_rule {
-    id                                     = "${var.env}-nfs-backup-transition"
+    id                                     = "${terraform.workspace}-nfs-backup-transition"
     abort_incomplete_multipart_upload_days = 1
     enabled                                = true
 

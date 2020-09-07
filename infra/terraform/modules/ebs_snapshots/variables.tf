@@ -41,11 +41,6 @@ variable "lifecycle_state" {
   description = "Whether or not to enable the DLM"
 }
 
-variable "env" {
-  type        = "string"
-  description = "environment name (env tag of DLM)"
-}
-
 variable "tags" {
   type        = "map"
   description = "Tags to attach to resources"

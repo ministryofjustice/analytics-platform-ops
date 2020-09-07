@@ -1,5 +1,5 @@
 resource "aws_iam_role" "buckets_archiver" {
-  name        = "${var.env}_buckets_archiver"
+  name        = "${terraform.workspace}_buckets_archiver"
   description = "IAM role assumed by the buckets archiver"
 
   tags = "${var.tags}"
@@ -34,7 +34,7 @@ resource "aws_iam_role_policy_attachment" "buckets_archiver" {
 }
 
 resource "aws_iam_policy" "buckets_archiver" {
-  name = "${var.env}_buckets_archiver"
+  name = "${terraform.workspace}_buckets_archiver"
 
   policy = <<EOF
 {
@@ -57,7 +57,7 @@ resource "aws_iam_policy" "buckets_archiver" {
             "s3:ListBucket"
         ],
         "Resource": [
-            "arn:aws:s3:::${var.env}-*"
+            "arn:aws:s3:::${terraform.workspace}-*"
         ]
     },
     {
@@ -68,7 +68,7 @@ resource "aws_iam_policy" "buckets_archiver" {
           "s3:DeleteObject"
       ],
       "Resource": [
-        "arn:aws:s3:::${var.env}-*/*"
+        "arn:aws:s3:::${terraform.workspace}-*/*"
       ]
     },
     {
@@ -88,7 +88,7 @@ resource "aws_iam_policy" "buckets_archiver" {
           "s3:DeleteBucket"
       ],
       "Resource": [
-          "arn:aws:s3:::${var.env}-*"
+          "arn:aws:s3:::${terraform.workspace}-*"
       ]
     }
   ]
