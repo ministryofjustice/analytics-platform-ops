@@ -60,6 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "health_monitoring" {
 
   namespace           = "AWS/EC2"
   metric_name         = "StatusCheckFailed"
+  statistic           = "Sum"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = "2"
   period              = "${var.period}"
