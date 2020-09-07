@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_threshold" {
   statistic           = "Average"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = "${var.cpu_threshold}"
-  evaluation_periods              = "${var.period}"
+  period              = "${var.period}"
   evaluation_periods  = "${var.evaluation_periods}"
   datapoints_to_alarm = "${var.datapoints_to_alarm}"
   treat_missing_data  = "breaching"
