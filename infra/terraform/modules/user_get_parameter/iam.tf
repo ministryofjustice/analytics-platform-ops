@@ -1,5 +1,5 @@
 resource "aws_iam_user" "parameter_user" {
-  name = "${var.env}_${var.user_name}_parameter_readonly"
+  name = "${terraform.workspace}_${var.user_name}_parameter_readonly"
   path = "/parameter/"
 }
 
@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "parameter_readonly_document" {
     effect = "Allow"
 
     resources = [
-      "arn:aws:ssm:*:*:parameter/${var.env}/webapp/*",
+      "arn:aws:ssm:*:*:parameter/${terraform.workspace}/webapp/*",
     ]
   }
 
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "parameter_readonly_document" {
 }
 
 resource "aws_iam_policy" "parameter_readonly_policy" {
-  name   = "${var.env}_${var.user_name}_parameter_roles_readonly"
+  name   = "${terraform.workspace}_${var.user_name}_parameter_roles_readonly"
   path   = "/parameter/"
   policy = "${data.aws_iam_policy_document.parameter_readonly_document.json}"
 }

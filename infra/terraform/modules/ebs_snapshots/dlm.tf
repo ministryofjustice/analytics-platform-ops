@@ -1,5 +1,5 @@
 resource "aws_dlm_lifecycle_policy" "dlm_lifecycle" {
-  description = "DLM Lifecycle Policy to take periodic EBS snapshots - ${var.env}"
+  description = "DLM Lifecycle Policy to take periodic EBS snapshots - ${terraform.workspace}"
   state       = "${var.lifecycle_state}"
 
   execution_role_arn = "${aws_iam_role.dlm_role.arn}"

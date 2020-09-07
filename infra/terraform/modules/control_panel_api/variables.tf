@@ -1,4 +1,3 @@
-variable "env" {}
 variable "vpc_id" {}
 variable "account_id" {}
 

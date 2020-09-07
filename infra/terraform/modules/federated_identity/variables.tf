@@ -1,7 +1,6 @@
-variable "env" {}
-
-# Auth0 tenant URLs MUST end with a trailing slash
-variable "oidc_provider_url" {}
+variable "oidc_provider_url" {
+  description = "Provider URL. Must end with a trailing slash"
+}
 
 variable "oidc_client_id" {}
 
