@@ -65,10 +65,14 @@ module "ppas_workforce_planning_upload_user" {
 module "lookup_upload_user" {
   source = "../modules/data_bucket_upload_user"
 
-  upload_bucket_arn = "${aws_s3_bucket.lookups.arn}"
+  upload_bucket_arn = "${data.aws_s3_bucket.lookups.arn}"
   system_name       = "lookup"
 }
 
 data "aws_s3_bucket" "uploads" {
   bucket = "mojap-land"
+}
+
+data "aws_s3_bucket" "lookups" {
+  bucket = "moj-analytics-lookup-tables"
 }
