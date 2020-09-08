@@ -13,10 +13,6 @@ variable "es_scheme" {
   default = "https"
 }
 
-variable "uploads_bucket_name" {
-  default = "mojap-land"
-}
-
 variable "lookups_bucket_name" {
   default = "moj-analytics-lookup-tables"
 }
