@@ -3,9 +3,9 @@ resource "null_resource" "vpcflowlogs_install_deps" {
     command = "${path.module}/vpcflowlogs/build.sh"
   }
 
-  triggers {
-    force_rebuild = "${timestamp()}"
-  }
+#   triggers {
+#     force_rebuild = "${timestamp()}"
+#   }
 }
 
 data "archive_file" "vpcflowlogs_zip" {
