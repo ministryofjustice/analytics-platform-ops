@@ -2,9 +2,7 @@
 
 // Create Snapshot policy document
 data "template_file" "lambda_create_snapshot_policy" {
-  template = file(
-    "assets/create_etcd_ebs_snapshot/lambda_create_snapshot_policy.json",
-  )
+  template = "${file("assets/create_etcd_ebs_snapshot/lambda_create_snapshot_policy.json")}"
 }
 
 // Lambda requires that we zip the distribution in order to deploy it
@@ -19,15 +17,15 @@ module "kubernetes_etcd_ebs_snapshot" {
   lambda_function_name  = "create_etcd_ebs_snapshot"
   zipfile               = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
   handler               = "create_etcd_ebs_snapshot"
-  source_code_hash      = data.archive_file.kubernetes_etcd_ebs_snapshot_code.output_base64sha256
-  lamda_policy          = data.template_file.lambda_create_snapshot_policy.rendered
-  environment_variables = var.create_etcd_ebs_snapshot_env_vars
+  source_code_hash      = "${data.archive_file.kubernetes_etcd_ebs_snapshot_code.output_base64sha256}"
+  lamda_policy          = "${data.template_file.lambda_create_snapshot_policy.rendered}"
+  environment_variables = "${var.create_etcd_ebs_snapshot_env_vars}"
 }
 
 // Prune snapshots -->
 
 data "template_file" "lambda_prune_ebs_snapshots_policy" {
-  template = file("assets/prune_ebs_snapshots/prune_ebs_snapshots_policy.json")
+  template = "${file("assets/prune_ebs_snapshots/prune_ebs_snapshots_policy.json")}"
 }
 
 // Lambda requires that we zip the distribution in order to deploy it
@@ -42,8 +40,8 @@ module "kubernetes_prune_ebs_snapshots" {
   lambda_function_name  = "prune_ebs_snapshots"
   zipfile               = "assets/prune_ebs_snapshots/prune_ebs_snapshots.zip"
   handler               = "prune_ebs_snapshots"
-  source_code_hash      = data.archive_file.kubernetes_prune_ebs_snapshots_code.output_base64sha256
-  lamda_policy          = data.template_file.lambda_prune_ebs_snapshots_policy.rendered
-  environment_variables = var.prune_etcd_ebs_snapshot_env_vars
+  source_code_hash      = "${data.archive_file.kubernetes_prune_ebs_snapshots_code.output_base64sha256}"
+  lamda_policy          = "${data.template_file.lambda_prune_ebs_snapshots_policy.rendered}"
+  environment_variables = "${var.prune_etcd_ebs_snapshot_env_vars}"
 }
 
