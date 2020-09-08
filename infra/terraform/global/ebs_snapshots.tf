@@ -13,7 +13,7 @@ data "archive_file" "kubernetes_etcd_ebs_snapshot_code" {
 }
 
 module "kubernetes_etcd_ebs_snapshot" {
-  source                = "../modules/lambda_mgmt"
+  source                = "./modules/lambda_mgmt"
   lambda_function_name  = "create_etcd_ebs_snapshot"
   zipfile               = "assets/create_etcd_ebs_snapshot/create_etcd_ebs_snapshot.zip"
   handler               = "create_etcd_ebs_snapshot"
@@ -36,7 +36,7 @@ data "archive_file" "kubernetes_prune_ebs_snapshots_code" {
 }
 
 module "kubernetes_prune_ebs_snapshots" {
-  source                = "../modules/lambda_mgmt"
+  source                = "./modules/lambda_mgmt"
   lambda_function_name  = "prune_ebs_snapshots"
   zipfile               = "assets/prune_ebs_snapshots/prune_ebs_snapshots.zip"
   handler               = "prune_ebs_snapshots"
