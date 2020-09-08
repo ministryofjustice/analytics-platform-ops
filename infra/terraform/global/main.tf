@@ -15,7 +15,7 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "aws_account_logging" {
-  source = "../modules/aws_account_logging"
+  source = "./modules/aws_account_logging"
 
   es_domain   = "${var.es_domain}"
   es_port     = "${var.es_port}"
@@ -36,13 +36,13 @@ module "aws_account_logging" {
 }
 
 module "mojanalytics_concourse_iam_list_roles_user" {
-  source      = "../modules/iam_list_roles"
+  source      = "./modules/iam_list_roles"
   org_name    = "mojanalytics"
   system_name = "concourse"
 }
 
 module "ses_domain" {
-  source = "../modules/ses_domain"
+  source = "./modules/ses_domain"
   domain = "${var.platform_root_domain}"
 
   aws_route53_zone_id = "${aws_route53_zone.platform_zone.zone_id}"
