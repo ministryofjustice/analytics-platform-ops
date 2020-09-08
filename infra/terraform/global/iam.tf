@@ -12,9 +12,10 @@ data "aws_iam_policy_document" "auth0_ses" {
   statement {
     effect    = "Allow"
     resources = ["*"]
+
     actions = [
       "ses:SendRawEmail",
-      "ses:SendEmail"
+      "ses:SendEmail",
     ]
   }
 }
@@ -32,6 +33,7 @@ data "aws_iam_policy_document" "softnas_role" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
+
     principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
@@ -50,6 +52,7 @@ data "aws_iam_policy_document" "softnas" {
     effect    = "Allow"
     sid       = "Stmt1444200186000"
     resources = ["*"]
+
     actions = [
       "ec2:ModifyInstanceAttribute",
       "ec2:DescribeInstances",
@@ -79,7 +82,7 @@ data "aws_iam_policy_document" "softnas" {
       "s3:Delete*",
       "s3:Get*",
       "s3:List*",
-      "s3:Put*"
+      "s3:Put*",
     ]
   }
 }
@@ -103,9 +106,10 @@ data "aws_iam_policy_document" "concourse" {
     effect    = "Allow"
     sid       = "UpdateHelmRepoS3Bucket"
     resources = ["arn:aws:s3:::${var.helm_repo_s3_bucket_name}/*"]
+
     actions = [
       "s3:PutObject",
-      "s3:GetObject"
+      "s3:GetObject",
     ]
   }
 }

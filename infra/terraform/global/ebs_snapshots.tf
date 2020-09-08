@@ -44,4 +44,3 @@ module "kubernetes_prune_ebs_snapshots" {
   lamda_policy          = "${data.template_file.lambda_prune_ebs_snapshots_policy.rendered}"
   environment_variables = "${var.prune_etcd_ebs_snapshot_env_vars}"
 }
-
