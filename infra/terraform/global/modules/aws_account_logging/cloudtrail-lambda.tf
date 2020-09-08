@@ -4,9 +4,9 @@ resource "null_resource" "cloudtrail_install_deps" {
     command = "${path.module}/cloudtrail/build.sh"
   }
 
-#   triggers {
-#     force_rebuild = "${timestamp()}"
-#   }
+  #   triggers {
+  #     force_rebuild = "${timestamp()}"
+  #   }
 }
 
 # Zip the lambda function before the actual deploy

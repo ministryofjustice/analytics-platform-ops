@@ -4,9 +4,9 @@ resource "null_resource" "s3logs_install_deps" {
     command = "${path.module}/s3logs/build.sh"
   }
 
-#   triggers {
-#     force_rebuild = "${timestamp()}"
-#   }
+  #   triggers {
+  #     force_rebuild = "${timestamp()}"
+  #   }
 }
 
 # Zip the lambda function before the actual deploy
