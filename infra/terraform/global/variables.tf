@@ -13,10 +13,6 @@ variable "es_scheme" {
   default = "https"
 }
 
-variable "lookups_bucket_name" {
-  default = "moj-analytics-lookup-tables"
-}
-
 variable "global_cloudtrail_bucket_name" {
   default = "moj-analytics-global-cloudtrail"
 }
