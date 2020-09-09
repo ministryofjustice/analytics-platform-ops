@@ -23,7 +23,6 @@ module "aws_vpc" {
 module "cluster_dns" {
   source = "../modules/cluster_dns"
 
-  env              = "${terraform.workspace}"
   root_zone_name   = "${data.terraform_remote_state.global.platform_dns_zone_name}"
   root_zone_domain = "${data.terraform_remote_state.global.platform_root_domain}"
   root_zone_id     = "${data.terraform_remote_state.global.platform_dns_zone_id}"
@@ -32,7 +31,6 @@ module "cluster_dns" {
 module "federated_identity" {
   source = "../modules/federated_identity"
 
-  env                       = "${terraform.workspace}"
   oidc_provider_url         = "${var.oidc_provider_url}"
   oidc_client_id            = "${var.oidc_client_id}"
   oidc_provider_thumbprints = ["${var.oidc_provider_thumbprints}"]
