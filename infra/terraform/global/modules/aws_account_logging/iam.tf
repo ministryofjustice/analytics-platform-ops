@@ -3,7 +3,7 @@ data "aws_iam_policy_document" "lambda_assume_role" {
     actions = ["sts:AssumeRole"]
     effect  = "Allow"
 
-    principals = {
+    principals {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
@@ -13,13 +13,13 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 # Role assumed by the 'ship_s3_logs_to_elasticsearch' lambda function
 resource "aws_iam_role" "s3_logs_to_elasticsearch" {
   name               = "s3_logs_to_elasticsearch"
-  assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 # Policies for the 'ship_s3_logs_to_elasticsearch' role
 resource "aws_iam_role_policy" "s3_logs_to_elasticsearch" {
   name = "s3_logs_to_elasticsearch"
-  role = "${aws_iam_role.s3_logs_to_elasticsearch.id}"
+  role = aws_iam_role.s3_logs_to_elasticsearch.id
 
   policy = <<EOF
 {
@@ -57,18 +57,19 @@ resource "aws_iam_role_policy" "s3_logs_to_elasticsearch" {
   ]
 }
 EOF
+
 }
 
 # Role assumed by the 'ship_cloudtrail_to_elasticsearch' lambda function
 resource "aws_iam_role" "cloudtrail_to_elasticsearch" {
   name               = "cloudtrail_to_elasticsearch"
-  assume_role_policy = "${data.aws_iam_policy_document.lambda_assume_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 # Policies for the 'ship_cloudtrail_to_elasticsearch' role
 resource "aws_iam_role_policy" "cloudtrail_to_elasticsearch" {
   name = "cloudtrail_to_elasticsearch"
-  role = "${aws_iam_role.cloudtrail_to_elasticsearch.id}"
+  role = aws_iam_role.cloudtrail_to_elasticsearch.id
 
   policy = <<EOF
 {
@@ -106,12 +107,13 @@ resource "aws_iam_role_policy" "cloudtrail_to_elasticsearch" {
   ]
 }
 EOF
+
 }
 
 # VPC flow logs
 
 data "aws_iam_policy_document" "vpcflowlogs_assume_role_policy_document" {
-  "statement" {
+  statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
@@ -128,7 +130,7 @@ data "aws_iam_policy_document" "vpcflowlogs_assume_role_policy_document" {
 }
 
 data "aws_iam_policy_document" "vpcflowlogs_policy_document" {
-  "statement" {
+  statement {
     sid    = "CanLog"
     effect = "Allow"
 
@@ -154,7 +156,7 @@ data "aws_iam_policy_document" "vpcflowlogs_policy_document" {
       "s3:PutBucketPolicy",
     ]
 
-    resources = ["${aws_s3_bucket.vpcflowlogs_bucket.arn}"]
+    resources = [aws_s3_bucket.vpcflowlogs_bucket.arn]
   }
 
   statement {
@@ -174,15 +176,15 @@ data "aws_iam_policy_document" "vpcflowlogs_policy_document" {
 
 resource "aws_iam_role" "vpcflowlogs_to_elasticsearch_role" {
   name               = "vpcflowlogs_to_elasticsearch"
-  assume_role_policy = "${data.aws_iam_policy_document.vpcflowlogs_assume_role_policy_document.json}"
+  assume_role_policy = data.aws_iam_policy_document.vpcflowlogs_assume_role_policy_document.json
 }
 
 resource "aws_iam_policy" "vpcflowlogs_to_elasticsearch_policy" {
-  policy = "${data.aws_iam_policy_document.vpcflowlogs_policy_document.json}"
+  policy = data.aws_iam_policy_document.vpcflowlogs_policy_document.json
   name   = "vpcflowlogs_to_elasticsearch"
 }
 
 resource "aws_iam_role_policy_attachment" "vpcflowlogs_to_elasticsearch_policy_attachment" {
-  policy_arn = "${aws_iam_policy.vpcflowlogs_to_elasticsearch_policy.arn}"
-  role       = "${aws_iam_role.vpcflowlogs_to_elasticsearch_role.name}"
+  policy_arn = aws_iam_policy.vpcflowlogs_to_elasticsearch_policy.arn
+  role       = aws_iam_role.vpcflowlogs_to_elasticsearch_role.name
 }

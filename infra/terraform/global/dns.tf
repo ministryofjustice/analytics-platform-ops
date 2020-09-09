@@ -8,15 +8,15 @@ resource "aws_route53_zone" "global" {
 }
 
 resource "aws_route53_record" "global_ns" {
-  zone_id = "${aws_route53_zone.platform_zone.zone_id}"
-  name    = "${aws_route53_zone.global.name}"
+  zone_id = aws_route53_zone.platform_zone.zone_id
+  name    = aws_route53_zone.global.name
   type    = "NS"
   ttl     = "30"
 
   records = [
-    "${aws_route53_zone.global.name_servers.0}",
-    "${aws_route53_zone.global.name_servers.1}",
-    "${aws_route53_zone.global.name_servers.2}",
-    "${aws_route53_zone.global.name_servers.3}",
+    aws_route53_zone.global.name_servers[0],
+    aws_route53_zone.global.name_servers[1],
+    aws_route53_zone.global.name_servers[2],
+    aws_route53_zone.global.name_servers[3],
   ]
 }

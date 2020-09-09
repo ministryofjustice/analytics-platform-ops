@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "s3_logs" {
-  bucket = "${var.s3_logs_bucket_name}"
+  bucket = var.s3_logs_bucket_name
   acl    = "log-delivery-write"
 
   lifecycle_rule {
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "s3_logs" {
     }
   }
 
-  tags {
+  tags = {
     Name = "moj-analytics-s3-logs"
   }
 
@@ -37,7 +37,7 @@ resource "aws_s3_bucket" "s3_logs" {
 }
 
 resource "aws_s3_bucket" "vpcflowlogs_bucket" {
-  bucket = "${var.vpcflowlogs_s3_bucket_name}"
+  bucket = var.vpcflowlogs_s3_bucket_name
 
   lifecycle_rule {
     enabled                                = true
@@ -59,7 +59,7 @@ resource "aws_s3_bucket" "vpcflowlogs_bucket" {
     }
   }
 
-  tags {
+  tags = {
     Name = "moj-analytics-vpcflowlogs"
   }
 }
