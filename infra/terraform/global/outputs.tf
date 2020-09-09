@@ -46,22 +46,6 @@ output "s3_logs_bucket_name" {
   value = "${module.aws_account_logging.s3_logs_bucket_name}"
 }
 
-output "hmpps_nomis_access_key_id" {
-  value = "${module.hmpps_nomis_upload_user.access_key_id}"
-}
-
-output "hmpps_nomis_access_key_secret" {
-  value = "${module.hmpps_nomis_upload_user.access_key_secret}"
-}
-
-output "hmpps_oasys_access_key_id" {
-  value = "${module.hmpps_oasys_upload_user.access_key_id}"
-}
-
-output "hmpps_oasys_access_key_secret" {
-  value = "${module.hmpps_oasys_upload_user.access_key_secret}"
-}
-
 output "mojanalytics_concourse_iam_list_roles_access_key_id" {
   value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_id}"
 }
@@ -70,66 +54,10 @@ output "mojanalytics_concourse_iam_list_roles_access_key_secret" {
   value = "${module.mojanalytics_concourse_iam_list_roles_user.access_key_secret}"
 }
 
-output "hmpps_prisonss_access_key_id" {
-  value = "${module.hmpps_prisonss_upload_user.access_key_id}"
-}
-
-output "hmpps_prisonss_access_key_secret" {
-  value = "${module.hmpps_prisonss_upload_user.access_key_secret}"
-}
-
 output "concourse_update_helm_repo_access_key_id" {
   value = "${aws_iam_access_key.concourse_update_helm_repo_access_key.id}"
 }
 
 output "concourse_update_helm_repo_access_key_secret" {
   value = "${aws_iam_access_key.concourse_update_helm_repo_access_key.secret}"
-}
-
-output "lookup_upload_user_access_key_id" {
-  value = "${module.lookup_upload_user.access_key_id}"
-}
-
-output "lookup_upload_user_access_key_secret" {
-  value = "${module.lookup_upload_user.access_key_secret}"
-}
-
-output "hmcts_upload_user_access_key_id" {
-  value = "${module.hmcts_upload_user.access_key_id}"
-}
-
-output "hmcts_upload_user_access_key_secret" {
-  value = "${module.hmcts_upload_user.access_key_secret}"
-}
-
-output "ppas_mdt_upload_access_key_id" {
-  value = "${module.ppas_mdt_upload_user.access_key_id}"
-}
-
-output "ppas_mdt_upload_access_key_secret" {
-  value = "${module.ppas_mdt_upload_user.access_key_secret}"
-}
-
-output "ppas_workforce_planning_upload_access_key_id" {
-  value = "${module.ppas_workforce_planning_upload_user.access_key_id}"
-}
-
-output "ppas_workforce_planning_upload_access_key_secret" {
-  value = "${module.ppas_workforce_planning_upload_user.access_key_secret}"
-}
-
-output "laa_cla_upload_user_access_key_id" {
-  value = "${module.laa_cla_upload_user.access_key_id}"
-}
-
-output "laa_cla_upload_user_access_key_secret" {
-  value = "${module.laa_cla_upload_user.access_key_secret}"
-}
-
-output "hmpps_prisoner_money_user_access_key_id" {
-  value = "${module.hmpps_prisoner_money_user.access_key_id}"
-}
-
-output "hmpps_prisoner_money_user_access_key_secret" {
-  value = "${module.hmpps_prisoner_money_user.access_key_secret}"
 }
