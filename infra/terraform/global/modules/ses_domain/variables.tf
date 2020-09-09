@@ -1,3 +1,6 @@
-variable "domain" {}
+variable "domain" {
+}
 
-variable "aws_route53_zone_id" {}
+variable "aws_route53_zone_id" {
+}
+

@@ -1,3 +1,5 @@
-variable "org_name" {}
+variable "org_name" {
+}
 
-variable "system_name" {}
+variable "system_name" {
+}

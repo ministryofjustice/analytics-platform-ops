@@ -2,12 +2,23 @@ variable "region" {
   default = "eu-west-1"
 }
 
-variable "kops_bucket_name" {}
-variable "platform_root_domain" {}
-variable "es_domain" {}
-variable "es_port" {}
-variable "es_username" {}
-variable "es_password" {}
+variable "kops_bucket_name" {
+}
+
+variable "platform_root_domain" {
+}
+
+variable "es_domain" {
+}
+
+variable "es_port" {
+}
+
+variable "es_username" {
+}
+
+variable "es_password" {
+}
 
 variable "es_scheme" {
   default = "https"
@@ -46,10 +57,11 @@ variable "vpcflowlogs_s3_bucket_name" {
   default = "moj-analytics-global-vpcflowlogs"
 }
 
-variable "vpc_id" {}
+variable "vpc_id" {
+}
 
 variable "environment_variables" {
-  type        = "map"
+  type        = map(string)
   description = "Empty Placeholder variable to be overrided when using the lambda_mgmt module"
   default     = {}
 }
