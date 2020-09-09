@@ -1,5 +1,4 @@
-*
-!build.sh
-!requirements.txt
-!s3_to_es.py
-!setup.cfg
+requests*
+s3_log_parser*
+ua_parser*
+user_agents*
