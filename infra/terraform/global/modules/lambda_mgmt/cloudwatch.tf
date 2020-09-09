@@ -14,5 +14,5 @@ resource "aws_cloudwatch_event_target" "lambda_cloud_watch_target" {
 }
 
 locals {
-    enabled = var.enabled ? 1 : 0
+  enabled = var.enabled ? 1 : 0
 }
