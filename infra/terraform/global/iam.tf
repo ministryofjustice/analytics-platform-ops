@@ -4,8 +4,8 @@ resource "aws_iam_user" "auth0_ses" {
 
 resource "aws_iam_user_policy" "auth0_ses" {
   name   = "auth0_ses_user_policy"
-  user   = "${aws_iam_user.auth0_ses.name}"
-  policy = "${data.aws_iam_policy_document.auth0_ses.json}"
+  user   = aws_iam_user.auth0_ses.name
+  policy = data.aws_iam_policy_document.auth0_ses.json
 }
 
 data "aws_iam_policy_document" "auth0_ses" {
@@ -21,12 +21,12 @@ data "aws_iam_policy_document" "auth0_ses" {
 }
 
 resource "aws_iam_access_key" "auth0_ses" {
-  user = "${aws_iam_user.auth0_ses.name}"
+  user = aws_iam_user.auth0_ses.name
 }
 
 resource "aws_iam_role" "softnas" {
   name               = "SoftNAS_HA_IAM"
-  assume_role_policy = "${data.aws_iam_policy_document.softnas_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.softnas_role.json
 }
 
 data "aws_iam_policy_document" "softnas_role" {
@@ -43,8 +43,8 @@ data "aws_iam_policy_document" "softnas_role" {
 
 resource "aws_iam_role_policy" "softnas" {
   name   = "softnas_ha_policy"
-  role   = "${aws_iam_role.softnas.id}"
-  policy = "${data.aws_iam_policy_document.softnas.json}"
+  role   = aws_iam_role.softnas.id
+  policy = data.aws_iam_policy_document.softnas.json
 }
 
 data "aws_iam_policy_document" "softnas" {
@@ -92,13 +92,13 @@ resource "aws_iam_user" "concourse_update_helm_repo" {
 }
 
 resource "aws_iam_access_key" "concourse_update_helm_repo_access_key" {
-  user = "${aws_iam_user.concourse_update_helm_repo.name}"
+  user = aws_iam_user.concourse_update_helm_repo.name
 }
 
 resource "aws_iam_user_policy" "concourse_update_helm_repo_policy" {
   name   = "${aws_iam_user.concourse_update_helm_repo.name}_policy"
-  user   = "${aws_iam_user.concourse_update_helm_repo.name}"
-  policy = "${data.aws_iam_policy_document.concourse.json}"
+  user   = aws_iam_user.concourse_update_helm_repo.name
+  policy = data.aws_iam_policy_document.concourse.json
 }
 
 data "aws_iam_policy_document" "concourse" {

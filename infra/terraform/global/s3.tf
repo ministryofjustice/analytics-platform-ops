@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "kops_state" {
-  bucket = "${var.kops_bucket_name}"
-  region = "${var.region}"
+  bucket = var.kops_bucket_name
+  region = var.region
   acl    = "private"
 
   versioning {

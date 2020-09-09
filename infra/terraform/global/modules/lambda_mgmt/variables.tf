@@ -17,6 +17,7 @@ variable "zipfile" {
 
 variable "enabled" {
   default = true
+  type    = bool
 }
 
 variable "timeout" {
@@ -27,14 +28,15 @@ variable "schedule_expression" {
   default = "rate(1 day)"
 }
 
-variable "source_code_hash" {}
+variable "source_code_hash" {
+}
 
 variable "lamda_policy" {
   description = "The IAM policy document.  Usually JSON"
 }
 
 variable "environment_variables" {
-  type        = "map"
+  type        = map(string)
   default     = {}
   description = "The environment variables for you lambda function"
 }

@@ -98,23 +98,24 @@ resource "aws_kms_key" "cloudtrail" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_kms_alias" "cloudtrail" {
   name          = "alias/cloudtrail"
-  target_key_id = "${aws_kms_key.cloudtrail.key_id}"
+  target_key_id = aws_kms_key.cloudtrail.key_id
 }
 
 resource "aws_cloudtrail" "global" {
   name                       = "global"
-  s3_bucket_name             = "${aws_s3_bucket.global_cloudtrail.id}"
+  s3_bucket_name             = aws_s3_bucket.global_cloudtrail.id
   is_multi_region_trail      = true
   enable_log_file_validation = true
-  kms_key_id                 = "${aws_kms_key.cloudtrail.arn}"
+  kms_key_id                 = aws_kms_key.cloudtrail.arn
 }
 
 resource "aws_s3_bucket" "global_cloudtrail" {
-  bucket        = "${var.global_cloudtrail_bucket_name}"
+  bucket        = var.global_cloudtrail_bucket_name
   force_destroy = false
 
   lifecycle_rule {
@@ -176,4 +177,5 @@ resource "aws_s3_bucket" "global_cloudtrail" {
     ]
 }
 POLICY
+
 }
