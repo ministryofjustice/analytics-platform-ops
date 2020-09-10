@@ -1,0 +1,25 @@
+---
+name: Global Terraform
+"on":
+  push:
+    paths:
+      - "infra/terraform/global"
+      - ".github/workflows/global.yml"
+defaults:
+  run:
+    working-directory: "infra/terraform/global"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform Format
+        run: terraform fmt -check -diff
+      # We can't validate/init until we have the correct credentials so leaving
+      # this here until we can get credentials
+      # - name: Terraform validate
+      #   run: terraform validate

@@ -1,0 +1,27 @@
+---
+name: Platform Terraform
+"on":
+  push:
+    paths:
+      - "infra/terraform/platform"
+      - ".github/workflows/platform.yml"
+defaults:
+  run:
+    working-directory: "infra/terraform/platform"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.11.14
+      - name: Terraform Format
+        run: terraform fmt -write=false -diff
+      # We can't validate/init until we have the correct credentials so leaving
+      # this here until we can get credentials
+      # - name: Terraform validate
+      #   run: terraform validate
