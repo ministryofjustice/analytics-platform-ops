@@ -1,4 +1,3 @@
-# Create the Lambda function with environment variables for filtering or config
 resource "aws_lambda_function" "lambda_function" {
   function_name    = var.lambda_function_name
   filename         = var.zipfile
@@ -8,13 +7,13 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = var.source_code_hash
   count            = local.enabled
   timeout          = var.timeout
+  tags             = var.tags
 
   environment {
     variables = var.environment_variables
   }
 }
 
-# Lambda permission to allow cloudwatch to invoke lambda function
 resource "aws_lambda_permission" "lambda_permission" {
   count         = local.enabled
   action        = "lambda:InvokeFunction"

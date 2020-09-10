@@ -1,6 +1,7 @@
 resource "aws_iam_user" "system" {
   name = "${var.org_name}_${var.system_name}_iam_roles_readonly"
   path = "/uploaders/${var.org_name}/"
+  tags = var.tags
 }
 
 resource "aws_iam_access_key" "system_user" {
@@ -9,15 +10,9 @@ resource "aws_iam_access_key" "system_user" {
 
 data "aws_iam_policy_document" "iam_roles_readonly" {
   statement {
-    actions = [
-      "iam:ListRoles",
-    ]
-
-    effect = "Allow"
-
-    resources = [
-      "*",
-    ]
+    actions   = ["iam:ListRoles"]
+    effect    = "Allow"
+    resources = ["*"]
   }
 }
 

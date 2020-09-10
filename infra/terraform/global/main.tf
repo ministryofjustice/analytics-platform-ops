@@ -34,17 +34,27 @@ module "aws_account_logging" {
   vpcflowlogs_s3_bucket_name = var.vpcflowlogs_s3_bucket_name
 
   vpc_id = var.vpc_id
+  tags   = local.tags
 }
 
 module "mojanalytics_concourse_iam_list_roles_user" {
   source      = "./modules/iam_list_roles"
   org_name    = "mojanalytics"
   system_name = "concourse"
+  tags        = local.tags
 }
 
 module "ses_domain" {
-  source = "./modules/ses_domain"
-  domain = var.platform_root_domain
-
+  source              = "./modules/ses_domain"
+  domain              = var.platform_root_domain
   aws_route53_zone_id = aws_route53_zone.platform_zone.zone_id
+}
+
+locals {
+  tags = {
+    business-unit = "Platforms"
+    application   = "analytical-platform"
+    owner         = "analytical-platform:analytics-platform-tech@digital.justice.gov.uk"
+    is-production = "true"
+  }
 }
