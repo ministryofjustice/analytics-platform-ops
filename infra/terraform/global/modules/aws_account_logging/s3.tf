@@ -23,9 +23,11 @@ resource "aws_s3_bucket" "s3_logs" {
     }
   }
 
-  tags = {
-    Name = "moj-analytics-s3-logs"
-  }
+  tags = merge(
+    var.tags,
+    { Name = "moj-analytics-s3-logs" }
+  )
+
 
   server_side_encryption_configuration {
     rule {

@@ -12,8 +12,7 @@ resource "aws_route53_record" "amazonses_verification_record" {
 }
 
 resource "aws_ses_domain_identity_verification" "amazonses_verification" {
-  domain = aws_ses_domain_identity.domain.id
-
+  domain     = aws_ses_domain_identity.domain.id
   depends_on = [aws_route53_record.amazonses_verification_record]
 }
 
