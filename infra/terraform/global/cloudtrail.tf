@@ -1,6 +1,7 @@
 resource "aws_kms_key" "cloudtrail" {
   description = "Cloudtrail S3 bucket KMS key"
   policy      = data.aws_iam_policy_document.cloudtrail.json
+  tags        = local.tags
 }
 
 data "aws_iam_policy_document" "cloudtrail" {
@@ -130,12 +131,14 @@ resource "aws_cloudtrail" "global" {
   is_multi_region_trail      = true
   enable_log_file_validation = true
   kms_key_id                 = aws_kms_key.cloudtrail.arn
+  tags                       = local.tags
 }
 
 resource "aws_s3_bucket" "global_cloudtrail" {
   bucket        = var.global_cloudtrail_bucket_name
   force_destroy = false
   policy        = data.aws_iam_policy_document.global_cloudtrail.json
+  tags          = local.tags
 
   lifecycle_rule {
     id                                     = "logs-transition"

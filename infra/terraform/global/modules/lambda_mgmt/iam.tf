@@ -19,6 +19,7 @@ resource "aws_iam_policy" "lambda_policy" {
 resource "aws_iam_role" "lambda_role" {
   name               = var.lambda_function_name
   assume_role_policy = data.aws_iam_policy_document.lambda_snapshot_assume.json
+  tags               = var.tags
 }
 
 # Attaching the lambda_policy to ebs_create_snapshot role
