@@ -52,9 +52,10 @@ module "ses_domain" {
 
 locals {
   tags = {
-    business-unit = "Platforms"
-    application   = "analytical-platform"
-    owner         = "analytical-platform:analytics-platform-tech@digital.justice.gov.uk"
-    is-production = "true"
+    business-unit  = "Platforms"
+    application    = "analytical-platform"
+    owner          = "analytical-platform:analytics-platform-tech@digital.justice.gov.uk"
+    is-production  = "true"
+    git-repository = "https://github.com/ministryofjustice/analytics-platform-ops"
   }
 }
