@@ -12,9 +12,6 @@ provider "aws" {
   version = "~> 2.70.0"
 }
 
-data "aws_caller_identity" "current" {
-}
-
 module "aws_account_logging" {
   source = "./modules/aws_account_logging"
 
