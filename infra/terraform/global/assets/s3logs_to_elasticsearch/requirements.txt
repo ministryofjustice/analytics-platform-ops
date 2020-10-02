@@ -1,0 +1,2 @@
+requests==2.20.0
+s3-log-parser==1.0.0

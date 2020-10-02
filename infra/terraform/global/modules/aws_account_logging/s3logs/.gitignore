@@ -1,4 +1,6 @@
-requests*
-s3_log_parser*
-ua_parser*
-user_agents*
+*
+!build.sh
+!.gitignore
+!requirements.txt
+!s3_to_es.py
+!setup.cfg
