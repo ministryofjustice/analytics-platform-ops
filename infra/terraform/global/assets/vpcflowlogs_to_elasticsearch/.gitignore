@@ -1,0 +1,7 @@
+*
+!build.sh
+!requirements.txt
+!vpcflowlogs_to_elasticsearch.py
+!.gitignore
+!Makefile
+!.gitignore

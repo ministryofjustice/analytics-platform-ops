@@ -65,3 +65,8 @@ variable "environment_variables" {
   description = "Empty Placeholder variable to be overrided when using the lambda_mgmt module"
   default     = {}
 }
+
+variable "es" {
+  type        = map(string)
+  description = "A map of environment variables to pass to lambads to authenticate"
+}

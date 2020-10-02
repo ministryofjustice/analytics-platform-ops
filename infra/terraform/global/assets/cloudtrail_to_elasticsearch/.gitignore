@@ -1,0 +1,9 @@
+*.dist-info
+*.egg-info
+certifi
+elasticsearch
+requests
+s3_log_parser
+ua_parser
+urllib3
+user_agents
