@@ -1,6 +1,8 @@
 resource "aws_db_subnet_group" "control_panel_db" {
   name       = "${terraform.workspace}_control_panel_db"
   subnet_ids = ["${var.db_subnet_ids}"]
+
+  tags = "${var.tags}"
 }
 
 resource "aws_security_group" "control_panel_db" {
@@ -13,6 +15,8 @@ resource "aws_security_group" "control_panel_db" {
     protocol        = "tcp"
     security_groups = ["${var.ingress_security_group_ids}"]
   }
+
+  tags = "${var.tags}"
 }
 
 resource "aws_db_instance" "control_panel_db" {
@@ -32,4 +36,6 @@ resource "aws_db_instance" "control_panel_db" {
   backup_window              = "22:00-23:59"
   skip_final_snapshot        = true
   maintenance_window         = "Sat:01:00-Sat:03:00"
+
+  tags = "${var.tags}"
 }

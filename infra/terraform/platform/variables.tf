@@ -41,6 +41,8 @@ variable "softnas_volume_size" {
 
 variable "control_panel_api_db_username" {}
 variable "control_panel_api_db_password" {}
+variable "control_panel_redis_node_type" {}
+variable "control_panel_redis_password" {}
 
 variable "airflow_db_username" {}
 variable "airflow_db_password" {}

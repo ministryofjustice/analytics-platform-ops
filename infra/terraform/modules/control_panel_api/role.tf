@@ -2,6 +2,8 @@ resource "aws_iam_role" "control_panel_api" {
   name        = "${terraform.workspace}_control_panel_api"
   description = "IAM role assumed by the Control Panel API"
 
+  tags = "${var.tags}"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
