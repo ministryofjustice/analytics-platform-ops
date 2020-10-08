@@ -75,6 +75,13 @@ module "control_panel_api" {
   vpc_id                     = "${data.terraform_remote_state.platform_base.vpc_id}"
   db_subnet_ids              = ["${data.terraform_remote_state.platform_base.storage_subnet_ids}"]
   ingress_security_group_ids = ["${data.terraform_remote_state.platform_base.extra_node_sg_id}"]
+  redis_node_type            = "${var.control_panel_redis_node_type}"
+  redis_password             = "${var.control_panel_redis_password}"
+  redis_engine_version       = "5.0.6"
+
+  tags = "${merge(map(
+    "component", "Control Panel",
+  ), var.tags)}"
 }
 
 module "airflow_storage_efs_volume" {

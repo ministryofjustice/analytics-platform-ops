@@ -33,3 +33,32 @@ variable "db_subnet_ids" {
 variable "ingress_security_group_ids" {
   type = "list"
 }
+
+variable "redis_node_type" {
+  default = "cache.t3.medium"
+}
+
+variable "redis_port" {
+  default = 6379
+}
+
+variable "redis_password" {}
+
+variable "redis_engine_version" {
+  default = "5.0.6"
+}
+
+variable "availability_zones" {
+  type = "list"
+
+  default = [
+    "eu-west-1a",
+    "eu-west-1b",
+    "eu-west-1c",
+  ]
+}
+
+variable "tags" {
+  type        = "map"
+  description = "Tags to attach to the this module's resources"
+}
