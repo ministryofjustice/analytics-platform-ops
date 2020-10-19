@@ -3,10 +3,6 @@ resource "null_resource" "cloudtrail_install_deps" {
   provisioner "local-exec" {
     command = "${path.module}/cloudtrail/build.sh"
   }
-
-  triggers = {
-    force_rebuild = timestamp()
-  }
 }
 
 # Zip the lambda function before the actual deploy
@@ -14,8 +10,7 @@ data "archive_file" "cloudtrail_zip" {
   type        = "zip"
   source_dir  = "${path.module}/cloudtrail"
   output_path = "/tmp/cloudtrail.zip"
-
-  depends_on = [null_resource.cloudtrail_install_deps]
+  depends_on  = [null_resource.cloudtrail_install_deps]
 }
 
 # Lambda function to ship Cloudtrail logs to Elasticsearch cluster
