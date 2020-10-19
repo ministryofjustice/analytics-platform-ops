@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -ex
 
 if [ $# -lt 1 ]; then
@@ -8,7 +8,6 @@ fi
 
 DOMAIN=$1
 WILDCARD_DOMAINS=(tools apps services)
-
 
 HOSTED_ZONE_ID=$(
     aws route53 list-hosted-zones \
@@ -21,15 +20,14 @@ ELB_HOSTNAME=$(
         --template="{{(index .status.loadBalancer.ingress 0).hostname}}"
 )
 
-ELB_NAME=$(echo $ELB_HOSTNAME | awk -F '-' '{print $1}')
+ELB_NAME=$(echo "${ELB_HOSTNAME}" | awk -F '-' '{print $1}')
 
 ELB_HOSTED_ZONE_ID=$(
-    aws elb describe-load-balancers --load-balancer-names $ELB_NAME \
+    aws elb describe-load-balancers --load-balancer-names "${ELB_NAME}" \
     | jq -r '.["LoadBalancerDescriptions"][0]["CanonicalHostedZoneNameID"]'
 )
 
-
-for SUBDOMAIN in ${WILDCARD_DOMAINS[@]}; do
+for SUBDOMAIN in "${WILDCARD_DOMAINS[@]}"; do
     cat << EOF > /tmp/elb_dns.json
         {
             "Comment": "Wildcard domain for $SUBDOMAIN",
@@ -51,6 +49,6 @@ for SUBDOMAIN in ${WILDCARD_DOMAINS[@]}; do
 EOF
 
     aws route53 change-resource-record-sets \
-        --hosted-zone-id $HOSTED_ZONE_ID \
+        --hosted-zone-id "${HOSTED_ZONE_ID}" \
         --change-batch file:///tmp/elb_dns.json
 done
