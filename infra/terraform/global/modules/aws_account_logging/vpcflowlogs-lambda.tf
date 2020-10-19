@@ -2,10 +2,6 @@ resource "null_resource" "vpcflowlogs_install_deps" {
   provisioner "local-exec" {
     command = "${path.module}/vpcflowlogs/build.sh"
   }
-
-  triggers = {
-    force_rebuild = timestamp()
-  }
 }
 
 data "archive_file" "vpcflowlogs_zip" {
