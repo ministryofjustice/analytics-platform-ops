@@ -7,9 +7,8 @@ data "aws_iam_policy_document" "analytics_logging_role_policy" {
       "s3:ListBucketVersions",
     ]
 
-    effect = "Allow"
-
-    resources = ["${aws_s3_bucket.analytics_logging_bucket.arn}"]
+    effect    = "Allow"
+    resources = [aws_s3_bucket.analytics_logging_bucket.arn]
   }
 
   statement {
@@ -28,16 +27,16 @@ data "aws_iam_policy_document" "analytics_logging_role_policy" {
 }
 
 resource "aws_iam_policy" "analytics_logging_policy" {
-  policy = "${data.aws_iam_policy_document.analytics_logging_role_policy.json}"
-  name   = "${var.name}"
+  policy = data.aws_iam_policy_document.analytics_logging_role_policy.json
+  name   = var.name
 }
 
 resource "aws_iam_user_policy_attachment" "analytics_logging_user_policy_attachment" {
-  user       = "${aws_iam_user.analytics_logging_user.name}"
-  policy_arn = "${aws_iam_policy.analytics_logging_policy.arn}"
+  user       = aws_iam_user.analytics_logging_user.name
+  policy_arn = aws_iam_policy.analytics_logging_policy.arn
 }
 
 resource "aws_iam_user" "analytics_logging_user" {
-  name = "${var.name}"
+  name = var.name
   path = "/"
 }

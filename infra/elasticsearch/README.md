@@ -1,25 +1,25 @@
-## Elasticsearch
+# Elasticsearch
 
 We use a hosted service provided by [elastic](https://www.elastic.co) which can be managed from the [console](https://cloud.elastic.co/#/authentication/login/)
 
-#### Administration
+## Administration
 
 The easiest way to administer elasticsearch itself is via the integrated __API Console__ which can be accessed once logged in to the [console](https://cloud.elastic.co/#/authentication/login/)
 
-#### Backups
+## Backups
 
 It is recommended to use the __analytics-logging-backups__ `iam` user when performing backup operations
 
 You'll need the __analytics-logging-backups__ `iam` user's access keys when working with the __s3__ backed repository
 
-##### Repository
+## Repository
 
-You'll need a repository to store snapshots.  For this we use an s3 backend
+You'll need a repository to store snapshots. For this we use an s3 backend
 
 From the __API Console__
 
-```
-PUT /_snapshot/repository 
+```json
+PUT /_snapshot/repository
 {
   "type": "s3",
   "settings": {
@@ -32,13 +32,13 @@ PUT /_snapshot/repository
 }
 ```
 
-##### Snapshot
+### Snapshot
 
 With an existing repository, you can now create snapshots
 
 From the __API Console__
 
-```
+```json
 PUT /_snapshot/repository/pre-upgrade-01-01-1970 {
 {
   "include_global_state": "false",
@@ -47,14 +47,14 @@ PUT /_snapshot/repository/pre-upgrade-01-01-1970 {
 }
 ```
 
-##### List Templates
+### List Templates
 
-```
+```json
 GET /_cat/templates?v&s=name
 ```
 
-##### List Indices
+### List Indices
 
-```
+```json
 GET /_cat/indices?v
 ```
