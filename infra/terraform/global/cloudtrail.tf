@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "cloudtrail" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
@@ -85,7 +85,7 @@ data "aws_iam_policy_document" "cloudtrail" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
@@ -109,7 +109,7 @@ data "aws_iam_policy_document" "cloudtrail" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
