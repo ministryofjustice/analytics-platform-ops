@@ -2,13 +2,15 @@ variable "region" {
   default = "eu-west-1"
 }
 
-variable "terraform_bucket_name" {}
+variable "terraform_bucket_name" {
+}
 
 variable "terraform_global_state_file" {
   default = "base/terraform.tfstate"
 }
 
-variable "softnas_ssh_public_key" {}
+variable "softnas_ssh_public_key" {
+}
 
 variable "softnas_num_instances" {
   default = 2
@@ -19,7 +21,7 @@ variable "is_production" {
 }
 
 variable "tags" {
-  type        = "map"
+  type        = map(string)
   description = "tags resources will have, e.g. 'application', 'env' or 'is-production' etc...modules could add more"
 }
 
@@ -39,16 +41,30 @@ variable "softnas_volume_size" {
   default = "10" # GB
 }
 
-variable "control_panel_api_db_username" {}
-variable "control_panel_api_db_password" {}
-variable "control_panel_redis_node_type" {}
-variable "control_panel_redis_password" {}
+variable "control_panel_api_db_username" {
+}
 
-variable "airflow_db_username" {}
-variable "airflow_db_password" {}
+variable "control_panel_api_db_password" {
+}
 
-variable "ses_ap_email_identity_arn" {}
+variable "control_panel_redis_node_type" {
+}
 
-variable "softnas_cpu_low_threshold" {}
+variable "control_panel_redis_password" {
+}
 
-variable "k8s_desired_capacity_threshold" {}
+variable "airflow_db_username" {
+}
+
+variable "airflow_db_password" {
+}
+
+variable "ses_ap_email_identity_arn" {
+}
+
+variable "softnas_cpu_low_threshold" {
+}
+
+variable "k8s_desired_capacity_threshold" {
+}
+
