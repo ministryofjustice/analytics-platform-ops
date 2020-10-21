@@ -50,9 +50,9 @@ output "airflow_smtp_username" {
   value = module.airflow_smtp_user.smtp_username
 }
 
-output "airflow_smtp_password" {
-  value = module.airflow_smtp_user.smtp_password
-}
+# output "airflow_smtp_password" {
+#   value = module.airflow_smtp_user.smtp_password
+# }
 
 output "control_panel_api_db_username" {
   value = var.control_panel_api_db_username
