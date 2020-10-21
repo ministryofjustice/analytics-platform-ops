@@ -2,7 +2,6 @@
 resource "aws_s3_bucket" "archived_buckets_data" {
   bucket = var.name
   acl    = "private"
-  region = var.region
 
   versioning {
     enabled = true

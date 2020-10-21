@@ -66,6 +66,7 @@ resource "aws_security_group" "softnas" {
 }
 
 resource "aws_network_interface" "softnas_eth0" {
+
   subnet_id       = element(var.subnet_ids, count.index)
   security_groups = [aws_security_group.softnas.id]
 
