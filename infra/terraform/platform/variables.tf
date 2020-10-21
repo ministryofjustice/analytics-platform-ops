@@ -13,6 +13,7 @@ variable "softnas_ssh_public_key" {
 }
 
 variable "softnas_num_instances" {
+  type    = number
   default = 2
 }
 
@@ -68,3 +69,21 @@ variable "softnas_cpu_low_threshold" {
 variable "k8s_desired_capacity_threshold" {
 }
 
+variable "platform_root_domain" {
+  type = string
+}
+
+variable "log_bucket_name" {
+  type        = string
+  description = "Bucket name to store logs in"
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "VPC ID for security groups and load balancers"
+}
+
+variable "softnas_subnet_ids" {
+  type        = list(string)
+  description = "Subnet IDs for fornas EBS volumes"
+}

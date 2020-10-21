@@ -1,25 +1,36 @@
 data "aws_caller_identity" "current" {
 }
 
-data "terraform_remote_state" "global" {
-  backend = "s3"
+data "aws_vpc" "main" {
+  id = var.vpc_id
+}
 
-  config = {
-    bucket = var.terraform_bucket_name
-    region = var.region
-    key    = var.terraform_global_state_file
+data "aws_security_group" "node" {
+  filter {
+    name   = "tag:Name"
+    values = ["node-extra.${terraform.workspace}.mojanalytics.xyz"]
   }
 }
 
-data "terraform_remote_state" "platform_base" {
-  backend   = "s3"
-  workspace = terraform.workspace
-
-  config = {
-    bucket               = var.terraform_bucket_name
-    region               = var.region
-    workspace_key_prefix = "platform-base:"
-    key                  = "terraform.tfstate"
+data "aws_security_group" "bastion" {
+  filter {
+    name   = "tag:Name"
+    values = ["bastion-extra.${terraform.workspace}.mojanalytics.xyz"]
   }
 }
 
+data "aws_subnet_ids" "storage" {
+  vpc_id = data.aws_vpc.main.id
+  filter {
+    name = "tag:Name"
+    values = [
+      "storage-eu-west-1a.${terraform.workspace}.mojanalytics.xyz",
+      "storage-eu-west-1b.${terraform.workspace}.mojanalytics.xyz",
+      "storage-eu-west-1c.${terraform.workspace}.mojanalytics.xyz",
+    ]
+  }
+}
+
+data "aws_route53_zone" "main" {
+  name = "${terraform.workspace}.mojanalytics.xyz"
+}

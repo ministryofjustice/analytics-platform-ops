@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "nfs_backup" {
   bucket = "${terraform.workspace}-moj-analytics-nfs-backup"
-  region = data.aws_region.current.name
   acl    = "private"
 
   tags = {

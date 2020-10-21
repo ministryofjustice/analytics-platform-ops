@@ -14,9 +14,10 @@
 ##
 
 resource "aws_ebs_volume" "softnas_vol1" {
-  availability_zone = element(aws_instance.softnas.*.availability_zone, count.index)
-  type              = "gp2"
-  size              = var.default_volume_size
+  availability_zone    = element(aws_instance.softnas.*.availability_zone, count.index)
+  type                 = "gp2"
+  size                 = var.default_volume_size
+  multi_attach_enabled = false
 
   count = var.num_instances
 

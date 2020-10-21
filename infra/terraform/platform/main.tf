@@ -5,13 +5,13 @@ module "user_nfs_softnas" {
   softnas_ami_id            = var.softnas_ami_id
   instance_type             = var.softnas_instance_type
   default_volume_size       = var.softnas_volume_size
-  vpc_id                    = data.terraform_remote_state.platform_base.outputs.vpc_id
-  node_security_group_id    = data.terraform_remote_state.platform_base.outputs.extra_node_sg_id
-  bastion_security_group_id = data.terraform_remote_state.platform_base.outputs.extra_bastion_sg_id
-  subnet_ids                = data.terraform_remote_state.platform_base.outputs.storage_subnet_ids
+  vpc_id                    = data.aws_vpc.main.id
+  node_security_group_id    = data.aws_security_group.node.id
+  bastion_security_group_id = data.aws_security_group.bastion.id
+  subnet_ids                = var.softnas_subnet_ids # This is now hard coded to this subnet as changing it destroys volumes
   ssh_public_key            = var.softnas_ssh_public_key
-  dns_zone_id               = data.terraform_remote_state.platform_base.outputs.dns_zone_id
-  dns_zone_domain           = data.terraform_remote_state.platform_base.outputs.dns_zone_domain
+  dns_zone_id               = data.aws_route53_zone.main.zone_id
+  dns_zone_domain           = "${terraform.workspace}.mojanalytics.xyz"
   is_production             = var.is_production
 
   tags = merge(
@@ -63,8 +63,8 @@ module "concourse_parameter_user" {
 module "data_backup" {
   source = "./modules/data_backup"
 
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}"
-  logs_bucket_arn     = data.terraform_remote_state.global.outputs.s3_logs_bucket_name
+  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${var.platform_root_domain}"
+  logs_bucket_arn     = var.log_bucket_name
 }
 
 module "container_registry" {
@@ -76,11 +76,11 @@ module "control_panel_api" {
 
   db_username                = var.control_panel_api_db_username
   db_password                = var.control_panel_api_db_password
-  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}"
+  k8s_worker_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${var.platform_root_domain}"
   account_id                 = data.aws_caller_identity.current.account_id
-  vpc_id                     = data.terraform_remote_state.platform_base.outputs.vpc_id
-  db_subnet_ids              = data.terraform_remote_state.platform_base.outputs.storage_subnet_ids
-  ingress_security_group_ids = [data.terraform_remote_state.platform_base.outputs.extra_node_sg_id]
+  vpc_id                     = data.aws_vpc.main.id
+  db_subnet_ids              = data.aws_subnet_ids.storage.ids
+  ingress_security_group_ids = [data.aws_security_group.node.id]
   redis_node_type            = var.control_panel_redis_node_type
   redis_password             = var.control_panel_redis_password
   redis_engine_version       = "5.0.6"
@@ -97,11 +97,11 @@ module "airflow_storage_efs_volume" {
   source = "./modules/efs_volume"
 
   name                   = "${terraform.workspace}-airflow-storage"
-  vpc_id                 = data.terraform_remote_state.platform_base.outputs.vpc_id
-  node_security_group_id = data.terraform_remote_state.platform_base.outputs.extra_node_sg_id
-  subnet_ids             = data.terraform_remote_state.platform_base.outputs.storage_subnet_ids
+  vpc_id                 = data.aws_vpc.main.id
+  node_security_group_id = data.aws_security_group.node.id
+  subnet_ids             = data.aws_subnet_ids.storage.ids
   num_subnets = length(
-    data.terraform_remote_state.platform_base.outputs.storage_subnet_ids,
+    data.aws_subnet_ids.storage.ids,
   )
 }
 
@@ -113,9 +113,9 @@ module "airflow_db" {
   db_name                = "airflow"
   username               = var.airflow_db_username
   password               = var.airflow_db_password
-  vpc_id                 = data.terraform_remote_state.platform_base.outputs.vpc_id
-  node_security_group_id = data.terraform_remote_state.platform_base.outputs.extra_node_sg_id
-  subnet_ids             = data.terraform_remote_state.platform_base.outputs.storage_subnet_ids
+  vpc_id                 = data.aws_vpc.main.id
+  node_security_group_id = data.aws_security_group.node.id
+  subnet_ids             = data.aws_subnet_ids.storage.ids
 }
 
 module "airflow_smtp_user" {
@@ -129,8 +129,8 @@ module "cert_manager" {
   source = "./modules/ec2_cert_manager_role"
 
   role_name      = "${terraform.workspace}-cert-manager"
-  trusted_entity = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}"]
-  hosted_zone_id = data.terraform_remote_state.platform_base.outputs.dns_zone_id
+  trusted_entity = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${var.platform_root_domain}"]
+  hosted_zone_id = data.aws_route53_zone.main.zone_id
 }
 
 resource "aws_iam_policy" "read-user-roles-inline-policies" {
@@ -161,11 +161,11 @@ module "cluster_autoscaler" {
   source = "./modules/ec2_cluster_autoscaler_policy"
 
   policy_name        = "${terraform.workspace}-cluster-autoscaler"
-  instance_role_name = ["nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}"]
+  instance_role_name = ["nodes.${terraform.workspace}.${var.platform_root_domain}"]
 
   auto_scaling_groups = [
-    "nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}",
-    "highmem-nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}",
+    "nodes.${terraform.workspace}.${var.platform_root_domain}",
+    "highmem-nodes.${terraform.workspace}.${var.platform_root_domain}",
   ]
 }
 
@@ -173,9 +173,9 @@ module "buckets_archiver" {
   source = "./modules/buckets_archiver"
 
   name                = "${terraform.workspace}-archived-buckets-data"
-  logging_bucket_name = data.terraform_remote_state.global.outputs.s3_logs_bucket_name
+  logging_bucket_name = var.log_bucket_name
   expiration_days     = 183 # 6 months
-  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${data.terraform_remote_state.global.outputs.platform_root_domain}"
+  k8s_worker_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/nodes.${terraform.workspace}.${var.platform_root_domain}"
   region              = var.region
 
   tags = merge(
