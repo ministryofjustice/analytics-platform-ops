@@ -14,7 +14,7 @@
 ##
 
 resource "aws_ebs_volume" "softnas_vol1" {
-  availability_zone    = element(aws_instance.softnas.*.availability_zone, count.index)
+  availability_zone    = element(["eu-west-1a", "eu-west-1b"], count.index)
   type                 = "gp2"
   size                 = var.default_volume_size
   multi_attach_enabled = false
@@ -30,7 +30,7 @@ resource "aws_ebs_volume" "softnas_vol1" {
 }
 
 resource "aws_ebs_volume" "softnas_vol2" {
-  availability_zone = element(aws_instance.softnas.*.availability_zone, count.index)
+  availability_zone = element(["eu-west-1a", "eu-west-1b"], count.index)
   type              = "gp2"
   size              = var.default_volume_size
   encrypted         = true
@@ -46,7 +46,7 @@ resource "aws_ebs_volume" "softnas_vol2" {
 }
 
 resource "aws_ebs_volume" "softnas_vol3" {
-  availability_zone = element(aws_instance.softnas.*.availability_zone, count.index)
+  availability_zone = element(["eu-west-1a", "eu-west-1b"], count.index)
   type              = "gp2"
   size              = "500"
 
@@ -61,7 +61,7 @@ resource "aws_ebs_volume" "softnas_vol3" {
 }
 
 resource "aws_ebs_volume" "softnas_vol4" {
-  availability_zone = element(aws_instance.softnas.*.availability_zone, count.index)
+  availability_zone = element(["eu-west-1a", "eu-west-1b"], count.index)
   type              = "gp2"
   size              = "500"
   encrypted         = true
@@ -77,7 +77,7 @@ resource "aws_ebs_volume" "softnas_vol4" {
 }
 
 resource "aws_ebs_volume" "softnas_vol5" {
-  availability_zone = element(aws_instance.softnas.*.availability_zone, count.index)
+  availability_zone = element(["eu-west-1a", "eu-west-1b"], count.index)
   type              = "gp2"
   size              = "500"
 
@@ -92,11 +92,10 @@ resource "aws_ebs_volume" "softnas_vol5" {
 }
 
 resource "aws_ebs_volume" "softnas_vol6" {
-  # production-only volume
   count = var.is_production ? var.num_instances : 0
 
   availability_zone = element(
-    concat(aws_instance.softnas.*.availability_zone, [""]),
+    concat(["eu-west-1a","eu-west-1b"], [""]),
     count.index,
   )
   type = "gp2"
@@ -113,10 +112,8 @@ resource "aws_ebs_volume" "softnas_vol6" {
 # Created EBS volume only for `softnas-1` in AWS Console - that's why the
 # SoftNAS instance is hardcoded to `.1` and it's a production-only volume
 resource "aws_ebs_volume" "softnas_1_vol7" {
-  # production-only volume
   count = var.is_production ? 1 : 0
-
-  availability_zone = aws_instance.softnas[1].availability_zone
+  availability_zone = "eu-west-1b"
   type              = "gp2"
   size              = "2048"
   encrypted         = true
