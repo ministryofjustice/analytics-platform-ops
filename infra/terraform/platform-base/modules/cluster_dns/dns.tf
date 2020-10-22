@@ -4,9 +4,9 @@ resource "aws_route53_zone" "env" {
 }
 
 resource "aws_route53_record" "root_ns_record" {
-  zone_id = "${var.root_zone_id}"
-  name    = "${terraform.workspace}"
+  zone_id = var.root_zone_id
+  name    = terraform.workspace
   type    = "NS"
   ttl     = "300"
-  records = ["${aws_route53_zone.env.name_servers}"]
+  records = aws_route53_zone.env.name_servers
 }
