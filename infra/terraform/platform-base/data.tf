@@ -1,11 +1,11 @@
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
-data "terraform_remote_state" "global" {
-  backend = "s3"
+data "aws_route53_zone" "main" {
+  name = "mojanalytics.xyz"
+}
 
-  config {
-    bucket = "${var.terraform_bucket_name}"
-    region = "${var.region}"
-    key    = "${var.terraform_global_state_file}"
-  }
+variable "kops_bucket_name" {
+    type = string
+    description = "name of the bucket where KOPS state is stored"
 }
