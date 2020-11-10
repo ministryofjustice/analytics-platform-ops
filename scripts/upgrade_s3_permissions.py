@@ -9,6 +9,8 @@ Requires boto3 and click packages to be installed.
 
 What does this script do?
 
+This script ensures that every user (or a named user) has the expected
+permissions for working with versioned S3 buckets.
 """
 import os
 import click
@@ -85,8 +87,9 @@ def update_user(username, execute=False):
     response = iam_client.get_role_policy(RoleName=username,
                                           PolicyName='s3-access')
     policy_document = response["PolicyDocument"]
+    # TODO: Check the permissions are not already correct.
     if execute:
-        # Patch the thing
+        # TODO: Patch the thing
         response = client.put_role_policy(RoleName=username,
                                           PolicyName='s3-access',
                                           PolicyDocument=new_policy_document)
