@@ -17,6 +17,7 @@ import click
 import logging
 import sys
 import boto3
+from botocore.exceptions import ClientError
 import json
 from pathlib import Path
 
@@ -64,35 +65,66 @@ def update(username="", execute=False):
     """
     if username:
         # Just update a specific user (for testing purposes).
-        update_user(username, execute)
+        rolename = f"alpha_user_{username}"
+        update_user(rolename, execute)
     else:
         # Grab all users and iterate.
-        client = boto3.client('iam')
-        response = client.list_users()
-        for user in response["Users"]:
-            update_user(user["UserName"], execute)
+        iam_client = boto3.client('iam')
+        paginator = iam_client.get_paginator('list_roles')
+        rolenames = set()
+        for response in paginator.paginate():
+            for role in response["Roles"]:
+                rolename = role["RoleName"]
+                if (
+                       rolename.startswith("dev_user_") or
+                       rolename.startswith("alpha_user_"
+                   ):
+                    rolenames.add(rolename)
+        for rolename in rolenames:
+            update_user(rolename, execute)
 
 
-def update_user(username, execute=False):
+def update_user(rolename, execute=False):
     """
-    Update the policy for the given user. Make changes if execute flag is True.
+    Update the policy for the given role. Make changes if execute flag is True.
     """
-    msg = f"Working on {username}."
+    msg = f"Working on {rolename}."
     logger.info(msg)
     if not VERBOSE:
         click.echo(msg)
-    # Update policy if not already set.
-    iam_client = boto3.client('iam')
 
-    response = iam_client.get_role_policy(RoleName=username,
-                                          PolicyName='s3-access')
-    policy_document = response["PolicyDocument"]
-    # TODO: Check the permissions are not already correct.
-    if execute:
-        # TODO: Patch the thing
-        response = client.put_role_policy(RoleName=username,
-                                          PolicyName='s3-access',
-                                          PolicyDocument=new_policy_document)
+    iam_client = boto3.client('iam')
+    try:
+        policy_document = iam_client.get_role_policy(RoleName=rolename,
+                                              PolicyName='s3-access')
+    except ClientError as ex:
+        logger.info(ex)
+        if not VERBOSE:
+            click.secho(str(ex), fg="red")
+        return  # No more to do.
+
+    # Grab the relevant action IF the permission isn't already there.
+    action = [action for action in
+                  policy_document["PolicyDocument"]["Statement"]
+              if
+                  "s3:ListAllMyBuckets" in action["Action"] and
+                  "s3:ListBucketVersions" not in action["Action"]]
+    if action:
+        action = action[0]
+        # Add the required permission.
+        action["Action"].append("s3:ListBucketVersions")
+        logger.info(policy_document)
+        if execute:
+            # POST the update.
+            response = iam_client.put_role_policy(
+                RoleName=rolename,
+                PolicyName='s3-access',
+                PolicyDocument=json.dumps(policy_document["PolicyDocument"])
+            )
+            msg = "OK"
+            logger.info(msg)
+            if not VERBOSE:
+                click.secho(msg, fg="green")
 
 
 if __name__ == "__main__":
