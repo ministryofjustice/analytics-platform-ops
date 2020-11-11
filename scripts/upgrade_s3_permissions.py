@@ -22,8 +22,42 @@ import json
 from pathlib import Path
 
 
-# A flag to indicate if the command is to be run in verbose mode.
-VERBOSE = False
+READWRITE_ACTION = [
+    "s3:GetObject",
+    "s3:GetObjectAcl",
+    "s3:GetObjectVersion",
+    "s3:DeleteObject",
+    "s3:DeleteObjectVersion",
+    "s3:GetObjectVersionAcl",
+    "s3:PutObject",
+    "s3:PutObjectAcl",
+    "s3:RestoreObject",
+    "s3:GetObjectVersionTagging"
+]
+
+LIST_ACTION = [
+    "s3:ListBucket",
+    "s3:GetBucketPublicAccessBlock",
+    "s3:GetBucketPolicyStatus",
+    "s3:GetBucketTagging",
+    "s3:GetBucketPolicy",
+    "s3:GetBucketAcl",
+    "s3:GetBucketCORS",
+    "s3:GetBucketVersioning",
+    "s3:GetBucketLocation",
+    "s3:ListBucketVersions"
+]
+
+LISTUSERBUCKETS_SECTION = {
+    "Sid": "ListUserBuckets",
+    "Effect": "Allow",
+    "Action": [
+        "s3:ListAllMyBuckets",
+        "s3:ListAccessPoints",
+        "s3:GetAccountPublicAccessBlock"
+    ],
+    "Resource": "*"
+}
 
 
 # Setup logging. Logs will appear in user's home directory.
@@ -45,13 +79,11 @@ def main(verbose=False):
     A tool to manage the versioning and life cycle of S3 buckets.
     """
     if verbose:
-        global VERBOSE
-        VERBOSE = True
         verbose_handler = logging.StreamHandler(sys.stdout)
         verbose_handler.setLevel(logging.INFO)
         verbose_handler.setFormatter(log_formatter)
         logger.addHandler(verbose_handler)
-        click.echo("Logging to {}\n".format(LOGFILE))
+    click.echo("Logging to {}\n".format(LOGFILE))
 
 
 @main.command()
@@ -77,7 +109,7 @@ def update(username="", execute=False):
                 rolename = role["RoleName"]
                 if (
                        rolename.startswith("dev_user_") or
-                       rolename.startswith("alpha_user_"
+                       rolename.startswith("alpha_user_")
                    ):
                     rolenames.add(rolename)
         for rolename in rolenames:
@@ -90,8 +122,7 @@ def update_user(rolename, execute=False):
     """
     msg = f"Working on {rolename}."
     logger.info(msg)
-    if not VERBOSE:
-        click.echo(msg)
+    click.echo(msg)
 
     iam_client = boto3.client('iam')
     try:
@@ -99,32 +130,33 @@ def update_user(rolename, execute=False):
                                               PolicyName='s3-access')
     except ClientError as ex:
         logger.info(ex)
-        if not VERBOSE:
-            click.secho(str(ex), fg="red")
+        click.secho(str(ex), fg="red")
         return  # No more to do.
 
-    # Grab the relevant action IF the permission isn't already there.
-    action = [action for action in
-                  policy_document["PolicyDocument"]["Statement"]
-              if
-                  "s3:ListAllMyBuckets" in action["Action"] and
-                  "s3:ListBucketVersions" not in action["Action"]]
-    if action:
-        action = action[0]
-        # Add the required permission.
-        action["Action"].append("s3:ListBucketVersions")
-        logger.info(policy_document)
-        if execute:
-            # POST the update.
-            response = iam_client.put_role_policy(
-                RoleName=rolename,
-                PolicyName='s3-access',
-                PolicyDocument=json.dumps(policy_document["PolicyDocument"])
-            )
-            msg = "OK"
-            logger.info(msg)
-            if not VERBOSE:
-                click.secho(msg, fg="green")
+    new_statements = []
+    for statement in policy_document["PolicyDocument"]["Statement"]:
+        # Update the "Action" list depending on the statement ID (Sid).
+        sid = statement["Sid"]
+        if sid == "console":
+            statement = LISTUSERBUCKETS_SECTION 
+        elif sid == "readwrite":
+            statement["Action"] = READWRITE_ACTION
+        elif sid == "list":
+            statement["Action"] = LIST_ACTION
+        new_statements.append(statement)
+    policy_document["PolicyDocument"]["Statement"] = new_statements
+
+    logger.info(policy_document)
+    if execute:
+        # POST the update.
+        response = iam_client.put_role_policy(
+            RoleName=rolename,
+            PolicyName='s3-access',
+            PolicyDocument=json.dumps(policy_document["PolicyDocument"])
+        )
+        click.secho("OK", fg="green")
+    else:
+        click.secho("Skipped", fg="yellow")
 
 
 if __name__ == "__main__":
