@@ -22,18 +22,23 @@ import json
 from pathlib import Path
 
 
-READWRITE_ACTION = [
+READ_ACTION = [
     "s3:GetObject",
     "s3:GetObjectAcl",
     "s3:GetObjectVersion",
+    "s3:GetObjectVersionAcl",
+    "s3:GetObjectVersionTagging"
+]
+
+WRITE_ACTION = [
     "s3:DeleteObject",
     "s3:DeleteObjectVersion",
-    "s3:GetObjectVersionAcl",
     "s3:PutObject",
     "s3:PutObjectAcl",
     "s3:RestoreObject",
-    "s3:GetObjectVersionTagging"
 ]
+
+READWRITE_ACTION = READ_ACTION + WRITE_ACTION
 
 LIST_ACTION = [
     "s3:ListBucket",
@@ -139,6 +144,8 @@ def update_user(rolename, execute=False):
         sid = statement["Sid"]
         if sid == "console":
             statement = LISTUSERBUCKETS_SECTION 
+        elif sid == "readonly":
+            statement["Action"] = READ_ACTION
         elif sid == "readwrite":
             statement["Action"] = READWRITE_ACTION
         elif sid == "list":
