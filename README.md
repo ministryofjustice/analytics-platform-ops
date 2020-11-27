@@ -376,7 +376,16 @@ terraform apply -var-file=vars/$ENVNAME.tfvars
   ```
   Where `$ENV_DOMAIN` is the full DNS name of the cluster, including the base domain, e.g. `dev.mojanalytics.xyz`.
 
-6. Plan and create cluster:
+6. Add the DockerHub creds to Kops cluster:
+  
+  ```
+  kops create secret --name $ENV_DOMAIN create secret dockerconfig -f PATH_TO_CONFIG.JSON
+  ```
+  Where `$ENV_DOMAIN` is the full DNS name of the cluster, including the base domain, e.g. `dev.mojanalytics.xyz` and
+  `PATH_TO_CONFIG.JSON` is the path to the config.json file containing the DockerHub creds.
+
+
+7. Plan and create cluster:
 
   ```
   kops update cluster $ENV_DOMAIN
