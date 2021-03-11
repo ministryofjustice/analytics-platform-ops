@@ -201,3 +201,30 @@ data "aws_iam_policy_document" "global_cloudtrail" {
     }
   }
 }
+
+resource "aws_s3_bucket_notification" "global_cloudtrail" {
+  bucket = aws_s3_bucket.global_cloudtrail.id
+
+  queue {
+    queue_arn = aws_sqs_queue.global_cloudtrail.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+}
+
+resource "aws_sqs_queue" "global_cloudtrail" {
+  name   = "global-cloudtrail-queue"
+  policy = aws_iam_policy_document.global_cloudtrail_sqs.json
+}
+
+data "aws_iam_policy_document" "global_cloudtrail_sqs" {
+  statement {
+    effect    = "Allow"
+    actions   = ["sqs:SendMessage"]
+    resources = ["arn:aws:sqs:*:*:global-cloudtrail-queue"]
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      valuess  = [aws_s3_bucket.global_cloudtrail.arn]
+    }
+  }
+}
