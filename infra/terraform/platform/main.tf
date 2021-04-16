@@ -256,3 +256,29 @@ module "bastion_monitoring" {
   )
 }
 
+
+module "bastion" {
+  source                = "Guimove/bastion/aws"
+  version               = "2.2.2"
+  region                = var.region
+  vpc_id                = var.vpc_id
+  bastion_ami           = data.aws_ami.ubuntu.id 
+  is_lb_private         = false
+  bastion_host_key_pair = var.bastion_host_key_pair
+  create_dns_record     = true
+  hosted_zone_id        = data.aws_route53_zone.main.zone_id
+  bastion_record_name   = "secure-bastion.${terraform.workspace}.mojanalytics.xyz"
+  bucket_name           = "analytical-platform-${terraform.workspace}-bastion-logs"
+  bastion_additional_security_groups = [
+    data.aws_security_group.bastion.id,
+    data.aws_security_group.bastion-main.id
+  ]
+  elb_subnets = var.dmz_subnet_ids
+  auto_scaling_group_subnets = var.dmz_subnet_ids
+  tags = merge(
+    {
+      "component" = "Bastion"
+    },
+    var.tags,
+  )
+}

@@ -19,6 +19,13 @@ data "aws_security_group" "bastion" {
   }
 }
 
+data "aws_security_group" "bastion-main" {
+  filter {
+    name   = "tag:Name"
+    values = ["bastion.${terraform.workspace}.mojanalytics.xyz"]
+  }
+}
+
 data "aws_subnet_ids" "storage" {
   vpc_id = data.aws_vpc.main.id
   filter {
@@ -33,4 +40,20 @@ data "aws_subnet_ids" "storage" {
 
 data "aws_route53_zone" "main" {
   name = "${terraform.workspace}.mojanalytics.xyz"
+}
+
+
+data "aws_ami" "ubuntu" {
+    most_recent = true
+
+    filter {
+        name   = "name"
+        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    }
+
+    filter {
+        name   = "virtualization-type"
+        values = ["hvm"]
+    }
+    owners = ["099720109477"] # Canonical
 }
