@@ -245,7 +245,7 @@ module "bastion_monitoring" {
   source = "./modules/elb_cloudwatch_alerts"
 
   name          = "${terraform.workspace}-bastion-alerts"
-  elb_name      = "bastion-${terraform.workspace}"
+  elb_name      = "${terraform.workspace}-bastion-lb"
   alarm_actions = [module.ap_infra_alert_topic.stack_notifications_arn]
 
   tags = merge(
