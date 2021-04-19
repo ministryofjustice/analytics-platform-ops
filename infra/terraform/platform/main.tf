@@ -241,22 +241,6 @@ module "kubernetes_node_asg_monitoring" {
   )
 }
 
-module "bastion_monitoring" {
-  source = "./modules/elb_cloudwatch_alerts"
-
-  name          = "${terraform.workspace}-bastion-alerts"
-  elb_name      = "${terraform.workspace}-bastion-lb"
-  alarm_actions = [module.ap_infra_alert_topic.stack_notifications_arn]
-
-  tags = merge(
-    {
-      "component" = "Bastion"
-    },
-    var.tags,
-  )
-}
-
-
 module "bastion" {
   source                       = "Guimove/bastion/aws"
   version                      = "2.2.2"
@@ -277,6 +261,36 @@ module "bastion" {
   ]
   elb_subnets                = var.dmz_subnet_ids
   auto_scaling_group_subnets = var.dmz_subnet_ids
+  tags = merge(
+    {
+      "component" = "Bastion"
+    },
+    var.tags,
+  )
+}
+
+resource "aws_cloudwatch_metric_alarm" "bastion_healthy_hosts" {
+  alarm_name        = "${terraform.workspace}-bastion-healthy-hosts-alarm"
+  alarm_description = "This metric monitors the number of Healthy hosts in an NLB"
+
+  dimensions = {
+    LoadBalancer = data.aws_lb.bastion.arn_suffix
+    TargetGroup  = data.aws_lb_target_group.bastion.arn_suffix
+  }
+
+  namespace           = "AWS/NetworkELB"
+  metric_name         = "HealthyHostCount"
+  statistic           = "Minimum"
+  comparison_operator = "LessThanThreshold"
+  threshold           = 1
+  period              = 60
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  treat_missing_data  = "breaching"
+
+  actions_enabled = "true"
+  alarm_actions   = [module.ap_infra_alert_topic.stack_notifications_arn]
+
   tags = merge(
     {
       "component" = "Bastion"

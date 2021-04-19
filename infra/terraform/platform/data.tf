@@ -44,16 +44,24 @@ data "aws_route53_zone" "main" {
 
 
 data "aws_ami" "ubuntu" {
-    most_recent = true
+  most_recent = true
 
-    filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-    }
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
 
-    filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-    }
-    owners = ["099720109477"] # Canonical
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["099720109477"] # Canonical
+}
+
+data "aws_lb" "bastion" {
+  name = "${terraform.workspace}-bastion-lb"
+}
+
+data "aws_lb_target_group" "bastion" {
+  name = "${terraform.workspace}-bastion-lb-target"
 }
