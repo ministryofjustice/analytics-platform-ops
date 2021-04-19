@@ -87,3 +87,13 @@ variable "softnas_subnet_ids" {
   type        = list(string)
   description = "Subnet IDs for fornas EBS volumes"
 }
+
+variable "dmz_subnet_ids" {
+  type        = list(string)
+  description = "IDs for DMZ subnets"
+}
+
+variable "bastion_host_key_pair" {
+  type        = string
+  description = "Name of key pair to use for Bastion servers"
+}
