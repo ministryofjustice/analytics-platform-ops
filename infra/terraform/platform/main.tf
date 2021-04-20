@@ -251,7 +251,7 @@ module "bastion" {
   bastion_host_key_pair        = var.bastion_host_key_pair
   create_dns_record            = true
   hosted_zone_id               = data.aws_route53_zone.main.zone_id
-  bastion_record_name          = "secure-bastion.${terraform.workspace}.mojanalytics.xyz"
+  bastion_record_name          = "bastion.${terraform.workspace}.mojanalytics.xyz"
   bucket_name                  = "analytical-platform-${terraform.workspace}-bastion-logs"
   bastion_launch_template_name = "${terraform.workspace}-bastion"
   bastion_iam_policy_name      = "${terraform.workspace}-bastion"

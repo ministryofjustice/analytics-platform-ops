@@ -377,7 +377,7 @@ terraform apply -var-file=vars/$ENVNAME.tfvars
   Where `$ENV_DOMAIN` is the full DNS name of the cluster, including the base domain, e.g. `dev.mojanalytics.xyz`.
 
 6. Add the DockerHub creds to Kops cluster:
-  
+
   ```
   kops create secret --name $ENV_DOMAIN create secret dockerconfig -f PATH_TO_CONFIG.JSON
   ```
@@ -602,15 +602,21 @@ You can use the Auth0 web ui to add the rules, or set-up auto deployment like th
 
 ### NFS server administration
 
-By default two SoftNAS instances are deployed, to provide data replication and high-availability. This can be changed to a single-server deployment by changing the `user_nfs_softnas.num_instances` Terraform variable to `1`.
 
 NFS server storage volumes are provided by EBS volumes defined in `infra/terraform/modules/user_nfs_softnas/ebs.tf`, and additional volumes can be defined there as necessary. By default two EBS volumes are created for each Terraform resource defined, to mirror storage between both SoftNAS instances.
 
 SoftNAS does not support any form of configuration management, so NFS server setup must be performed manually via the SoftNAS web interface. As SoftNAS is deployed into private subnets, you must use an SSH tunnel to access the admin interface:
 
-`$ ssh -L 8443:softnas-0.dev.mojanalytics.xyz:443 -L 8444:softnas-1.dev.mojanalytics.xyz:443 admin@bastion.dev.mojanalytics.xyz -N`
+Alpha
 
-The two instances can then be accessed on `https://localhost:8443/` and `https://localhost:8444/`.
+`$ ssh -AL 8443:softnas-1.alpha.mojanalytics.xyz:443 ubuntu@bastion.alpha.mojanalytics.xyz -N`
+
+Dev
+
+`$ ssh -AL 8443:softnas-0.dev.mojanalytics.xyz:443 ubuntu@bastion.dev.mojanalytics.xyz -N`
+
+
+The instance can then be accessed on `https://localhost:8443/`.
 
 #### NFS share setup
 
