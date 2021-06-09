@@ -13,14 +13,14 @@ resource "aws_efs_access_point" "homedirs" {
 
 resource "aws_security_group" "efs" {
   count = terraform.workspace == "dev" ? 1 : 0
-  name        = "MyEfsSecurityGroup"
+  name        = "EfsSecurityGroup"
   description = "EFS security group to allow access to home directories"
   vpc_id      = data.aws_vpc.main.id
   ingress {
     from_port        = 2049
     to_port          = 2049
     protocol         = "tcp"
-    cidr_blocks      = var.storage_cidrs
+    cidr_blocks      = var.private_cidrs
   }
 }
 

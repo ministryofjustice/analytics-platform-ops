@@ -98,7 +98,7 @@ variable "bastion_host_key_pair" {
   description = "Name of key pair to use for Bastion servers"
 }
 
-variable "storage_cidrs" {
+variable "private_cidrs" {
   type        = list(string)
   description = "Sorry future devops person - this is a hack to get EFS working"
 }
