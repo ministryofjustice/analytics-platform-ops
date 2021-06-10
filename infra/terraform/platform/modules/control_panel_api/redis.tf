@@ -16,6 +16,7 @@ resource "aws_elasticache_replication_group" "control_panel_redis" {
   security_group_ids         = [aws_security_group.control_panel_redis.id]
   at_rest_encryption_enabled = true
   transit_encryption_enabled = true
+  multi_az_enabled           = true
 
   tags = var.tags
 }
@@ -38,4 +39,3 @@ resource "aws_elasticache_subnet_group" "control_panel_redis" {
   name       = "${terraform.workspace}-control-panel-redis"
   subnet_ids = var.db_subnet_ids
 }
-
