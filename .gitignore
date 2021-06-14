@@ -7,6 +7,7 @@
 *.sublime-project
 *.sublime-workspace
 /*.iml
+.terraform.lock.hcl
 
 # Python caches and virtual env
 __pycache__
