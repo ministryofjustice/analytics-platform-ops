@@ -2,7 +2,7 @@
 
 [Kubernetes]-based data analysis platform, using [Terraform], [Kops] and [Helm] charts.
 
-Contact samuel.tazzyman@digital.justice.gov.uk if you're in government and interested in talking to us about analytics platforms.
+Contact alex.craciun@digital.justice.gov.uk if you're in government and interested in talking to us about analytics platforms.
 
 ## Directory structure
 
