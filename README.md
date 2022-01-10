@@ -585,19 +585,20 @@ in the dev or alpha branches. Create a new branch (or fork it if another organiz
 | `AUTHENTICATOR_LABEL` | The name of the platform, as shown when doing Auth0 MFA |
 | `whitelist` | The GitHub organizations whose members are authorized to access the platform |
 
-You can use the Auth0 web ui to add the rules, or set-up auto deployment like this:
-1. In Auth0 click "Extensions" in the side menu.
-2. Search for and click "GitHub Deployments"
-3. Fill in options, e.g.:
-   * GITHUB_REPOSITORY: ministryofjustice/analytics-platform-auth0
-   * GITHUB_BRANCH: alpha
-   * GITHUB_TOKEN: (create one this from: https://github.com/settings/tokens and select the "repo" scope)
-4. Click "Save"
-5. Click "Installed Extensions" tab, then click "GitHub Integration" and agree to access.
-6. Find the text "A webhook has to be created <$repo>" and open the link a new tab. Note: actually you need to create the webhook yourself!
-7. Click "Add webhook" and copy the three option values from the previous browser tab. Then click "Add webhook".
-8. Click "Deployments" tab and click "Deploy" which should show add a line with Status of "Success".
-9. https://manage.auth0.com/#/rules should now be populated
+Auto-deployment with `GitHub Deployments` was [removed by Auth0 in February 2021](https://auth0.com/changelog#1Eee2MQt0uQsfKCL27aDi5).
+~~You can use the Auth0 web ui to add the rules, or set-up auto deployment like this:~~
+1. ~~In Auth0 click "Extensions" in the side menu.~~
+2. ~~Search for and click "GitHub Deployments"~~
+3. ~~Fill in options, e.g.:~~
+   * ~~GITHUB_REPOSITORY: ministryofjustice/analytics-platform-auth0~~
+   * ~~GITHUB_BRANCH: alpha~~
+   * ~~GITHUB_TOKEN: (create one this from: https://github.com/settings/tokens and select the "repo" scope)~~
+4. ~~Click "Save"~~
+5. ~~Click "Installed Extensions" tab, then click "GitHub Integration" and agree to access.~~
+6. ~~Find the text "A webhook has to be created <$repo>" and open the link a new tab. Note: actually you need to create the webhook yourself!~~
+7. ~~Click "Add webhook" and copy the three option values from the previous browser tab. Then click "Add webhook".~~
+8. ~~Click "Deployments" tab and click "Deploy" which should show add a line with Status of "Success".~~
+9. ~~https://manage.auth0.com/#/rules should now be populated~~
 
 
 ### NFS server administration
