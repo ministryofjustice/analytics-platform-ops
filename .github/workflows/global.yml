@@ -1,6 +1,6 @@
 ---
 name: Global Terraform
-"on":
+on:
   push:
     paths:
       - "infra/terraform/global"
