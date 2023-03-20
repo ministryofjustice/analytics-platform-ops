@@ -86,30 +86,3 @@ data "aws_iam_policy_document" "softnas" {
     ]
   }
 }
-
-resource "aws_iam_user" "concourse_update_helm_repo" {
-  name = "concourse_update_helm_repo"
-}
-
-resource "aws_iam_access_key" "concourse_update_helm_repo_access_key" {
-  user = aws_iam_user.concourse_update_helm_repo.name
-}
-
-resource "aws_iam_user_policy" "concourse_update_helm_repo_policy" {
-  name   = "${aws_iam_user.concourse_update_helm_repo.name}_policy"
-  user   = aws_iam_user.concourse_update_helm_repo.name
-  policy = data.aws_iam_policy_document.concourse.json
-}
-
-data "aws_iam_policy_document" "concourse" {
-  statement {
-    effect    = "Allow"
-    sid       = "UpdateHelmRepoS3Bucket"
-    resources = ["arn:aws:s3:::${var.helm_repo_s3_bucket_name}/*"]
-
-    actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-    ]
-  }
-}
