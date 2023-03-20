@@ -11,7 +11,7 @@ click = "^7.0"
 auth0-python = "^3.7"
 environs = "^4.1"
 jinja2 = "^2.10"
-pyyaml = "^5.1"
+pyyaml = "^5.4"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.5"
